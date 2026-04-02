@@ -73,7 +73,7 @@
     .tb-btn {
       font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.06em;
       padding: 0.3rem 0.75rem; border: 1px solid var(--rule);
-      background: var(--bg); color: var(--ink-dim); cursor: pointer; border-radius: 2px;
+      background: var(--bg); color: var(--ink); cursor: pointer; border-radius: 2px;
       white-space: nowrap; transition: all 0.12s;
       display: flex; align-items: center; gap: 0.35rem; flex-shrink: 0;
     }
@@ -84,15 +84,23 @@
     .tb-btn.danger:hover { background: #fdeaea; border-color: #c88; }
     .tb-btn.sm {
       font-size: 0.56rem; padding: 0.2rem 0.5rem;
-      color: var(--ink-faint); border-color: transparent; background: transparent;
+      color: var(--ink); border-color: transparent; background: transparent;
     }
     .tb-btn.sm:hover { color: var(--ink-dim); border-color: var(--rule); background: var(--bg); }
     .tb-btn.sm.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
     .tb-btn.sm.is-connect.active { background: var(--accent); border-color: var(--accent); }
     .shape-icon { display: inline-flex; align-items: center; justify-content: center; }
 
-    /* Hide text labels early, keep icons */
+    /* Breakpoint 1: hide Speichern / Laden labels */
     @media (max-width: 1200px) {
+      .tb-text-io { display: none; }
+    }
+    /* Breakpoint 2: also hide Auswählen / Verbinden labels */
+    @media (max-width: 960px) {
+      .tb-text-mode { display: none; }
+    }
+    /* Breakpoint 3: hide all remaining labels + structural chrome */
+    @media (max-width: 720px) {
       .tb-label { display: none; }
       .tb-sep   { display: none; }
       .tb-text  { display: none; }
@@ -231,8 +239,8 @@
 
 <div class="toolbar">
   <span class="tb-label">Modus</span>
-  <button class="tb-btn sm" id="tool-select"  onclick="setTool('select')"  title="Auswählen · S">↖ <span class="tb-text">Auswählen</span></button>
-  <button class="tb-btn sm is-connect" id="tool-connect" onclick="setTool('connect')" title="Verbinden · C">⌒ <span class="tb-text">Verbinden</span></button>
+  <button class="tb-btn sm" id="tool-select"  onclick="setTool('select')"  title="Auswählen · S"><span style="font-size:1.1rem;line-height:1">↖</span> <span class="tb-text tb-text-mode">Auswählen</span></button>
+  <button class="tb-btn sm is-connect" id="tool-connect" onclick="setTool('connect')" title="Verbinden · C"><span style="font-size:1.1rem;line-height:1">⌒</span> <span class="tb-text tb-text-mode">Verbinden</span></button>
 
   <div class="tb-sep"></div>
   <span class="tb-label">Platzieren</span>
@@ -273,8 +281,8 @@
 
   <div class="tb-sep"></div>
 
-  <button class="tb-btn sm" onclick="saveJSON()" title="Ctrl+S">💾 <span class="tb-text">Speichern</span></button>
-  <button class="tb-btn sm" onclick="loadJSON()">📂 <span class="tb-text">Laden</span></button>
+  <button class="tb-btn sm" onclick="saveJSON()" title="Ctrl+S">💾 <span class="tb-text tb-text-io">Speichern</span></button>
+  <button class="tb-btn sm" onclick="loadJSON()">📂 <span class="tb-text tb-text-io">Laden</span></button>
 </div>
 
 <div class="canvas-wrap" id="canvas-wrap">
