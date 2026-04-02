@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Datenbank Theorie – m290</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:        #f5f2eb;
+      --ink:       #1a1a18;
+      --ink-dim:   #6b6860;
+      --ink-faint: #b8b4aa;
+      --rule:      #d9d5cc;
+      --surface:   #ffffff;
+      --surface2:  #f0ece3;
+      --accent:    #1a3a8f;
+      --accent2:   #8f3a1a;
+      --green:     #1a6b3a;
+      --green-bg:  #e8f5ee;
+      --red:       #8f1a1a;
+      --red-bg:    #f5e8e8;
+      --yellow:    #7a6010;
+      --yellow-bg: #fdf8e8;
+      --serif:     'DM Serif Display', Georgia, serif;
+      --mono:      'DM Mono', monospace;
+      --sans:      'DM Sans', sans-serif;
+      --radius:    8px;
+      --tr:        0.18s ease;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+    }
+
+    /* ── Top rule ── */
+    .top-rule { width: 100%; height: 3px; background: var(--ink); flex-shrink: 0; }
+
+    /* ── Header ── */
+    header {
+      width: 100%;
+      padding: 0 2rem;
+      background: var(--bg);
+      border-bottom: 1px solid var(--rule);
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      height: 54px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-back {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--ink-dim);
+      text-decoration: none;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: color var(--tr);
+      white-space: nowrap;
+    }
+    .header-back:hover { color: var(--ink); }
+    .header-sep { color: var(--rule); font-size: 1.1rem; }
+    .header-title {
+      font-family: var(--serif);
+      font-size: 1.1rem;
+      color: var(--ink);
+    }
+    .header-badge {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--ink-dim);
+      background: var(--surface2);
+      border: 1px solid var(--rule);
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+      letter-spacing: 0.06em;
+    }
+
+    /* ── Tabs ── */
+    .tabs-bar {
+      width: 100%;
+      border-bottom: 1px solid var(--rule);
+      background: var(--bg);
+      display: flex;
+      padding: 0 2rem;
+      gap: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .tabs-bar::-webkit-scrollbar { display: none; }
+    .tab-btn {
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--ink-dim);
+      font-family: var(--sans);
+      font-size: 0.82rem;
+      font-weight: 500;
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: color var(--tr), border-color var(--tr);
+      margin-bottom: -1px;
+    }
+    .tab-btn:hover { color: var(--ink); }
+    .tab-btn.active { color: var(--ink); border-bottom-color: var(--ink); font-weight: 600; }
+
+    /* ── Main ── */
+    main { width: 100%; max-width: 780px; padding: 2.5rem 1.5rem 5rem; }
+
+    /* ── Views ── */
+    .view { display: none; }
+    .view.active { display: block; animation: fadeUp 0.25s ease; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Progress ── */
+    .progress-wrap {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .progress-bar {
+      flex: 1;
+      height: 3px;
+      background: var(--rule);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--ink);
+      border-radius: 2px;
+      transition: width 0.4s ease;
+    }
+    .progress-label {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--ink-dim);
+      white-space: nowrap;
+    }
+
+    /* ── Flashcard ── */
+    .card-scene {
+      perspective: 1100px;
+      width: 100%;
+      height: 300px;
+      cursor: pointer;
+      margin-bottom: 1.5rem;
+    }
+    .card-inner {
+      width: 100%; height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.5s cubic-bezier(.4,0,.2,1);
+    }
+    .card-scene.flipped .card-inner { transform: rotateY(180deg); }
+    .card-face {
+      position: absolute; inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: var(--radius);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2.5rem;
+      text-align: center;
+    }
+    .card-front {
+      background: var(--surface);
+      border: 1px solid var(--rule);
+    }
+    .card-back {
+      background: var(--ink);
+      transform: rotateY(180deg);
+    }
+    .card-tag {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      margin-bottom: 1rem;
+    }
+    .card-front .card-tag { color: var(--ink-faint); }
+    .card-back .card-tag  { color: rgba(255,255,255,0.4); }
+    .card-term {
+      font-family: var(--serif);
+      font-size: 2.4rem;
+      color: var(--ink);
+      line-height: 1.1;
+      margin-bottom: 0.6rem;
+    }
+    .card-hint {
+      font-size: 0.78rem;
+      color: var(--ink-faint);
+      font-family: var(--mono);
+    }
+    .card-definition {
+      font-size: 1rem;
+      line-height: 1.65;
+      color: #f0ece3;
+      font-weight: 300;
+    }
+    .card-example {
+      margin-top: 1rem;
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.4);
+      font-style: italic;
+      font-family: var(--mono);
+    }
+
+    /* Card nav */
+    .card-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+    .nav-btn {
+      padding: 0.55rem 1.4rem;
+      border: 1px solid var(--rule);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--tr);
+    }
+    .nav-btn:hover:not(:disabled) { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+    .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .shuffle-btn {
+      padding: 0.55rem 1rem;
+      border: 1px solid var(--rule);
+      border-radius: var(--radius);
+      background: transparent;
+      color: var(--ink-dim);
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      transition: all var(--tr);
+    }
+    .shuffle-btn:hover { color: var(--ink); border-color: var(--ink-dim); }
+
+    /* ── Quiz ── */
+    .quiz-question {
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+      margin-bottom: 1.25rem;
+    }
+    .quiz-question h2 {
+      font-family: var(--serif);
+      font-size: 1.3rem;
+      line-height: 1.45;
+      color: var(--ink);
+      margin-bottom: 0.4rem;
+    }
+    .quiz-meta {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--ink-faint);
+      margin-bottom: 0.75rem;
+    }
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+    @media (max-width: 520px) { .options-grid { grid-template-columns: 1fr; } }
+    .option-btn {
+      padding: 1rem 1.1rem;
+      border: 1px solid var(--rule);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 0.88rem;
+      text-align: left;
+      cursor: pointer;
+      transition: all var(--tr);
+      line-height: 1.45;
+    }
+    .option-btn:hover:not(:disabled) { border-color: var(--ink); background: var(--surface2); }
+    .option-btn.correct { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+    .option-btn.wrong   { border-color: var(--red);   background: var(--red-bg);   color: var(--red); }
+    .option-btn:disabled { cursor: default; }
+
+    .quiz-feedback {
+      padding: 0.8rem 1rem;
+      border-radius: var(--radius);
+      font-size: 0.88rem;
+      margin-bottom: 1rem;
+      display: none;
+      font-family: var(--sans);
+    }
+    .quiz-feedback.show { display: block; }
+    .quiz-feedback.correct { background: var(--green-bg); border: 1px solid var(--green); color: var(--green); }
+    .quiz-feedback.wrong   { background: var(--red-bg);   border: 1px solid var(--red);   color: var(--red); }
+
+    .next-btn {
+      width: 100%;
+      padding: 0.85rem;
+      background: var(--ink);
+      border: none;
+      border-radius: var(--radius);
+      color: var(--bg);
+      font-family: var(--sans);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity var(--tr);
+      display: none;
+    }
+    .next-btn.show { display: block; }
+    .next-btn:hover { opacity: 0.82; }
+
+    /* ── Result ── */
+    .result-screen { text-align: center; padding: 4rem 0; }
+    .result-score {
+      font-family: var(--serif);
+      font-size: 5rem;
+      color: var(--ink);
+      margin-bottom: 0.5rem;
+      line-height: 1;
+    }
+    .result-label {
+      font-size: 1rem;
+      color: var(--ink-dim);
+      margin-bottom: 2rem;
+      font-weight: 300;
+    }
+    .result-stars { font-size: 1.8rem; margin-bottom: 2rem; letter-spacing: 0.1em; }
+    .restart-btn {
+      padding: 0.75rem 2.5rem;
+      background: var(--ink);
+      border: none;
+      border-radius: var(--radius);
+      color: var(--bg);
+      font-family: var(--sans);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity var(--tr);
+    }
+    .restart-btn:hover { opacity: 0.82; }
+
+    /* ── Overview ── */
+    .overview-heading {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--ink-faint);
+      margin-bottom: 1.25rem;
+    }
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 1px;
+      background: var(--rule);
+      border: 1px solid var(--rule);
+    }
+    .overview-card {
+      background: var(--surface);
+      padding: 1.1rem 1.25rem;
+      cursor: pointer;
+      transition: background var(--tr);
+    }
+    .overview-card:hover { background: var(--surface2); }
+    .overview-term {
+      font-family: var(--serif);
+      font-size: 1.05rem;
+      color: var(--ink);
+      margin-bottom: 0.35rem;
+    }
+    .overview-def {
+      font-size: 0.78rem;
+      color: var(--ink-dim);
+      line-height: 1.5;
+    }
+
+    /* ── Tupel-Prüfung ── */
+    .check-intro {
+      font-size: 0.88rem;
+      color: var(--ink-dim);
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+      padding: 1rem 1.25rem;
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius);
+    }
+    .check-intro strong { color: var(--ink); }
+
+    .check-box {
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .check-box-title {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--ink-faint);
+      margin-bottom: 1rem;
+    }
+    .attr-row {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      margin-bottom: 0.6rem;
+    }
+    .attr-input {
+      flex: 1;
+      padding: 0.5rem 0.75rem;
+      background: var(--bg);
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 0.88rem;
+    }
+    .attr-input:focus { outline: none; border-color: var(--ink-dim); }
+    .pk-label {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--ink-dim);
+      cursor: pointer;
+      white-space: nowrap;
+      padding: 0.45rem 0.75rem;
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      transition: all var(--tr);
+    }
+    .pk-label:has(input:checked) { border-color: var(--ink); color: var(--ink); background: var(--surface2); }
+    .pk-radio { accent-color: var(--ink); }
+    .remove-attr-btn {
+      padding: 0.45rem 0.7rem;
+      background: transparent;
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      color: var(--ink-faint);
+      cursor: pointer;
+      font-size: 1rem;
+      line-height: 1;
+      transition: all var(--tr);
+    }
+    .remove-attr-btn:hover { border-color: var(--red); color: var(--red); }
+    .add-attr-btn {
+      margin-top: 0.4rem;
+      padding: 0.45rem 1rem;
+      background: transparent;
+      border: 1px dashed var(--rule);
+      border-radius: 6px;
+      color: var(--ink-dim);
+      cursor: pointer;
+      font-family: var(--sans);
+      font-size: 0.82rem;
+      transition: all var(--tr);
+    }
+    .add-attr-btn:hover { border-color: var(--ink-dim); color: var(--ink); }
+
+    /* Tuple table */
+    .tuple-table-wrap { overflow-x: auto; }
+    .tuple-table { width: 100%; border-collapse: collapse; min-width: 280px; }
+    .tuple-table th {
+      padding: 0.5rem 0.75rem;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--ink-faint);
+      border-bottom: 1px solid var(--rule);
+    }
+    .tuple-table th.pk-col { color: var(--accent); }
+    .tuple-table .row-head { width: 64px; text-align: left; }
+    .tuple-table td { padding: 0.4rem 0.4rem; }
+    .tuple-label {
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 500;
+      white-space: nowrap;
+      padding-right: 0.75rem !important;
+    }
+    .t1-label { color: var(--accent); }
+    .t2-label { color: var(--accent2); }
+    .tuple-val-input {
+      width: 100%;
+      min-width: 72px;
+      padding: 0.45rem 0.6rem;
+      background: var(--bg);
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      color: var(--ink);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      text-align: center;
+    }
+    .tuple-val-input:focus { outline: none; border-color: var(--ink-dim); }
+
+    .check-btn {
+      width: 100%;
+      padding: 0.85rem;
+      background: var(--ink);
+      border: none;
+      border-radius: var(--radius);
+      color: var(--bg);
+      font-family: var(--sans);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 1.5rem;
+      transition: opacity var(--tr);
+    }
+    .check-btn:hover { opacity: 0.82; }
+
+    /* Result */
+    .check-result-box { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--rule); }
+    .verdict-banner {
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-family: var(--serif);
+      font-size: 1.15rem;
+    }
+    .verdict-banner.widerspruch { background: var(--red-bg);   border-left: 3px solid var(--red);   color: var(--red); }
+    .verdict-banner.ok          { background: var(--green-bg); border-left: 3px solid var(--green); color: var(--green); }
+    .verdict-banner.identical   { background: var(--surface2); border-left: 3px solid var(--ink-dim); color: var(--ink-dim); }
+    .verdict-icon { font-size: 1.3rem; }
+
+    .compare-table-wrap { overflow-x: auto; border-top: 1px solid var(--rule); }
+    .compare-table { width: 100%; border-collapse: collapse; }
+    .compare-table th {
+      padding: 0.6rem 0.9rem;
+      text-align: left;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--ink-faint);
+      border-bottom: 1px solid var(--rule);
+      background: var(--surface2);
+    }
+    .compare-table th.pk-th  { color: var(--accent); }
+    .compare-table th.t1-th  { color: var(--accent); }
+    .compare-table th.t2-th  { color: var(--accent2); }
+    .compare-table td { padding: 0.6rem 0.9rem; font-size: 0.85rem; border-bottom: 1px solid var(--rule); font-family: var(--mono); }
+    .compare-table tr:last-child td { border-bottom: none; }
+    .compare-table .cell-conflict  { background: var(--red-bg);   color: var(--red);   font-weight: 600; }
+    .compare-table .cell-match-pk  { color: var(--accent);  font-weight: 600; }
+    .compare-table .cell-match     { color: var(--green); }
+    .compare-table .diff-indicator { font-size: 0.75rem; }
+    .compare-table .diff-indicator.conflict { color: var(--red); font-weight: 700; }
+    .compare-table .diff-indicator.same-pk  { color: var(--accent); }
+    .compare-table .diff-indicator.same     { color: var(--green); }
+    .compare-table .diff-indicator.diff     { color: var(--ink-faint); }
+
+    .verdict-explain {
+      padding: 1rem 1.25rem;
+      font-size: 0.85rem;
+      color: var(--ink-dim);
+      line-height: 1.7;
+      background: var(--surface2);
+      border-top: 1px solid var(--rule);
+    }
+    .verdict-explain strong { color: var(--ink); }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<div class="top-rule"></div>
+
+<header>
+  <a href="../" class="header-back">← Archiv</a>
+  <span class="header-sep">|</span>
+  <span class="header-title">Datenbank Theorie</span>
+  <span class="header-badge">m290</span>
+</header>
+
+<div class="tabs-bar">
+  <button class="tab-btn active" onclick="switchTab('cards', this)">Karteikarten</button>
+  <button class="tab-btn" onclick="switchTab('quiz', this)">Quiz</button>
+  <button class="tab-btn" onclick="switchTab('overview', this)">Übersicht</button>
+  <button class="tab-btn" onclick="switchTab('check', this)">Tupel-Prüfung</button>
+</div>
+
+<main>
+
+  <!-- ── KARTEIKARTEN ── -->
+  <div id="view-cards" class="view active">
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="card-progress"></div></div>
+      <span class="progress-label" id="card-counter">1 / 12</span>
+    </div>
+
+    <div class="card-scene" id="card-scene" onclick="flipCard()">
+      <div class="card-inner" id="card-inner">
+        <div class="card-face card-front">
+          <div class="card-tag">Begriff</div>
+          <div class="card-term" id="card-term"></div>
+          <div class="card-hint">Klicken zum Aufdecken</div>
+        </div>
+        <div class="card-face card-back">
+          <div class="card-tag">Definition</div>
+          <div class="card-definition" id="card-def"></div>
+          <div class="card-example" id="card-ex"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-nav">
+      <button class="nav-btn" id="prev-btn" onclick="prevCard()">← Zurück</button>
+      <button class="shuffle-btn" onclick="shuffleCards()">Mischen</button>
+      <button class="nav-btn" id="next-btn" onclick="nextCard()">Weiter →</button>
+    </div>
+  </div>
+
+  <!-- ── QUIZ ── -->
+  <div id="view-quiz" class="view">
+    <div id="quiz-content">
+      <div class="progress-wrap">
+        <div class="progress-bar"><div class="progress-fill" id="quiz-progress"></div></div>
+        <span class="progress-label" id="quiz-counter">Frage 1 / 10</span>
+      </div>
+
+      <div class="quiz-question">
+        <div class="quiz-meta" id="quiz-meta"></div>
+        <h2 id="quiz-question-text"></h2>
+      </div>
+
+      <div class="options-grid" id="options-grid"></div>
+      <div class="quiz-feedback" id="quiz-feedback"></div>
+      <button class="next-btn" id="next-q-btn" onclick="nextQuestion()">Nächste Frage →</button>
+    </div>
+
+    <div id="quiz-result" class="result-screen" style="display:none">
+      <div class="result-score" id="result-score"></div>
+      <div class="result-label" id="result-label"></div>
+      <div class="result-stars" id="result-stars"></div>
+      <button class="restart-btn" onclick="restartQuiz()">Nochmal versuchen</button>
+    </div>
+  </div>
+
+  <!-- ── ÜBERSICHT ── -->
+  <div id="view-overview" class="view">
+    <div class="overview-heading">Alle Begriffe auf einen Blick</div>
+    <div class="overview-grid" id="overview-grid"></div>
+  </div>
+
+  <!-- ── TUPEL-PRÜFUNG ── -->
+  <div id="view-check" class="view">
+    <p class="check-intro">
+      Definiere ein <strong>Schema</strong> (Attribute + Primärschlüssel), gib zwei Tupel ein
+      und prüfe, ob sie <strong>widerspruchsfrei</strong> oder in <strong>Widerspruch</strong> stehen.<br><br>
+      <em>Zwei Tupel widersprechen sich, wenn sie denselben Primärschlüssel, aber verschiedene Werte in anderen Attributen haben.</em>
+    </p>
+
+    <div class="check-box">
+      <div class="check-box-title">1 · Schema definieren</div>
+      <div id="attr-rows"></div>
+      <button class="add-attr-btn" onclick="addAttrRow()">+ Attribut hinzufügen</button>
+    </div>
+
+    <div class="check-box">
+      <div class="check-box-title">2 · Tupelwerte eingeben</div>
+      <div class="tuple-table-wrap">
+        <table class="tuple-table">
+          <thead><tr id="th-row"><th class="row-head"></th></tr></thead>
+          <tbody>
+            <tr id="t1-row"><td class="tuple-label t1-label">T<sub>1</sub></td></tr>
+            <tr id="t2-row"><td class="tuple-label t2-label">T<sub>2</sub></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <button class="check-btn" onclick="checkTuples()">Prüfen →</button>
+    <div id="check-result-box" class="check-result-box" style="display:none"></div>
+  </div>
+
+</main>
+
+<script>
+// ══════════════════════════════════════════
+//  DATEN
+// ══════════════════════════════════════════
+const TERMS = [
+  { term: "Relation", definition: "Eine zweidimensionale Tabelle in einer relationalen Datenbank, die aus Zeilen (Tupeln) und Spalten (Attributen) besteht.", example: "Bsp: Die Tabelle «Kunde» mit Spalten KundenID, Name, Ort ist eine Relation." },
+  { term: "Tupel", definition: "Eine einzelne Zeile (Datensatz) in einer Relation. Jedes Tupel beschreibt eine konkrete Instanz eines Objekts.", example: "Bsp: (1, 'Müller', 'Bern') ist ein Tupel in der Relation «Kunde»." },
+  { term: "Attribut", definition: "Eine Spalte in einer Relation. Jedes Attribut beschreibt eine Eigenschaft aller Tupel dieser Relation.", example: "Bsp: «Name», «Geburtsdatum» und «PLZ» sind Attribute der Relation «Person»." },
+  { term: "Domäne", definition: "Der Wertebereich (alle erlaubten Werte) eines Attributs. Definiert den Datentyp und mögliche Werte.", example: "Bsp: Domäne von «Alter» könnte INTEGER 0–150 sein; Domäne von «Geschlecht» könnte {'m', 'w', 'd'} sein." },
+  { term: "Schema", definition: "Die formale Beschreibung der Struktur einer Datenbank: welche Relationen existieren, welche Attribute sie haben und welche Datentypen/Constraints gelten.", example: "Bsp: Kunde(KundenID: INT, Name: VARCHAR(50), Ort: VARCHAR(50))" },
+  { term: "Primärschlüssel", definition: "Ein Attribut (oder eine Kombination von Attributen), das jeden Tupel in einer Relation eindeutig identifiziert. Wert darf nicht NULL und nicht doppelt sein.", example: "Bsp: KundenID in der Tabelle «Kunde» – jeder Kunde hat eine einzigartige ID." },
+  { term: "Fremdschlüssel", definition: "Ein Attribut in einer Relation, das auf den Primärschlüssel einer anderen (oder derselben) Relation verweist. Stellt referentielle Integrität sicher.", example: "Bsp: BestellungID verweist über KundenID als Fremdschlüssel auf die Tabelle «Kunde»." },
+  { term: "Beziehung", definition: "Eine Verbindung zwischen zwei oder mehr Relationen (Entitäten). Wird durch Kardinalitäten beschrieben (1:1, 1:n, m:n).", example: "Bsp: Ein Kunde kann mehrere Bestellungen aufgeben → 1:n-Beziehung." },
+  { term: "Kardinalität", definition: "Beschreibt die Anzahl der möglichen Verknüpfungen zwischen Entitäten: 1:1 (eins-zu-eins), 1:n (eins-zu-viele) oder m:n (viele-zu-viele).", example: "Bsp: Schüler ↔ Kurse = m:n, weil ein Schüler viele Kurse hat und ein Kurs viele Schüler." },
+  { term: "Entität", definition: "Ein eindeutig identifizierbares Objekt oder Konzept der realen Welt, das in einer Datenbank abgebildet wird.", example: "Bsp: Ein bestimmter Kunde, ein Produkt oder ein Auftrag sind Entitäten." },
+  { term: "Redundanz", definition: "Das mehrfache Speichern identischer Daten an verschiedenen Stellen in der Datenbank. Führt zu Inkonsistenzen und Speicherverschwendung.", example: "Bsp: Den Kundennamen in jeder Bestellzeile wiederholen, statt ihn einmal in der Kundentabelle zu speichern." },
+  { term: "Normalisierung", definition: "Ein Prozess zur Strukturierung einer Datenbank, um Redundanz zu reduzieren und Datenintegrität zu erhöhen. Erfolgt in mehreren Normalformen (1NF, 2NF, 3NF …).", example: "Bsp: Eine Tabelle mit wiederholten Gruppen in die 1. Normalform überführen." }
+];
+
+// ══════════════════════════════════════════
+//  TABS
+// ══════════════════════════════════════════
+function switchTab(name, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'overview') renderOverview();
+}
+
+// ══════════════════════════════════════════
+//  KARTEIKARTEN
+// ══════════════════════════════════════════
+let cardDeck = [...TERMS];
+let cardIndex = 0;
+let isFlipped = false;
+
+function renderCard() {
+  const t = cardDeck[cardIndex];
+  document.getElementById('card-term').textContent = t.term;
+  document.getElementById('card-def').textContent = t.definition;
+  document.getElementById('card-ex').textContent = t.example || '';
+  document.getElementById('card-counter').textContent = `${cardIndex + 1} / ${cardDeck.length}`;
+  const pct = ((cardIndex + 1) / cardDeck.length) * 100;
+  document.getElementById('card-progress').style.width = pct + '%';
+  document.getElementById('prev-btn').disabled = cardIndex === 0;
+  document.getElementById('next-btn').disabled = cardIndex === cardDeck.length - 1;
+  document.getElementById('card-scene').classList.remove('flipped');
+  isFlipped = false;
+}
+
+function flipCard() {
+  document.getElementById('card-scene').classList.toggle('flipped');
+  isFlipped = !isFlipped;
+}
+
+function nextCard() { if (cardIndex < cardDeck.length - 1) { cardIndex++; renderCard(); } }
+function prevCard() { if (cardIndex > 0) { cardIndex--; renderCard(); } }
+
+function shuffleCards() {
+  for (let i = cardDeck.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [cardDeck[i], cardDeck[j]] = [cardDeck[j], cardDeck[i]];
+  }
+  cardIndex = 0;
+  renderCard();
+}
+
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('view-cards').classList.contains('active')) return;
+  if (e.key === 'ArrowRight') nextCard();
+  else if (e.key === 'ArrowLeft') prevCard();
+  else if (e.key === ' ') { e.preventDefault(); flipCard(); }
+});
+
+// ══════════════════════════════════════════
+//  QUIZ
+// ══════════════════════════════════════════
+const QUESTION_TYPES = [
+  (t, wrong) => ({ question: `Was bedeutet der Begriff «${t.term}»?`, correct: t.definition, options: shuffle([t.definition, ...wrong.map(w => w.definition)]) }),
+  (t, wrong) => ({ question: `Welcher Begriff wird hier beschrieben?\n«${t.definition}»`, correct: t.term, options: shuffle([t.term, ...wrong.map(w => w.term)]) }),
+];
+
+let quizQuestions = [], quizIndex = 0, quizScore = 0, answered = false;
+
+function buildQuiz() {
+  const shuffled = shuffle([...TERMS]);
+  const pool = shuffled.slice(0, 10);
+  quizQuestions = pool.map((t, i) => {
+    const wrongPick = shuffle(TERMS.filter(x => x !== t)).slice(0, 3);
+    return QUESTION_TYPES[i % 2](t, wrongPick);
+  });
+  quizIndex = 0; quizScore = 0;
+}
+
+function renderQuestion() {
+  answered = false;
+  const q = quizQuestions[quizIndex];
+  document.getElementById('quiz-question-text').textContent = q.question;
+  document.getElementById('quiz-meta').textContent = `Frage ${quizIndex + 1} von ${quizQuestions.length}`;
+  document.getElementById('quiz-counter').textContent = `Frage ${quizIndex + 1} / ${quizQuestions.length}`;
+  document.getElementById('quiz-progress').style.width = ((quizIndex / quizQuestions.length) * 100) + '%';
+  const grid = document.getElementById('options-grid');
+  grid.innerHTML = '';
+  q.options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.textContent = opt;
+    btn.onclick = () => selectAnswer(opt, btn);
+    grid.appendChild(btn);
+  });
+  const fb = document.getElementById('quiz-feedback');
+  fb.className = 'quiz-feedback'; fb.textContent = '';
+  document.getElementById('next-q-btn').classList.remove('show');
+}
+
+function selectAnswer(chosen, btn) {
+  if (answered) return;
+  answered = true;
+  const q = quizQuestions[quizIndex];
+  const correct = chosen === q.correct;
+  if (correct) quizScore++;
+  document.querySelectorAll('.option-btn').forEach(b => {
+    b.disabled = true;
+    if (b.textContent === q.correct) b.classList.add('correct');
+  });
+  if (!correct) btn.classList.add('wrong');
+  const fb = document.getElementById('quiz-feedback');
+  if (correct) { fb.textContent = 'Richtig!'; fb.className = 'quiz-feedback show correct'; }
+  else { fb.textContent = `Falsch. Richtige Antwort: ${q.correct}`; fb.className = 'quiz-feedback show wrong'; }
+  const isLast = quizIndex === quizQuestions.length - 1;
+  const nextBtn = document.getElementById('next-q-btn');
+  nextBtn.textContent = isLast ? 'Ergebnis anzeigen →' : 'Nächste Frage →';
+  nextBtn.classList.add('show');
+}
+
+function nextQuestion() {
+  if (quizIndex < quizQuestions.length - 1) { quizIndex++; renderQuestion(); }
+  else showResult();
+}
+
+function showResult() {
+  document.getElementById('quiz-content').style.display = 'none';
+  document.getElementById('quiz-result').style.display = 'block';
+  const pct = Math.round((quizScore / quizQuestions.length) * 100);
+  document.getElementById('result-score').textContent = `${quizScore} / ${quizQuestions.length}`;
+  let label, stars;
+  if (pct === 100) { label = 'Perfekt! Du kennst alle Begriffe.'; stars = '★★★★★'; }
+  else if (pct >= 80) { label = 'Sehr gut! Fast perfekt.'; stars = '★★★★☆'; }
+  else if (pct >= 60) { label = 'Gut! Noch ein bisschen üben.'; stars = '★★★☆☆'; }
+  else if (pct >= 40) { label = 'Nicht schlecht. Wiederhole die Karteikarten!'; stars = '★★☆☆☆'; }
+  else { label = 'Nochmal lernen und dann nochmal versuchen!'; stars = '★☆☆☆☆'; }
+  document.getElementById('result-label').textContent = label;
+  document.getElementById('result-stars').textContent = stars;
+}
+
+function restartQuiz() {
+  document.getElementById('quiz-content').style.display = 'block';
+  document.getElementById('quiz-result').style.display = 'none';
+  buildQuiz(); renderQuestion();
+}
+
+// ══════════════════════════════════════════
+//  TUPEL-PRÜFUNG
+// ══════════════════════════════════════════
+let attrCounter = 0;
+const attrIds = [];
+
+function initCheckView() {
+  addAttrRow('KundenID', true);
+  addAttrRow('Name', false);
+  addAttrRow('Stadt', false);
+}
+
+function addAttrRow(name = '', isPK = false) {
+  const id = 'attr-' + (attrCounter++);
+  attrIds.push(id);
+  const row = document.createElement('div');
+  row.className = 'attr-row'; row.id = id;
+  row.innerHTML = `
+    <input class="attr-input" type="text" placeholder="Attributname" value="${name}" oninput="rebuildTupleTable()" />
+    <label class="pk-label">
+      <input type="radio" name="pk-radio" class="pk-radio" ${isPK ? 'checked' : ''} onchange="rebuildTupleTable()" />
+      PK
+    </label>
+    <button class="remove-attr-btn" onclick="removeAttrRow('${id}')">×</button>
+  `;
+  document.getElementById('attr-rows').appendChild(row);
+  rebuildTupleTable();
+}
+
+function removeAttrRow(id) {
+  const idx = attrIds.indexOf(id);
+  if (idx > -1) attrIds.splice(idx, 1);
+  const el = document.getElementById(id);
+  if (el) el.remove();
+  rebuildTupleTable();
+}
+
+function getAttrs() {
+  return attrIds.map(id => {
+    const row = document.getElementById(id);
+    if (!row) return null;
+    return { id, name: row.querySelector('.attr-input').value.trim() || '?', isPK: row.querySelector('.pk-radio').checked };
+  }).filter(Boolean);
+}
+
+function rebuildTupleTable() {
+  const attrs = getAttrs();
+  const thRow = document.getElementById('th-row');
+  const t1Row = document.getElementById('t1-row');
+  const t2Row = document.getElementById('t2-row');
+  const saved = [{}, {}];
+  document.querySelectorAll('[data-tuple]').forEach(inp => { saved[inp.dataset.tuple - 1][inp.dataset.attr] = inp.value; });
+  thRow.innerHTML = '<th class="row-head"></th>';
+  attrs.forEach(a => {
+    const th = document.createElement('th');
+    th.textContent = a.isPK ? a.name + ' 🔑' : a.name;
+    if (a.isPK) th.className = 'pk-col';
+    thRow.appendChild(th);
+  });
+  [t1Row, t2Row].forEach((row, ri) => {
+    while (row.children.length > 1) row.removeChild(row.lastChild);
+    attrs.forEach(a => {
+      const td = document.createElement('td');
+      const input = document.createElement('input');
+      input.type = 'text'; input.className = 'tuple-val-input';
+      input.dataset.tuple = ri + 1; input.dataset.attr = a.name;
+      input.placeholder = '–'; input.value = saved[ri][a.name] || '';
+      td.appendChild(input); row.appendChild(td);
+    });
+  });
+  document.getElementById('check-result-box').style.display = 'none';
+}
+
+function checkTuples() {
+  const attrs = getAttrs();
+  const pkAttrs = attrs.filter(a => a.isPK);
+  const nonPkAttrs = attrs.filter(a => !a.isPK);
+  if (pkAttrs.length === 0) { alert('Bitte markiere mindestens ein Attribut als Primärschlüssel (PK).'); return; }
+  const vals = [{}, {}];
+  document.querySelectorAll('[data-tuple]').forEach(inp => { vals[inp.dataset.tuple - 1][inp.dataset.attr] = inp.value.trim(); });
+  const t1 = vals[0], t2 = vals[1];
+  if (attrs.some(a => !t1[a.name] || !t2[a.name])) { alert('Bitte fülle alle Felder für beide Tupel aus.'); return; }
+  const allSame = attrs.every(a => t1[a.name] === t2[a.name]);
+  const pkSame = pkAttrs.every(a => t1[a.name] === t2[a.name]);
+  const conflicts = nonPkAttrs.filter(a => t1[a.name] !== t2[a.name]);
+  const tableRows = attrs.map(a => {
+    const v1 = t1[a.name], v2 = t2[a.name], same = v1 === v2;
+    const isConflict = pkSame && !same && !a.isPK;
+    const isPKCell = a.isPK;
+    let c1 = '', c2 = '', indClass = 'diff', indText = '≠ verschieden';
+    if (isConflict) { c1 = c2 = 'cell-conflict'; indClass = 'conflict'; indText = '⚠ Konflikt!'; }
+    else if (same && isPKCell) { c1 = c2 = 'cell-match-pk'; indClass = 'same-pk'; indText = '= gleich (PK)'; }
+    else if (same) { c1 = c2 = 'cell-match'; indClass = 'same'; indText = '= gleich'; }
+    return `<tr><th class="${isPKCell ? 'pk-th' : ''}">${isPKCell ? '🔑 ' : ''}${a.name}</th><td class="${c1}">${v1}</td><td class="${c2}">${v2}</td><td class="diff-indicator ${indClass}">${indText}</td></tr>`;
+  }).join('');
+  let verdict, title, icon, explanation;
+  if (allSame) {
+    verdict = 'identical'; icon = '♾️'; title = 'Identische Tupel';
+    explanation = `Beide Tupel sind <strong>vollständig identisch</strong>. Sie stehen nicht in direktem Widerspruch, aber <strong>identische Duplikate</strong> sind in einer Relation nicht erlaubt und bezeichnen <strong>Redundanz</strong>.`;
+  } else if (!pkSame) {
+    verdict = 'ok'; icon = '✅'; title = 'Widerspruchsfrei';
+    explanation = `Die Tupel sind <strong>widerspruchsfrei</strong>. Der Primärschlüssel ist in beiden Tupeln <strong>verschieden</strong> – sie beschreiben damit unterschiedliche Entitäten.`;
+  } else {
+    verdict = 'widerspruch'; icon = '⚠️'; title = 'Widerspruch!';
+    const pkList = pkAttrs.map(a => `«${a.name}» = "${t1[a.name]}"`).join(', ');
+    const confList = conflicts.map(a => `<strong>«${a.name}»</strong>`).join(', ');
+    explanation = `Die Tupel stehen in <strong>Widerspruch</strong>! Beide haben denselben Primärschlüssel (${pkList}), aber unterschiedliche Werte bei: ${confList}.<br><br>Der Primärschlüssel muss jeden Datensatz <em>eindeutig</em> identifizieren – er bestimmt funktional alle anderen Attribute (<strong>PK → alle Attribute</strong>).`;
+  }
+  const resultBox = document.getElementById('check-result-box');
+  resultBox.style.display = 'block';
+  resultBox.innerHTML = `
+    <div class="verdict-banner ${verdict}"><span class="verdict-icon">${icon}</span><span>${title}</span></div>
+    <div class="compare-table-wrap">
+      <table class="compare-table">
+        <thead><tr><th>Attribut</th><th class="t1-th">Tupel 1 (T₁)</th><th class="t2-th">Tupel 2 (T₂)</th><th>Vergleich</th></tr></thead>
+        <tbody>${tableRows}</tbody>
+      </table>
+    </div>
+    <div class="verdict-explain">${explanation}</div>
+  `;
+  resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ══════════════════════════════════════════
+//  ÜBERSICHT
+// ══════════════════════════════════════════
+function renderOverview() {
+  const grid = document.getElementById('overview-grid');
+  if (grid.children.length > 0) return;
+  TERMS.forEach(t => {
+    const card = document.createElement('div');
+    card.className = 'overview-card';
+    card.innerHTML = `<div class="overview-term">${t.term}</div><div class="overview-def">${t.definition}</div>`;
+    grid.appendChild(card);
+  });
+}
+
+// ══════════════════════════════════════════
+//  UTILS
+// ══════════════════════════════════════════
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ══════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════
+renderCard();
+buildQuiz();
+renderQuestion();
+initCheckView();
+</script>
+</body>
+</html>

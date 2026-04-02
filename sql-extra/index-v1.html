@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQL Kurs – Datenbankabfragen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #181c27;
+    --surface2: #1e2336;
+    --border: #2a3050;
+    --accent: #4f8ef7;
+    --accent2: #7c3aed;
+    --green: #22c55e;
+    --yellow: #facc15;
+    --red: #f87171;
+    --text: #e2e8f0;
+    --text-dim: #8892a4;
+    --text-muted: #4a5568;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+    --radius: 10px;
+    --transition: 0.2s ease;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* ── Header ── */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    height: 56px;
+  }
+  .logo {
+    font-family: var(--mono);
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+  .logo span { color: var(--text-dim); }
+  nav {
+    display: flex;
+    gap: 0.25rem;
+    flex: 1;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  nav::-webkit-scrollbar { display: none; }
+  .nav-btn {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-family: var(--sans);
+    font-size: 0.82rem;
+    font-weight: 500;
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: var(--transition);
+  }
+  .nav-btn:hover { color: var(--text); background: var(--surface2); }
+  .nav-btn.active { color: var(--accent); background: rgba(79,142,247,0.12); }
+
+  /* ── Progress bar ── */
+  .progress-bar-wrap {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0.5rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .progress-label {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    font-family: var(--mono);
+    white-space: nowrap;
+  }
+  .progress-track {
+    flex: 1;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  /* ── Main layout ── */
+  main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  /* ── Section ── */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* ── Schema ── */
+  .schema-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .schema-table {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .schema-table-header {
+    background: var(--surface2);
+    padding: 0.6rem 1rem;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--accent);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .schema-table-header .icon { opacity: 0.6; }
+  .schema-fields { padding: 0.5rem 0; }
+  .schema-field {
+    padding: 0.3rem 1rem;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .field-name { color: var(--text); }
+  .field-type { color: var(--text-muted); font-size: 0.7rem; }
+  .badge-pk {
+    background: rgba(79,142,247,0.2);
+    color: var(--accent);
+    font-size: 0.6rem;
+    padding: 0.05rem 0.35rem;
+    border-radius: 3px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+  .badge-fk {
+    background: rgba(124,58,237,0.2);
+    color: #a78bfa;
+    font-size: 0.6rem;
+    padding: 0.05rem 0.35rem;
+    border-radius: 3px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── Cards ── */
+  .page-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+    color: var(--text);
+  }
+  .page-subtitle {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+  }
+
+  /* ── Task Card ── */
+  .task-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 1rem;
+    overflow: hidden;
+    transition: border-color var(--transition);
+  }
+  .task-card.solved { border-color: rgba(34,197,94,0.35); }
+  .task-header {
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    cursor: pointer;
+    user-select: none;
+  }
+  .task-header:hover { background: rgba(255,255,255,0.02); }
+  .task-num {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--accent);
+    background: rgba(79,142,247,0.12);
+    border: 1px solid rgba(79,142,247,0.25);
+    border-radius: 5px;
+    padding: 0.2rem 0.5rem;
+    white-space: nowrap;
+    margin-top: 0.1rem;
+    flex-shrink: 0;
+  }
+  .task-title-wrap { flex: 1; }
+  .task-title {
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: var(--text);
+    line-height: 1.4;
+  }
+  .task-difficulty {
+    font-size: 0.7rem;
+    margin-top: 0.25rem;
+    color: var(--text-dim);
+    font-family: var(--mono);
+  }
+  .task-chevron {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    transition: transform var(--transition);
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+  }
+  .task-card.open .task-chevron { transform: rotate(90deg); }
+  .task-check {
+    color: var(--green);
+    font-size: 1rem;
+    flex-shrink: 0;
+    margin-top: 0.15rem;
+  }
+
+  .task-body {
+    display: none;
+    border-top: 1px solid var(--border);
+    padding: 1.25rem;
+    animation: slideDown 0.2s ease;
+  }
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .task-card.open .task-body { display: block; }
+
+  .task-description {
+    color: var(--text);
+    font-size: 0.9rem;
+    line-height: 1.7;
+    margin-bottom: 1rem;
+  }
+  .task-description strong { color: var(--accent); font-weight: 600; }
+
+  .output-label {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    margin-bottom: 0.4rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .output-cols {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.25rem;
+  }
+  .col-badge {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--yellow);
+    padding: 0.2rem 0.5rem;
+  }
+
+  /* ── SQL Editor ── */
+  .editor-wrap {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+  }
+  .editor-topbar {
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    padding: 0.4rem 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .editor-label {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+  }
+  .editor-actions { display: flex; gap: 0.5rem; }
+  .btn-clear {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  .btn-clear:hover { border-color: var(--text-dim); color: var(--text); }
+
+  textarea.sql-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: #c9d1d9;
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    line-height: 1.7;
+    padding: 0.75rem 1rem;
+    resize: vertical;
+    min-height: 100px;
+    outline: none;
+    tab-size: 2;
+  }
+  textarea.sql-input::placeholder { color: var(--text-muted); }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    font-family: var(--sans);
+    font-weight: 500;
+    font-size: 0.82rem;
+    padding: 0.5rem 1.25rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  .btn-primary:hover { background: #3b82f6; }
+
+  .btn-hint {
+    background: rgba(250,204,21,0.1);
+    color: var(--yellow);
+    border: 1px solid rgba(250,204,21,0.25);
+    font-family: var(--sans);
+    font-size: 0.82rem;
+    padding: 0.5rem 1.25rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  .btn-hint:hover { background: rgba(250,204,21,0.15); }
+
+  .btn-solution {
+    background: rgba(124,58,237,0.12);
+    color: #a78bfa;
+    border: 1px solid rgba(124,58,237,0.25);
+    font-family: var(--sans);
+    font-size: 0.82rem;
+    padding: 0.5rem 1.25rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  .btn-solution:hover { background: rgba(124,58,237,0.2); }
+
+  .task-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+
+  /* ── Hint / Solution blocks ── */
+  .hint-block, .solution-block {
+    display: none;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    animation: slideDown 0.2s ease;
+  }
+  .hint-block.visible, .solution-block.visible { display: block; }
+  .hint-block {
+    background: rgba(250,204,21,0.05);
+    border: 1px solid rgba(250,204,21,0.2);
+  }
+  .hint-title {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--yellow);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.5rem;
+  }
+  .hint-text {
+    font-size: 0.85rem;
+    color: #fde68a;
+    line-height: 1.6;
+  }
+  .solution-block {
+    background: rgba(124,58,237,0.06);
+    border: 1px solid rgba(124,58,237,0.25);
+  }
+  .solution-title {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: #a78bfa;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  pre.solution-sql {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: #c9d1d9;
+    overflow-x: auto;
+    line-height: 1.7;
+    white-space: pre;
+    tab-size: 2;
+  }
+  .sql-kw { color: #ff79c6; }
+  .sql-fn { color: #50fa7b; }
+  .sql-str { color: #f1fa8c; }
+  .sql-col { color: #8be9fd; }
+  .sql-tbl { color: #ffb86c; }
+  .sql-cm { color: #6272a4; font-style: italic; }
+
+  /* ── Feedback ── */
+  .feedback {
+    border-radius: 6px;
+    padding: 0.6rem 0.9rem;
+    font-size: 0.82rem;
+    margin-bottom: 1rem;
+    display: none;
+    font-family: var(--mono);
+  }
+  .feedback.visible { display: block; animation: slideDown 0.2s ease; }
+  .feedback.ok {
+    background: rgba(34,197,94,0.1);
+    border: 1px solid rgba(34,197,94,0.3);
+    color: #86efac;
+  }
+  .feedback.err {
+    background: rgba(248,113,113,0.1);
+    border: 1px solid rgba(248,113,113,0.3);
+    color: #fca5a5;
+  }
+
+  /* ── Overview section ── */
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 0.75rem;
+  }
+  .overview-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem;
+    cursor: pointer;
+    transition: border-color var(--transition), background var(--transition);
+  }
+  .overview-item:hover { border-color: var(--accent); background: var(--surface2); }
+  .overview-item.solved { border-color: rgba(34,197,94,0.4); }
+  .overview-num {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--accent);
+    margin-bottom: 0.4rem;
+  }
+  .overview-title { font-size: 0.85rem; font-weight: 500; color: var(--text); margin-bottom: 0.4rem; }
+  .overview-diff {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+  }
+  .diff-easy { color: var(--green); }
+  .diff-medium { color: var(--yellow); }
+  .diff-hard { color: var(--red); }
+  .overview-check { color: var(--green); float: right; }
+
+  /* ── Info block ── */
+  .info-block {
+    background: rgba(79,142,247,0.07);
+    border: 1px solid rgba(79,142,247,0.2);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.85rem;
+    color: #93c5fd;
+    line-height: 1.7;
+  }
+  .info-block strong { color: var(--accent); }
+
+  /* ── Divider ── */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2rem 0;
+  }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--surface); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">SQL<span>/</span>BFS · m290</div>
+  <nav>
+    <button class="nav-btn active" onclick="showSection('schema')">Schema</button>
+    <button class="nav-btn" onclick="showSection('aufgaben')">Aufgaben</button>
+    <button class="nav-btn" onclick="showSection('uebersicht')">Übersicht</button>
+  </nav>
+</header>
+
+<div class="progress-bar-wrap">
+  <span class="progress-label" id="progress-label">0 / 10 gelöst</span>
+  <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+</div>
+
+<main>
+
+<!-- ════════════════════════════════════════════════
+     SECTION: Schema
+════════════════════════════════════════════════ -->
+<section class="section active" id="sec-schema">
+  <div class="page-title">Datenbankschema</div>
+  <div class="page-subtitle">Drei Tabellen bilden die Grundlage aller Abfragen in diesem Kurs.</div>
+
+  <div class="info-block">
+    <strong>Hinweis:</strong> Die Tabelle <code>subject</code> enthält eine direkte <code>teacher_id</code> (1:1-Beziehung).
+    Zusätzlich existiert die N:m-Brückentabelle <code>subject_teacher</code>, über die einem Fach mehrere Lehrer zugeordnet werden können.
+    Diese doppelte Zuordnung ist bewusst gestaltet und ist Gegenstand mehrerer Aufgaben.
+  </div>
+
+  <div class="schema-overview">
+    <div class="schema-table">
+      <div class="schema-table-header"><span class="icon">▤</span> teacher</div>
+      <div class="schema-fields">
+        <div class="schema-field">
+          <span class="badge-pk">PK</span>
+          <span class="field-name">teacher_id</span>
+          <span class="field-type">INT</span>
+        </div>
+        <div class="schema-field">
+          <span class="field-name">first_part</span>
+          <span class="field-type">VARCHAR(80)</span>
+        </div>
+        <div class="schema-field">
+          <span class="field-name">last_part</span>
+          <span class="field-type">VARCHAR(80)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="schema-table">
+      <div class="schema-table-header"><span class="icon">▤</span> subject</div>
+      <div class="schema-fields">
+        <div class="schema-field">
+          <span class="badge-pk">PK</span>
+          <span class="field-name">subject_id</span>
+          <span class="field-type">INT</span>
+        </div>
+        <div class="schema-field">
+          <span class="field-name">subject_name</span>
+          <span class="field-type">VARCHAR(100)</span>
+        </div>
+        <div class="schema-field">
+          <span class="badge-fk">FK</span>
+          <span class="field-name">teacher_id</span>
+          <span class="field-type">INT</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="schema-table">
+      <div class="schema-table-header"><span class="icon">▤</span> subject_teacher <span style="font-size:0.65rem;color:var(--text-muted);font-weight:400">(N:m)</span></div>
+      <div class="schema-fields">
+        <div class="schema-field">
+          <span class="badge-pk">PK</span>
+          <span class="badge-fk">FK</span>
+          <span class="field-name">subject_id</span>
+          <span class="field-type">INT</span>
+        </div>
+        <div class="schema-field">
+          <span class="badge-pk">PK</span>
+          <span class="badge-fk">FK</span>
+          <span class="field-name">teacher_id</span>
+          <span class="field-type">INT</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="output-label">Beispiel-Daten (vereinfacht)</div>
+  <div style="overflow-x:auto;margin-top:0.75rem;">
+    <table style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:0.75rem;">
+      <thead>
+        <tr style="background:var(--surface2);color:var(--text-dim);">
+          <th style="padding:0.5rem 0.75rem;text-align:left;border-bottom:1px solid var(--border);">teacher_id</th>
+          <th style="padding:0.5rem 0.75rem;text-align:left;border-bottom:1px solid var(--border);">first_part</th>
+          <th style="padding:0.5rem 0.75rem;text-align:left;border-bottom:1px solid var(--border);">last_part</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:0.4rem 0.75rem;color:#8be9fd;">1</td><td style="padding:0.4rem 0.75rem;color:var(--text);">Anna</td><td style="padding:0.4rem 0.75rem;color:var(--text);">Müller</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:0.4rem 0.75rem;color:#8be9fd;">2</td><td style="padding:0.4rem 0.75rem;color:var(--text);">Beat</td><td style="padding:0.4rem 0.75rem;color:var(--text);">Keller</td></tr>
+        <tr><td style="padding:0.4rem 0.75rem;color:#8be9fd;">3</td><td style="padding:0.4rem 0.75rem;color:var(--text);">Clara</td><td style="padding:0.4rem 0.75rem;color:var(--text);">Brunner</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="overflow-x:auto;margin-top:1rem;">
+    <table style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:0.75rem;">
+      <thead>
+        <tr style="background:var(--surface2);color:var(--text-dim);">
+          <th style="padding:0.5rem 0.75rem;text-align:left;border-bottom:1px solid var(--border);">subject_id</th>
+          <th style="padding:0.5rem 0.75rem;text-align:left;border-bottom:1px solid var(--border);">subject_name</th>
+          <th style="padding:0.5rem 0.75rem;text-align:left;border-bottom:1px solid var(--border);">teacher_id</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:0.4rem 0.75rem;color:#8be9fd;">1</td><td style="padding:0.4rem 0.75rem;color:var(--text);">Mathematik</td><td style="padding:0.4rem 0.75rem;color:#ffb86c;">1</td></tr>
+        <tr style="border-bottom:1px solid var(--border);"><td style="padding:0.4rem 0.75rem;color:#8be9fd;">2</td><td style="padding:0.4rem 0.75rem;color:var(--text);">Informatik</td><td style="padding:0.4rem 0.75rem;color:#ffb86c;">2</td></tr>
+        <tr><td style="padding:0.4rem 0.75rem;color:#8be9fd;">3</td><td style="padding:0.4rem 0.75rem;color:var(--text);">Englisch</td><td style="padding:0.4rem 0.75rem;color:#ffb86c;">NULL</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════
+     SECTION: Aufgaben
+════════════════════════════════════════════════ -->
+<section class="section" id="sec-aufgaben">
+  <div class="page-title">Aufgaben</div>
+  <div class="page-subtitle">10 SQL-Aufgaben · von einfach bis komplex · MySQL</div>
+  <div id="tasks-container"></div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════
+     SECTION: Übersicht
+════════════════════════════════════════════════ -->
+<section class="section" id="sec-uebersicht">
+  <div class="page-title">Übersicht</div>
+  <div class="page-subtitle">Alle Aufgaben auf einen Blick</div>
+  <div class="overview-grid" id="overview-grid"></div>
+</section>
+
+</main>
+
+<script>
+// ══════════════════════════════════════════════════
+// Data
+// ══════════════════════════════════════════════════
+const tasks = [
+  {
+    id: 1,
+    title: "Einfache Auflistung",
+    difficulty: "easy",
+    diffLabel: "Einfach",
+    description: `Liste alle Fächer (<strong>subject_name</strong>) sortiert nach Namen auf. Zeige zusätzlich die zugehörige <strong>teacher_id</strong> aus der Tabelle <strong>subject</strong>.`,
+    output: ["subject_name", "teacher_id"],
+    hint: "Nutze ORDER BY auf subject_name. Keine JOIN-Verknüpfung nötig – alle Daten kommen aus einer einzigen Tabelle.",
+    solution: `SELECT subject_name, teacher_id
+FROM   subject
+ORDER BY subject_name ASC;`,
+    keywords: ["SELECT", "FROM", "ORDER BY"],
+    check: (sql) => /order\s+by/i.test(sql) && /subject/i.test(sql) && /subject_name/i.test(sql)
+  },
+  {
+    id: 2,
+    title: "Aggregation: Fächer pro Lehrer",
+    difficulty: "easy",
+    diffLabel: "Einfach",
+    description: `Ermittle für jeden Lehrer (<strong>teacher_id</strong>) in der Tabelle <strong>subject</strong>, wie viele Fächer er unterrichtet (laut der Spalte <strong>teacher_id</strong> in subject).`,
+    output: ["teacher_id", "anzahl_faecher"],
+    hint: "Verwende GROUP BY auf teacher_id und COUNT(*) oder COUNT(subject_id) als Aggregatfunktion.",
+    solution: `SELECT   teacher_id,
+         COUNT(*) AS anzahl_faecher
+FROM     subject
+WHERE    teacher_id IS NOT NULL
+GROUP BY teacher_id
+ORDER BY anzahl_faecher DESC;`,
+    keywords: ["COUNT", "GROUP BY"],
+    check: (sql) => /group\s+by/i.test(sql) && /count/i.test(sql) && /teacher_id/i.test(sql)
+  },
+  {
+    id: 3,
+    title: "INNER JOIN: Fächer mit Lehrername",
+    difficulty: "easy",
+    diffLabel: "Einfach",
+    description: `Zeige alle Fächer mit dem vollständigen Lehrernamen (<strong>first_part</strong>, <strong>last_part</strong>), basierend auf der direkten Verknüpfung <code>subject.teacher_id = teacher.teacher_id</code>.`,
+    output: ["subject_name", "lehrer_name"],
+    hint: "Verbinde subject und teacher über INNER JOIN. Konkateniere first_part und last_part mit CONCAT().",
+    solution: `SELECT s.subject_name,
+       CONCAT(t.first_part, ' ', t.last_part) AS lehrer_name
+FROM   subject  s
+INNER JOIN teacher t ON s.teacher_id = t.teacher_id
+ORDER BY s.subject_name;`,
+    keywords: ["INNER JOIN", "CONCAT", "ON"],
+    check: (sql) => /inner\s+join|join/i.test(sql) && /concat/i.test(sql) && /teacher/i.test(sql)
+  },
+  {
+    id: 4,
+    title: "LEFT JOIN: Lehrer ohne Fach",
+    difficulty: "medium",
+    diffLabel: "Mittel",
+    description: `Finde alle Lehrer, die <em>keinem</em> Fach in der Tabelle <strong>subject</strong> direkt zugeordnet sind (d. h. ihre teacher_id kommt in <code>subject.teacher_id</code> nicht vor).`,
+    output: ["teacher_id", "first_part", "last_part"],
+    hint: "Starte mit teacher als linker Tabelle und verknüpfe subject per LEFT JOIN. Filtere dann mit WHERE s.subject_id IS NULL.",
+    solution: `SELECT t.teacher_id,
+       t.first_part,
+       t.last_part
+FROM   teacher t
+LEFT JOIN subject s ON t.teacher_id = s.teacher_id
+WHERE  s.subject_id IS NULL
+ORDER BY t.last_part;`,
+    keywords: ["LEFT JOIN", "IS NULL"],
+    check: (sql) => /left\s+join/i.test(sql) && /is\s+null/i.test(sql)
+  },
+  {
+    id: 5,
+    title: "N:m-Beziehung: Drei Tabellen",
+    difficulty: "medium",
+    diffLabel: "Mittel",
+    description: `Über die Tabelle <strong>subject_teacher</strong> (N:m) sollen alle Fächer mit den zugehörigen Lehrernamen ausgegeben werden. Verwende <strong>subject</strong>, <strong>subject_teacher</strong> und <strong>teacher</strong>. Ein Fach kann hier mehreren Lehrern zugeordnet sein.`,
+    output: ["subject_name", "lehrer_name"],
+    hint: "Verknüpfe alle drei Tabellen mit zwei JOINs: subject → subject_teacher → teacher.",
+    solution: `SELECT s.subject_name,
+       CONCAT(t.first_part, ' ', t.last_part) AS lehrer_name
+FROM   subject         s
+INNER JOIN subject_teacher st ON s.subject_id  = st.subject_id
+INNER JOIN teacher         t  ON st.teacher_id = t.teacher_id
+ORDER BY s.subject_name, t.last_part;`,
+    keywords: ["JOIN ×2", "subject_teacher"],
+    check: (sql) => /subject_teacher/i.test(sql) && (sql.match(/join/gi)||[]).length >= 2
+  },
+  {
+    id: 6,
+    title: "Vergleich: direkte vs. N:m-Zuordnung",
+    difficulty: "hard",
+    diffLabel: "Komplex",
+    description: `Erstelle eine Liste aller Fächer mit dem <strong>direkten</strong> Lehrer (subject.teacher_id) und allen <strong>zusätzlichen</strong> Lehrern aus subject_teacher (ohne den direkten, falls dort ebenfalls vorhanden).`,
+    output: ["subject_name", "direkter_lehrer", "zusätzliche_lehrer"],
+    hint: "Nutze GROUP_CONCAT() für die N:m-Lehrer. Schliesse mit einer WHERE-Bedingung den direkten Lehrer aus der N:m-Liste aus.",
+    solution: `SELECT   s.subject_name,
+         CONCAT(t_dir.first_part, ' ', t_dir.last_part) AS direkter_lehrer,
+         GROUP_CONCAT(
+           DISTINCT CONCAT(t_nm.first_part, ' ', t_nm.last_part)
+           ORDER BY t_nm.last_part
+           SEPARATOR ', '
+         ) AS zusätzliche_lehrer
+FROM     subject s
+LEFT JOIN teacher         t_dir ON s.teacher_id      = t_dir.teacher_id
+LEFT JOIN subject_teacher st    ON s.subject_id       = st.subject_id
+                                AND st.teacher_id    <> s.teacher_id
+LEFT JOIN teacher         t_nm  ON st.teacher_id      = t_nm.teacher_id
+GROUP BY s.subject_id, s.subject_name, direkter_lehrer
+ORDER BY s.subject_name;`,
+    keywords: ["GROUP_CONCAT", "DISTINCT", "LEFT JOIN ×3"],
+    check: (sql) => /group_concat/i.test(sql)
+  },
+  {
+    id: 7,
+    title: "Lehrer ohne N:m-Zuordnung",
+    difficulty: "hard",
+    diffLabel: "Komplex",
+    description: `Finde alle Lehrer, die in <strong>subject_teacher</strong> <em>nicht</em> vorkommen, aber möglicherweise als direkter Lehrer in subject eingetragen sind. Zusätzlich: Zeige an, ob sie als direkter Lehrer existieren (<em>ja/nein</em>).`,
+    output: ["teacher_id", "first_part", "last_part", "direkter_lehrer"],
+    hint: "Starte mit teacher, LEFT JOIN auf subject_teacher (und filtere IS NULL), dann nochmals LEFT JOIN auf subject um 'ja/nein' zu bestimmen.",
+    solution: `SELECT   t.teacher_id,
+         t.first_part,
+         t.last_part,
+         IF(s.subject_id IS NOT NULL, 'ja', 'nein') AS direkter_lehrer
+FROM     teacher t
+LEFT JOIN subject_teacher st ON t.teacher_id = st.teacher_id
+LEFT JOIN subject          s  ON t.teacher_id = s.teacher_id
+WHERE    st.teacher_id IS NULL
+ORDER BY t.last_part;`,
+    keywords: ["IF()", "IS NULL", "LEFT JOIN ×2"],
+    check: (sql) => /subject_teacher/i.test(sql) && /is\s+null/i.test(sql)
+  },
+  {
+    id: 8,
+    title: "Widersprüchliche Zuordnungen",
+    difficulty: "hard",
+    diffLabel: "Komplex",
+    description: `Finde Fälle, bei denen ein Lehrer in <strong>subject_teacher</strong> einem Fach zugeordnet ist, aber <em>nicht</em> dem direkten Lehrer in subject entspricht. Zeige den Unterschied auf.`,
+    output: ["subject_name", "teacher_id_aus_nm", "lehrer_name", "direkter_teacher_id_des_faches"],
+    hint: "Verknüpfe subject mit subject_teacher und filtere mit WHERE st.teacher_id <> s.teacher_id.",
+    solution: `SELECT s.subject_name,
+       st.teacher_id                                  AS teacher_id_aus_nm,
+       CONCAT(t.first_part, ' ', t.last_part)         AS lehrer_name,
+       s.teacher_id                                   AS direkter_teacher_id_des_faches
+FROM   subject         s
+INNER JOIN subject_teacher st ON s.subject_id  = st.subject_id
+                              AND st.teacher_id <> s.teacher_id
+INNER JOIN teacher         t  ON st.teacher_id = t.teacher_id
+ORDER BY s.subject_name;`,
+    keywords: ["<> (Ungleich)", "INNER JOIN", "Filterung im ON"],
+    check: (sql) => /subject_teacher/i.test(sql) && /<>/i.test(sql) || /!=/.test(sql)
+  },
+  {
+    id: 9,
+    title: "Statistik: Anzahl Lehrer pro Fach",
+    difficulty: "hard",
+    diffLabel: "Komplex",
+    description: `Erstelle für jedes Fach eine Statistik:<br>• Anzahl direkte Lehrer (0 oder 1)<br>• Anzahl Lehrer über subject_teacher<br>• Gesamtanzahl <em>einzigartiger</em> Lehrer (beide Wege, bereinigt)`,
+    output: ["subject_name", "anzahl_direkt", "anzahl_nm", "anzahl_gesamt_eindeutig"],
+    hint: "Nutze Subqueries oder COUNT(DISTINCT …) mit UNION-Logik. Alternativ: Zähle direkte als 0/1 per IF(), N:m separat per LEFT JOIN auf subject_teacher.",
+    solution: `SELECT   s.subject_name,
+         IF(s.teacher_id IS NOT NULL, 1, 0)   AS anzahl_direkt,
+         COUNT(DISTINCT st.teacher_id)          AS anzahl_nm,
+         COUNT(DISTINCT
+           CASE
+             WHEN s.teacher_id IS NOT NULL THEN s.teacher_id
+             ELSE NULL
+           END
+         ) +
+         COUNT(DISTINCT st.teacher_id)
+         -- Abzug der Überschneidung:
+         - COUNT(DISTINCT
+             CASE WHEN st.teacher_id = s.teacher_id THEN st.teacher_id ELSE NULL END
+           )                                    AS anzahl_gesamt_eindeutig
+FROM     subject s
+LEFT JOIN subject_teacher st ON s.subject_id = st.subject_id
+GROUP BY s.subject_id, s.subject_name, s.teacher_id
+ORDER BY s.subject_name;`,
+    keywords: ["IF()", "COUNT(DISTINCT)", "CASE WHEN"],
+    check: (sql) => /count.*distinct/i.test(sql) && /group\s+by/i.test(sql)
+  },
+  {
+    id: 10,
+    title: "Top 5: Größte Gesamtverantwortung",
+    difficulty: "hard",
+    diffLabel: "Komplex",
+    description: `Ermittle den Lehrer (Name), der über <em>beide</em> Zuordnungsarten (direkt in subject + Einträge in subject_teacher) an den meisten Fächern beteiligt ist. Zähle einfach (kein Deduplizieren). Top 5 absteigend sortiert.`,
+    output: ["teacher_id", "lehrer_name", "anzahl_faecher_gesamt"],
+    hint: "Nutze UNION ALL, um beide Quellen zu kombinieren, danach GROUP BY und ORDER BY LIMIT 5.",
+    solution: `SELECT   teacher_id,
+         CONCAT(first_part, ' ', last_part) AS lehrer_name,
+         COUNT(*)                           AS anzahl_faecher_gesamt
+FROM (
+  -- Direkte Zuordnung
+  SELECT t.teacher_id, t.first_part, t.last_part
+  FROM   subject s
+  INNER JOIN teacher t ON s.teacher_id = t.teacher_id
+
+  UNION ALL
+
+  -- N:m-Zuordnung
+  SELECT t.teacher_id, t.first_part, t.last_part
+  FROM   subject_teacher st
+  INNER JOIN teacher t ON st.teacher_id = t.teacher_id
+) combined
+GROUP BY teacher_id, first_part, last_part
+ORDER BY anzahl_faecher_gesamt DESC
+LIMIT 5;`,
+    keywords: ["UNION ALL", "Subquery", "LIMIT"],
+    check: (sql) => /union/i.test(sql) && /limit/i.test(sql)
+  }
+];
+
+// ══════════════════════════════════════════════════
+// State
+// ══════════════════════════════════════════════════
+const solved = new Set();
+
+// ══════════════════════════════════════════════════
+// Syntax highlighting (very lightweight)
+// ══════════════════════════════════════════════════
+function highlight(sql) {
+  const kws = /\b(SELECT|FROM|WHERE|JOIN|INNER|LEFT|RIGHT|ON|GROUP BY|GROUP|BY|ORDER BY|ORDER|HAVING|LIMIT|UNION|ALL|DISTINCT|AS|AND|OR|NOT|IN|IS|NULL|NULL|IF|CASE|WHEN|THEN|ELSE|END|COUNT|SUM|AVG|MIN|MAX|CONCAT|GROUP_CONCAT|SEPARATOR)\b/gi;
+  return sql
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/'([^']*)'/g, `<span class="sql-str">'$1'</span>`)
+    .replace(/--[^\n]*/g, m => `<span class="sql-cm">${m}</span>`)
+    .replace(kws, m => `<span class="sql-kw">${m}</span>`);
+}
+
+// ══════════════════════════════════════════════════
+// Render tasks
+// ══════════════════════════════════════════════════
+function renderTasks() {
+  const container = document.getElementById('tasks-container');
+  container.innerHTML = '';
+
+  tasks.forEach(task => {
+    const card = document.createElement('div');
+    card.className = 'task-card';
+    card.id = `task-card-${task.id}`;
+
+    const diffClass = task.difficulty === 'easy' ? 'diff-easy' : task.difficulty === 'medium' ? 'diff-medium' : 'diff-hard';
+
+    card.innerHTML = `
+      <div class="task-header" onclick="toggleTask(${task.id})">
+        <div class="task-num">A${String(task.id).padStart(2,'0')}</div>
+        <div class="task-title-wrap">
+          <div class="task-title">${task.title}</div>
+          <div class="task-difficulty">
+            <span class="${diffClass}">${task.diffLabel}</span>
+            ${task.keywords.map(k=>`<span style="color:var(--text-muted);margin-left:0.5rem;">· ${k}</span>`).join('')}
+          </div>
+        </div>
+        <div class="task-check" id="check-${task.id}" style="display:none">✓</div>
+        <div class="task-chevron">▶</div>
+      </div>
+      <div class="task-body" id="body-${task.id}">
+        <div class="task-description">${task.description}</div>
+        <div class="output-label">Erwartete Ausgabe (Spalten)</div>
+        <div class="output-cols">
+          ${task.output.map(c=>`<span class="col-badge">${c}</span>`).join('')}
+        </div>
+
+        <div class="hint-block" id="hint-${task.id}">
+          <div class="hint-title">💡 Hinweis</div>
+          <div class="hint-text">${task.hint}</div>
+        </div>
+
+        <div class="editor-wrap">
+          <div class="editor-topbar">
+            <span class="editor-label">MySQL · deine Lösung</span>
+            <div class="editor-actions">
+              <button class="btn-clear" onclick="clearSQL(${task.id})">Leeren</button>
+            </div>
+          </div>
+          <textarea class="sql-input" id="sql-${task.id}" placeholder="SELECT ..." rows="5" spellcheck="false"></textarea>
+        </div>
+
+        <div class="feedback" id="feedback-${task.id}"></div>
+
+        <div class="task-actions">
+          <button class="btn-primary" onclick="checkSQL(${task.id})">▶ Prüfen</button>
+          <button class="btn-hint" onclick="toggleHint(${task.id})">💡 Hinweis</button>
+          <button class="btn-solution" onclick="toggleSolution(${task.id})">⚷ Musterlösung</button>
+        </div>
+
+        <div class="solution-block" id="sol-${task.id}">
+          <div class="solution-title">⚷ Musterlösung (MySQL)</div>
+          <pre class="solution-sql">${highlight(task.solution)}</pre>
+        </div>
+      </div>
+    `;
+
+    container.appendChild(card);
+  });
+}
+
+// ══════════════════════════════════════════════════
+// Render overview
+// ══════════════════════════════════════════════════
+function renderOverview() {
+  const grid = document.getElementById('overview-grid');
+  grid.innerHTML = '';
+  tasks.forEach(task => {
+    const diffClass = task.difficulty === 'easy' ? 'diff-easy' : task.difficulty === 'medium' ? 'diff-medium' : 'diff-hard';
+    const isSolved = solved.has(task.id);
+    const item = document.createElement('div');
+    item.className = `overview-item${isSolved ? ' solved' : ''}`;
+    item.onclick = () => { showSection('aufgaben'); openTask(task.id); };
+    item.innerHTML = `
+      ${isSolved ? '<span class="overview-check">✓</span>' : ''}
+      <div class="overview-num">Aufgabe ${task.id}</div>
+      <div class="overview-title">${task.title}</div>
+      <div class="overview-diff"><span class="${diffClass}">${task.diffLabel}</span></div>
+    `;
+    grid.appendChild(item);
+  });
+}
+
+// ══════════════════════════════════════════════════
+// Interactions
+// ══════════════════════════════════════════════════
+function toggleTask(id) {
+  const card = document.getElementById(`task-card-${id}`);
+  card.classList.toggle('open');
+}
+function openTask(id) {
+  const card = document.getElementById(`task-card-${id}`);
+  card.classList.add('open');
+  card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function toggleHint(id) {
+  document.getElementById(`hint-${id}`).classList.toggle('visible');
+}
+function toggleSolution(id) {
+  document.getElementById(`sol-${id}`).classList.toggle('visible');
+}
+function clearSQL(id) {
+  document.getElementById(`sql-${id}`).value = '';
+  const fb = document.getElementById(`feedback-${id}`);
+  fb.className = 'feedback';
+  fb.textContent = '';
+}
+
+function checkSQL(id) {
+  const task = tasks.find(t => t.id === id);
+  const sql = document.getElementById(`sql-${id}`).value.trim();
+  const fb = document.getElementById(`feedback-${id}`);
+
+  if (!sql) {
+    fb.textContent = '⚠ Bitte gib zuerst eine SQL-Abfrage ein.';
+    fb.className = 'feedback err visible';
+    return;
+  }
+
+  const ok = task.check(sql);
+  if (ok) {
+    fb.textContent = '✓ Gut gemacht! Deine Abfrage enthält die wichtigsten Bestandteile.';
+    fb.className = 'feedback ok visible';
+    markSolved(id);
+  } else {
+    fb.textContent = '✗ Überprüfe deine Abfrage – es fehlen noch wichtige SQL-Elemente. Nutze den Hinweis!';
+    fb.className = 'feedback err visible';
+  }
+}
+
+function markSolved(id) {
+  solved.add(id);
+  const card = document.getElementById(`task-card-${id}`);
+  card.classList.add('solved');
+  document.getElementById(`check-${id}`).style.display = 'block';
+  updateProgress();
+}
+
+function updateProgress() {
+  const n = solved.size;
+  document.getElementById('progress-label').textContent = `${n} / 10 gelöst`;
+  document.getElementById('progress-fill').style.width = `${n * 10}%`;
+}
+
+// ══════════════════════════════════════════════════
+// Navigation
+// ══════════════════════════════════════════════════
+function showSection(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`sec-${name}`).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => {
+    if (b.textContent.toLowerCase().includes(name.replace('aufgaben','aufg').slice(0,4))) {
+      b.classList.add('active');
+    }
+  });
+  // Re-map by onclick text
+  document.querySelectorAll('.nav-btn').forEach(b => {
+    if (b.getAttribute('onclick').includes(`'${name}'`)) b.classList.add('active');
+  });
+  if (name === 'uebersicht') renderOverview();
+}
+
+// ══════════════════════════════════════════════════
+// Init
+// ══════════════════════════════════════════════════
+renderTasks();
+</script>
+</body>
+</html>

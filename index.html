@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache">
+  <title>Lern-Archiv · jkingma.sbw.media</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:       #f5f2eb;
+      --ink:      #1a1a18;
+      --ink-dim:  #6b6860;
+      --ink-faint:#b8b4aa;
+      --rule:     #d9d5cc;
+      --card-bg:  #ffffff;
+      --accent-1: #1a3a8f;   /* DB Theorie – deep navy */
+      --accent-2: #8f3a1a;   /* ER Editor  – terracotta */
+      --accent-3: #1a6b3a;   /* SQL Extra  – forest */
+      --accent-4: #5a1a8f;   /* ER Aufgaben – violet */
+      --serif:    'DM Serif Display', Georgia, serif;
+      --mono:     'DM Mono', monospace;
+      --sans:     'DM Sans', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      /* Subtle paper grain */
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    }
+
+    /* ── Top rule ── */
+    .top-rule {
+      height: 3px;
+      background: var(--ink);
+    }
+
+    /* ── Masthead ── */
+    masthead {
+      display: block;
+      padding: 3.5rem 2rem 0;
+      max-width: 860px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .kicker {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-dim);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      opacity: 0;
+      animation: fadeUp 0.5s ease 0.1s forwards;
+    }
+    .kicker::before {
+      content: '';
+      display: inline-block;
+      width: 28px;
+      height: 1px;
+      background: var(--ink-dim);
+    }
+
+    h1 {
+      font-family: var(--serif);
+      font-size: clamp(2.8rem, 7vw, 5rem);
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+      margin-bottom: 1.25rem;
+      opacity: 0;
+      animation: fadeUp 0.55s ease 0.2s forwards;
+    }
+    h1 em {
+      font-style: italic;
+      color: var(--ink-dim);
+    }
+
+    .subtitle {
+      font-size: 1rem;
+      color: var(--ink-dim);
+      font-weight: 300;
+      max-width: 480px;
+      line-height: 1.65;
+      margin-bottom: 3rem;
+      opacity: 0;
+      animation: fadeUp 0.55s ease 0.3s forwards;
+    }
+
+    /* ── Divider ── */
+    .rule {
+      border: none;
+      border-top: 1px solid var(--rule);
+      margin: 0 auto 3rem;
+      max-width: 860px;
+      opacity: 0;
+      animation: fadeIn 0.4s ease 0.4s forwards;
+    }
+
+    /* ── Cards ── */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1px;
+      background: var(--rule);
+      border: 1px solid var(--rule);
+      max-width: 860px;
+      margin: 0 auto;
+      width: calc(100% - 4rem);
+      opacity: 0;
+      animation: fadeUp 0.6s ease 0.45s forwards;
+    }
+
+    .card {
+      background: var(--card-bg);
+      padding: 2rem 1.75rem 1.75rem;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.18s ease;
+    }
+    .card::after {
+      content: '';
+      position: absolute;
+      left: 0; top: 0;
+      width: 3px;
+      height: 100%;
+      background: var(--card-accent);
+      transform: scaleY(0);
+      transform-origin: bottom;
+      transition: transform 0.22s ease;
+    }
+    .card:hover { background: #fafaf7; }
+    .card:hover::after { transform: scaleY(1); }
+
+    .card-index {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--ink-faint);
+      letter-spacing: 0.12em;
+      margin-bottom: 1.25rem;
+    }
+
+    .card-icon {
+      font-size: 1.6rem;
+      margin-bottom: 1rem;
+      line-height: 1;
+    }
+
+    .card-title {
+      font-family: var(--serif);
+      font-size: 1.35rem;
+      line-height: 1.2;
+      color: var(--ink);
+      margin-bottom: 0.6rem;
+    }
+
+    .card-desc {
+      font-size: 0.82rem;
+      color: var(--ink-dim);
+      line-height: 1.6;
+      flex: 1;
+      margin-bottom: 1.5rem;
+    }
+
+    .card-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--card-accent);
+      font-weight: 500;
+      transition: gap 0.15s ease;
+    }
+    .card:hover .card-cta { gap: 0.7rem; }
+    .card-cta .arrow { font-size: 0.9rem; }
+
+    /* per-card accent colours */
+    .card-1 { --card-accent: var(--accent-1); }
+    .card-2 { --card-accent: var(--accent-2); }
+    .card-3 { --card-accent: var(--accent-3); }
+    .card-4 { --card-accent: var(--accent-4); }
+
+    /* new badge on card 4 */
+    .card-badge {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      font-family: var(--mono);
+      font-size: 0.55rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.5rem;
+      background: var(--accent-4);
+      color: white;
+      border-radius: 2px;
+    }
+
+    /* ── Footer ── */
+    footer {
+      margin-top: auto;
+      padding: 2.5rem 2rem;
+      max-width: 860px;
+      margin-left: auto;
+      margin-right: auto;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeIn 0.5s ease 0.7s forwards;
+    }
+    .footer-brand {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--ink-faint);
+      letter-spacing: 0.08em;
+    }
+    .footer-rule {
+      flex: 1;
+      height: 1px;
+      background: var(--rule);
+      min-width: 40px;
+    }
+    .footer-note {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--ink-faint);
+      letter-spacing: 0.06em;
+    }
+
+    /* ── Animations ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 540px) {
+      masthead { padding: 2.5rem 1.25rem 0; }
+      .cards { width: calc(100% - 2.5rem); }
+      footer { padding: 2rem 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="top-rule"></div>
+
+<masthead>
+  <p class="kicker">BFS · jkingma.sbw.media</p>
+  <h1>Lern<em>archiv</em></h1>
+  <p class="subtitle">Interaktive Lernmaterialien für Informatik &amp; Datenbanken — Modul 290 und mehr.</p>
+</masthead>
+
+<hr class="rule">
+
+<div class="cards">
+
+  <a href="db-theorie" class="card card-1">
+    <div class="card-index">01 / 04</div>
+    <div class="card-icon">🗃</div>
+    <div class="card-title">DB Theorie</div>
+    <div class="card-desc">Karteikarten, Quiz und interaktive Tupel-Prüfung zu den Grundlagen relationaler Datenbanken.</div>
+    <span class="card-cta">Öffnen <span class="arrow">→</span></span>
+  </a>
+
+  <a href="er-designer" class="card card-2">
+    <div class="card-index">02 / 04</div>
+    <div class="card-icon">📐</div>
+    <div class="card-title">DB ER Editor</div>
+    <div class="card-desc">Visueller Entity-Relationship-Designer zum Erstellen und Analysieren von Datenbankdiagrammen.</div>
+    <span class="card-cta">Öffnen <span class="arrow">→</span></span>
+  </a>
+
+  <a href="sql-extra" class="card card-3">
+    <div class="card-index">03 / 04</div>
+    <div class="card-icon">⌨︎</div>
+    <div class="card-title">Extra Aufgaben SQL</div>
+    <div class="card-desc">10 SQL-Übungsaufgaben von einfachen Abfragen bis zu komplexen Mehrfach-Join-Analysen.</div>
+    <span class="card-cta">Öffnen <span class="arrow">→</span></span>
+  </a>
+
+  <a href="er-aufgaben" class="card card-4">
+    <div class="card-badge">Neu</div>
+    <div class="card-index">04 / 04</div>
+    <div class="card-icon">🧩</div>
+    <div class="card-title">ER Aufgaben</div>
+    <div class="card-desc">10 praxisnahe Modellierungsaufgaben in 4 Schwierigkeitsstufen — von der Bibliothek bis zum Flughafen-System.</div>
+    <span class="card-cta">Öffnen <span class="arrow">→</span></span>
+  </a>
+
+</div>
+
+<footer>
+  <span class="footer-brand">LERN-ARCHIV</span>
+  <div class="footer-rule"></div>
+  <span class="footer-note">m290 · Datenbanken</span>
+</footer>
+
+</body>
+</html>

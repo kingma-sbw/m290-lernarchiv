@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Datenbank Theorie Lernen – m290</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d2e;
+      --card: #22263a;
+      --border: #2e3250;
+      --accent: #6c63ff;
+      --accent2: #ff6b6b;
+      --green: #43d98f;
+      --text: #e8eaf6;
+      --muted: #8892b0;
+      --radius: 14px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ── HEADER ── */
+    header {
+      width: 100%;
+      padding: 20px 32px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    header h1 { font-size: 1.25rem; font-weight: 700; }
+    header span { font-size: 0.8rem; color: var(--muted); background: var(--card); padding: 3px 10px; border-radius: 20px; }
+
+    /* ── MAIN ── */
+    main {
+      width: 100%;
+      max-width: 780px;
+      padding: 32px 16px 80px;
+    }
+
+    /* ── MODE TABS ── */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 32px;
+      background: var(--surface);
+      padding: 6px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    /* ── VIEWS ── */
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* ── PROGRESS BAR ── */
+    .progress-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .progress-bar {
+      flex: 1;
+      height: 6px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 99px;
+      transition: width 0.4s ease;
+    }
+    .progress-label { font-size: 0.85rem; color: var(--muted); white-space: nowrap; }
+
+    /* ── FLASHCARD ── */
+    .card-scene {
+      perspective: 1000px;
+      width: 100%;
+      height: 320px;
+      cursor: pointer;
+      margin-bottom: 24px;
+    }
+    .card-inner {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.55s cubic-bezier(.4,0,.2,1);
+    }
+    .card-scene.flipped .card-inner { transform: rotateY(180deg); }
+    .card-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: var(--radius);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      border: 1px solid var(--border);
+      text-align: center;
+    }
+    .card-front {
+      background: var(--card);
+    }
+    .card-back {
+      background: linear-gradient(135deg, #1e1b4b, #22263a);
+      transform: rotateY(180deg);
+      border-color: var(--accent);
+    }
+    .card-tag {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+    .card-front .card-tag { color: var(--muted); }
+    .card-term {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+    .card-hint {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .card-definition {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      color: var(--text);
+    }
+    .card-example {
+      margin-top: 16px;
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    /* Card nav */
+    .card-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .nav-btn {
+      padding: 10px 24px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--card);
+      color: var(--text);
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .nav-btn:hover { background: var(--accent); border-color: var(--accent); }
+    .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .nav-btn:disabled:hover { background: var(--card); border-color: var(--border); }
+    .shuffle-btn {
+      padding: 10px 16px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .shuffle-btn:hover { color: var(--text); border-color: var(--muted); }
+
+    /* ── QUIZ ── */
+    .quiz-question {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 28px 24px;
+      margin-bottom: 20px;
+    }
+    .quiz-question h2 {
+      font-size: 1.3rem;
+      line-height: 1.5;
+      margin-bottom: 6px;
+    }
+    .quiz-meta {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 520px) { .options-grid { grid-template-columns: 1fr; } }
+    .option-btn {
+      padding: 16px 18px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--card);
+      color: var(--text);
+      font-size: 0.95rem;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.15s;
+      line-height: 1.4;
+    }
+    .option-btn:hover:not(:disabled) { border-color: var(--accent); background: rgba(108,99,255,.08); }
+    .option-btn.correct { border-color: var(--green); background: rgba(67,217,143,.1); color: var(--green); }
+    .option-btn.wrong { border-color: var(--accent2); background: rgba(255,107,107,.1); color: var(--accent2); }
+    .option-btn:disabled { cursor: default; }
+
+    .quiz-feedback {
+      padding: 14px 18px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .quiz-feedback.show { display: block; }
+    .quiz-feedback.correct { background: rgba(67,217,143,.12); border: 1px solid var(--green); color: var(--green); }
+    .quiz-feedback.wrong { background: rgba(255,107,107,.12); border: 1px solid var(--accent2); color: #ff9f9f; }
+
+    .next-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--accent);
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      display: none;
+    }
+    .next-btn.show { display: block; }
+    .next-btn:hover { opacity: 0.88; }
+
+    /* ── RESULT SCREEN ── */
+    .result-screen {
+      text-align: center;
+      padding: 48px 0;
+    }
+    .result-score {
+      font-size: 5rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--accent), #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+    .result-label { font-size: 1.1rem; color: var(--muted); margin-bottom: 32px; }
+    .result-stars { font-size: 2rem; margin-bottom: 32px; }
+    .restart-btn {
+      padding: 14px 40px;
+      background: var(--accent);
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .restart-btn:hover { opacity: 0.88; }
+
+    /* ── OVERVIEW ── */
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 14px;
+    }
+    .overview-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .overview-card:hover { border-color: var(--accent); }
+    .overview-term { font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; }
+    .overview-def { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
+    .overview-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    /* ── TUPEL-PRÜFUNG ── */
+    .check-intro {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    .check-intro strong { color: var(--text); }
+    .check-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 22px;
+      margin-bottom: 14px;
+    }
+    .check-box-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent);
+      margin-bottom: 14px;
+    }
+    .attr-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .attr-input {
+      flex: 1;
+      padding: 8px 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+    .attr-input:focus { outline: none; border-color: var(--accent); }
+    .pk-label {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      cursor: pointer;
+      white-space: nowrap;
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      transition: all 0.15s;
+    }
+    .pk-label:has(input:checked) { border-color: var(--accent); color: var(--accent); background: rgba(108,99,255,.1); }
+    .pk-radio { accent-color: var(--accent); }
+    .remove-attr-btn {
+      padding: 7px 11px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 1rem;
+      line-height: 1;
+      transition: all 0.15s;
+    }
+    .remove-attr-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+    .add-attr-btn {
+      margin-top: 6px;
+      padding: 7px 16px;
+      background: transparent;
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.15s;
+    }
+    .add-attr-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* Tuple input table */
+    .tuple-table-wrap { overflow-x: auto; }
+    .tuple-table { width: 100%; border-collapse: collapse; min-width: 300px; }
+    .tuple-table th {
+      padding: 8px 10px;
+      text-align: center;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+    .tuple-table th.pk-col { color: var(--accent); }
+    .tuple-table .row-head { width: 72px; text-align: left; }
+    .tuple-table td { padding: 6px 6px; }
+    .tuple-label {
+      font-size: 0.85rem;
+      font-weight: 700;
+      white-space: nowrap;
+      padding-right: 12px !important;
+    }
+    .t1-label { color: #60a5fa; }
+    .t2-label { color: #fb923c; }
+    .tuple-val-input {
+      width: 100%;
+      min-width: 80px;
+      padding: 8px 10px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 0.9rem;
+      text-align: center;
+    }
+    .tuple-val-input:focus { outline: none; border-color: var(--accent); }
+
+    .check-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--accent);
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 20px;
+      transition: opacity 0.15s;
+    }
+    .check-btn:hover { opacity: 0.88; }
+
+    /* Result */
+    .check-result-box { border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
+    .verdict-banner {
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+    .verdict-banner.widerspruch { background: rgba(255,107,107,.15); border-left: 4px solid var(--accent2); color: #ff9f9f; }
+    .verdict-banner.ok { background: rgba(67,217,143,.12); border-left: 4px solid var(--green); color: var(--green); }
+    .verdict-banner.identical { background: rgba(108,99,255,.12); border-left: 4px solid var(--accent); color: #a78bfa; }
+    .verdict-icon { font-size: 1.4rem; }
+
+    /* Comparison table */
+    .compare-table-wrap { overflow-x: auto; border-top: 1px solid var(--border); }
+    .compare-table { width: 100%; border-collapse: collapse; }
+    .compare-table th {
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      background: var(--card);
+    }
+    .compare-table th.pk-th { color: var(--accent); }
+    .compare-table th.t1-th { color: #60a5fa; }
+    .compare-table th.t2-th { color: #fb923c; }
+    .compare-table td { padding: 10px 14px; font-size: 0.9rem; border-bottom: 1px solid var(--border); }
+    .compare-table tr:last-child td { border-bottom: none; }
+    .compare-table .cell-conflict { background: rgba(255,107,107,.1); color: #ff9f9f; font-weight: 700; }
+    .compare-table .cell-match-pk { color: var(--accent); font-weight: 700; }
+    .compare-table .cell-match { color: var(--green); }
+    .compare-table .diff-indicator { font-size: 0.82rem; }
+    .compare-table .diff-indicator.conflict { color: var(--accent2); font-weight: 700; }
+    .compare-table .diff-indicator.same-pk { color: var(--accent); }
+    .compare-table .diff-indicator.same { color: var(--green); }
+    .compare-table .diff-indicator.diff { color: var(--muted); }
+
+    .verdict-explain {
+      padding: 16px 20px;
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.7;
+      background: var(--card);
+      border-top: 1px solid var(--border);
+    }
+    .verdict-explain strong { color: var(--text); }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Datenbank Theorie</h1>
+  <span>m290</span>
+</header>
+
+<main>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('cards')">Karteikarten</button>
+    <button class="tab-btn" onclick="switchTab('quiz')">Quiz</button>
+    <button class="tab-btn" onclick="switchTab('overview')">Übersicht</button>
+    <button class="tab-btn" onclick="switchTab('check')">Tupel-Prüfung</button>
+  </div>
+
+  <!-- ── KARTEIKARTEN ── -->
+  <div id="view-cards" class="view active">
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="card-progress"></div></div>
+      <span class="progress-label" id="card-counter">1 / 12</span>
+    </div>
+
+    <div class="card-scene" id="card-scene" onclick="flipCard()">
+      <div class="card-inner" id="card-inner">
+        <div class="card-face card-front">
+          <div class="card-tag">Begriff</div>
+          <div class="card-term" id="card-term"></div>
+          <div class="card-hint">Klicken zum Aufdecken</div>
+        </div>
+        <div class="card-face card-back">
+          <div class="card-tag">Definition</div>
+          <div class="card-definition" id="card-def"></div>
+          <div class="card-example" id="card-ex"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-nav">
+      <button class="nav-btn" id="prev-btn" onclick="prevCard()">← Zurück</button>
+      <button class="shuffle-btn" onclick="shuffleCards()">Mischen</button>
+      <button class="nav-btn" id="next-btn" onclick="nextCard()">Weiter →</button>
+    </div>
+  </div>
+
+  <!-- ── QUIZ ── -->
+  <div id="view-quiz" class="view">
+    <div id="quiz-content">
+      <div class="progress-wrap">
+        <div class="progress-bar"><div class="progress-fill" id="quiz-progress"></div></div>
+        <span class="progress-label" id="quiz-counter">Frage 1 / 10</span>
+      </div>
+
+      <div class="quiz-question">
+        <div class="quiz-meta" id="quiz-meta"></div>
+        <h2 id="quiz-question-text"></h2>
+      </div>
+
+      <div class="options-grid" id="options-grid"></div>
+
+      <div class="quiz-feedback" id="quiz-feedback"></div>
+      <button class="next-btn" id="next-q-btn" onclick="nextQuestion()">Nächste Frage →</button>
+    </div>
+
+    <div id="quiz-result" class="result-screen" style="display:none">
+      <div class="result-score" id="result-score"></div>
+      <div class="result-label" id="result-label"></div>
+      <div class="result-stars" id="result-stars"></div>
+      <button class="restart-btn" onclick="restartQuiz()">Nochmal versuchen</button>
+    </div>
+  </div>
+
+  <!-- ── ÜBERSICHT ── -->
+  <div id="view-overview" class="view">
+    <div class="overview-title">Alle Begriffe auf einen Blick</div>
+    <div class="overview-grid" id="overview-grid"></div>
+  </div>
+
+  <!-- ── TUPEL-PRÜFUNG ── -->
+  <div id="view-check" class="view">
+    <p class="check-intro">
+      Definiere ein <strong>Schema</strong> (Attribute + Primärschlüssel), gib zwei Tupel ein
+      und prüfe, ob sie <strong>widerspruchsfrei</strong> oder in <strong>Widerspruch</strong> stehen.<br>
+      <em>Zwei Tupel widersprechen sich, wenn sie denselben Primärschlüssel, aber verschiedene Werte in anderen Attributen haben.</em>
+    </p>
+
+    <!-- Step 1: Schema -->
+    <div class="check-box">
+      <div class="check-box-title">1 · Schema definieren</div>
+      <div id="attr-rows"></div>
+      <button class="add-attr-btn" onclick="addAttrRow()">+ Attribut hinzufügen</button>
+    </div>
+
+    <!-- Step 2: Tuple input -->
+    <div class="check-box">
+      <div class="check-box-title">2 · Tupelwerte eingeben</div>
+      <div class="tuple-table-wrap">
+        <table class="tuple-table">
+          <thead><tr id="th-row"><th class="row-head"></th></tr></thead>
+          <tbody>
+            <tr id="t1-row"><td class="tuple-label t1-label">T<sub>1</sub></td></tr>
+            <tr id="t2-row"><td class="tuple-label t2-label">T<sub>2</sub></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <button class="check-btn" onclick="checkTuples()">Prüfen →</button>
+
+    <div id="check-result-box" class="check-result-box" style="display:none"></div>
+  </div>
+</main>
+
+<script>
+// ══════════════════════════════════════════
+//  DATEN
+// ══════════════════════════════════════════
+const TERMS = [
+  {
+    term: "Relation",
+    definition: "Eine zweidimensionale Tabelle in einer relationalen Datenbank, die aus Zeilen (Tupeln) und Spalten (Attributen) besteht.",
+    example: "Bsp: Die Tabelle «Kunde» mit Spalten KundenID, Name, Ort ist eine Relation."
+  },
+  {
+    term: "Tupel",
+    definition: "Eine einzelne Zeile (Datensatz) in einer Relation. Jedes Tupel beschreibt eine konkrete Instanz eines Objekts.",
+    example: "Bsp: (1, 'Müller', 'Bern') ist ein Tupel in der Relation «Kunde»."
+  },
+  {
+    term: "Attribut",
+    definition: "Eine Spalte in einer Relation. Jedes Attribut beschreibt eine Eigenschaft aller Tupel dieser Relation.",
+    example: "Bsp: «Name», «Geburtsdatum» und «PLZ» sind Attribute der Relation «Person»."
+  },
+  {
+    term: "Domäne",
+    definition: "Der Wertebereich (alle erlaubten Werte) eines Attributs. Definiert den Datentyp und mögliche Werte.",
+    example: "Bsp: Domäne von «Alter» könnte INTEGER 0–150 sein; Domäne von «Geschlecht» könnte {'m', 'w', 'd'} sein."
+  },
+  {
+    term: "Schema",
+    definition: "Die formale Beschreibung der Struktur einer Datenbank: welche Relationen existieren, welche Attribute sie haben und welche Datentypen/Constraints gelten.",
+    example: "Bsp: Kunde(KundenID: INT, Name: VARCHAR(50), Ort: VARCHAR(50))"
+  },
+  {
+    term: "Primärschlüssel",
+    definition: "Ein Attribut (oder eine Kombination von Attributen), das jeden Tupel in einer Relation eindeutig identifiziert. Wert darf nicht NULL und nicht doppelt sein.",
+    example: "Bsp: KundenID in der Tabelle «Kunde» – jeder Kunde hat eine einzigartige ID."
+  },
+  {
+    term: "Fremdschlüssel",
+    definition: "Ein Attribut in einer Relation, das auf den Primärschlüssel einer anderen (oder derselben) Relation verweist. Stellt referentielle Integrität sicher.",
+    example: "Bsp: BestellungID verweist über KundenID als Fremdschlüssel auf die Tabelle «Kunde»."
+  },
+  {
+    term: "Beziehung",
+    definition: "Eine Verbindung zwischen zwei oder mehr Relationen (Entitäten). Wird durch Kardinalitäten beschrieben (1:1, 1:n, m:n).",
+    example: "Bsp: Ein Kunde kann mehrere Bestellungen aufgeben → 1:n-Beziehung."
+  },
+  {
+    term: "Kardinalität",
+    definition: "Beschreibt die Anzahl der möglichen Verknüpfungen zwischen Entitäten: 1:1 (eins-zu-eins), 1:n (eins-zu-viele) oder m:n (viele-zu-viele).",
+    example: "Bsp: Schüler ↔ Kurse = m:n, weil ein Schüler viele Kurse hat und ein Kurs viele Schüler."
+  },
+  {
+    term: "Entität",
+    definition: "Ein eindeutig identifizierbares Objekt oder Konzept der realen Welt, das in einer Datenbank abgebildet wird.",
+    example: "Bsp: Ein bestimmter Kunde, ein Produkt oder ein Auftrag sind Entitäten."
+  },
+  {
+    term: "Redundanz",
+    definition: "Das mehrfache Speichern identischer Daten an verschiedenen Stellen in der Datenbank. Führt zu Inkonsistenzen und Speicherverschwendung.",
+    example: "Bsp: Den Kundennamen in jeder Bestellzeile wiederholen, statt ihn einmal in der Kundentabelle zu speichern."
+  },
+  {
+    term: "Normalisierung",
+    definition: "Ein Prozess zur Strukturierung einer Datenbank, um Redundanz zu reduzieren und Datenintegrität zu erhöhen. Erfolgt in mehreren Normalformen (1NF, 2NF, 3NF …).",
+    example: "Bsp: Eine Tabelle mit wiederholten Gruppen in die 1. Normalform überführen."
+  }
+];
+
+// ══════════════════════════════════════════
+//  TABS
+// ══════════════════════════════════════════
+function switchTab(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if (name === 'overview') renderOverview();
+}
+
+// ══════════════════════════════════════════
+//  KARTEIKARTEN
+// ══════════════════════════════════════════
+let cardDeck = [...TERMS];
+let cardIndex = 0;
+let isFlipped = false;
+
+function renderCard() {
+  const t = cardDeck[cardIndex];
+  document.getElementById('card-term').textContent = t.term;
+  document.getElementById('card-def').textContent = t.definition;
+  document.getElementById('card-ex').textContent = t.example || '';
+  document.getElementById('card-counter').textContent = `${cardIndex + 1} / ${cardDeck.length}`;
+  const pct = ((cardIndex + 1) / cardDeck.length) * 100;
+  document.getElementById('card-progress').style.width = pct + '%';
+  document.getElementById('prev-btn').disabled = cardIndex === 0;
+  document.getElementById('next-btn').disabled = cardIndex === cardDeck.length - 1;
+  // reset flip
+  const scene = document.getElementById('card-scene');
+  scene.classList.remove('flipped');
+  isFlipped = false;
+}
+
+function flipCard() {
+  const scene = document.getElementById('card-scene');
+  scene.classList.toggle('flipped');
+  isFlipped = !isFlipped;
+}
+
+function nextCard() {
+  if (cardIndex < cardDeck.length - 1) { cardIndex++; renderCard(); }
+}
+
+function prevCard() {
+  if (cardIndex > 0) { cardIndex--; renderCard(); }
+}
+
+function shuffleCards() {
+  for (let i = cardDeck.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [cardDeck[i], cardDeck[j]] = [cardDeck[j], cardDeck[i]];
+  }
+  cardIndex = 0;
+  renderCard();
+}
+
+// keyboard nav
+document.addEventListener('keydown', e => {
+  const cardsActive = document.getElementById('view-cards').classList.contains('active');
+  if (!cardsActive) return;
+  if (e.key === 'ArrowRight') nextCard();
+  else if (e.key === 'ArrowLeft') prevCard();
+  else if (e.key === ' ') { e.preventDefault(); flipCard(); }
+});
+
+// ══════════════════════════════════════════
+//  QUIZ
+// ══════════════════════════════════════════
+const QUESTION_TYPES = [
+  // Was bedeutet Begriff X?
+  (t, wrong) => ({
+    question: `Was bedeutet der Begriff «${t.term}»?`,
+    correct: t.definition,
+    options: shuffle([t.definition, ...wrong.map(w => w.definition)])
+  }),
+  // Welcher Begriff wird beschrieben?
+  (t, wrong) => ({
+    question: `Welcher Begriff wird hier beschrieben?\n«${t.definition}»`,
+    correct: t.term,
+    options: shuffle([t.term, ...wrong.map(w => w.term)])
+  }),
+];
+
+let quizQuestions = [];
+let quizIndex = 0;
+let quizScore = 0;
+let answered = false;
+
+function buildQuiz() {
+  const shuffled = shuffle([...TERMS]);
+  const pool = shuffled.slice(0, 10);
+  quizQuestions = pool.map((t, i) => {
+    const wrong = TERMS.filter(x => x !== t);
+    const wrongPick = shuffle(wrong).slice(0, 3);
+    const typeFn = QUESTION_TYPES[i % 2];
+    return typeFn(t, wrongPick);
+  });
+  quizIndex = 0;
+  quizScore = 0;
+}
+
+function renderQuestion() {
+  answered = false;
+  const q = quizQuestions[quizIndex];
+  document.getElementById('quiz-question-text').textContent = q.question;
+  document.getElementById('quiz-meta').textContent = `Frage ${quizIndex + 1} von ${quizQuestions.length}`;
+  document.getElementById('quiz-counter').textContent = `Frage ${quizIndex + 1} / ${quizQuestions.length}`;
+  const pct = ((quizIndex) / quizQuestions.length) * 100;
+  document.getElementById('quiz-progress').style.width = pct + '%';
+
+  const grid = document.getElementById('options-grid');
+  grid.innerHTML = '';
+  q.options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.textContent = opt;
+    btn.onclick = () => selectAnswer(opt, btn);
+    grid.appendChild(btn);
+  });
+
+  const fb = document.getElementById('quiz-feedback');
+  fb.className = 'quiz-feedback';
+  fb.textContent = '';
+  document.getElementById('next-q-btn').classList.remove('show');
+}
+
+function selectAnswer(chosen, btn) {
+  if (answered) return;
+  answered = true;
+  const q = quizQuestions[quizIndex];
+  const correct = chosen === q.correct;
+  if (correct) quizScore++;
+
+  // mark all buttons
+  document.querySelectorAll('.option-btn').forEach(b => {
+    b.disabled = true;
+    if (b.textContent === q.correct) b.classList.add('correct');
+  });
+  if (!correct) btn.classList.add('wrong');
+
+  // feedback
+  const fb = document.getElementById('quiz-feedback');
+  if (correct) {
+    fb.textContent = 'Richtig!';
+    fb.className = 'quiz-feedback show correct';
+  } else {
+    fb.textContent = `Falsch. Richtige Antwort: ${q.correct}`;
+    fb.className = 'quiz-feedback show wrong';
+  }
+
+  const isLast = quizIndex === quizQuestions.length - 1;
+  const nextBtn = document.getElementById('next-q-btn');
+  nextBtn.textContent = isLast ? 'Ergebnis anzeigen →' : 'Nächste Frage →';
+  nextBtn.classList.add('show');
+}
+
+function nextQuestion() {
+  if (quizIndex < quizQuestions.length - 1) {
+    quizIndex++;
+    renderQuestion();
+  } else {
+    showResult();
+  }
+}
+
+function showResult() {
+  document.getElementById('quiz-content').style.display = 'none';
+  const res = document.getElementById('quiz-result');
+  res.style.display = 'block';
+  const pct = Math.round((quizScore / quizQuestions.length) * 100);
+  document.getElementById('result-score').textContent = `${quizScore} / ${quizQuestions.length}`;
+  let label, stars;
+  if (pct === 100) { label = 'Perfekt! Du kennst alle Begriffe.'; stars = '★★★★★'; }
+  else if (pct >= 80) { label = 'Sehr gut! Fast perfekt.'; stars = '★★★★☆'; }
+  else if (pct >= 60) { label = 'Gut! Noch ein bisschen üben.'; stars = '★★★☆☆'; }
+  else if (pct >= 40) { label = 'Nicht schlecht. Wiederhole die Karteikarten!'; stars = '★★☆☆☆'; }
+  else { label = 'Nochmal lernen und dann nochmal versuchen!'; stars = '★☆☆☆☆'; }
+  document.getElementById('result-label').textContent = label;
+  document.getElementById('result-stars').textContent = stars;
+}
+
+function restartQuiz() {
+  document.getElementById('quiz-content').style.display = 'block';
+  document.getElementById('quiz-result').style.display = 'none';
+  buildQuiz();
+  renderQuestion();
+}
+
+// ══════════════════════════════════════════
+//  TUPEL-PRÜFUNG
+// ══════════════════════════════════════════
+let attrCounter = 0;
+const attrIds = [];
+
+function initCheckView() {
+  addAttrRow('KundenID', true);
+  addAttrRow('Name', false);
+  addAttrRow('Stadt', false);
+}
+
+function addAttrRow(name = '', isPK = false) {
+  const id = 'attr-' + (attrCounter++);
+  attrIds.push(id);
+  const row = document.createElement('div');
+  row.className = 'attr-row';
+  row.id = id;
+  row.innerHTML = `
+    <input class="attr-input" type="text" placeholder="Attributname" value="${name}" oninput="rebuildTupleTable()" />
+    <label class="pk-label">
+      <input type="radio" name="pk-radio" class="pk-radio" ${isPK ? 'checked' : ''} onchange="rebuildTupleTable()" />
+      PK (Primärschlüssel)
+    </label>
+    <button class="remove-attr-btn" title="Entfernen" onclick="removeAttrRow('${id}')">×</button>
+  `;
+  document.getElementById('attr-rows').appendChild(row);
+  rebuildTupleTable();
+}
+
+function removeAttrRow(id) {
+  const idx = attrIds.indexOf(id);
+  if (idx > -1) attrIds.splice(idx, 1);
+  const el = document.getElementById(id);
+  if (el) el.remove();
+  rebuildTupleTable();
+}
+
+function getAttrs() {
+  return attrIds.map(id => {
+    const row = document.getElementById(id);
+    if (!row) return null;
+    return {
+      id,
+      name: row.querySelector('.attr-input').value.trim() || '?',
+      isPK: row.querySelector('.pk-radio').checked
+    };
+  }).filter(Boolean);
+}
+
+function rebuildTupleTable() {
+  const attrs = getAttrs();
+  const thRow = document.getElementById('th-row');
+  const t1Row = document.getElementById('t1-row');
+  const t2Row = document.getElementById('t2-row');
+
+  // Save existing input values by attribute name
+  const saved = [{}, {}];
+  document.querySelectorAll('[data-tuple]').forEach(inp => {
+    saved[inp.dataset.tuple - 1][inp.dataset.attr] = inp.value;
+  });
+
+  // Rebuild header
+  thRow.innerHTML = '<th class="row-head"></th>';
+  attrs.forEach(a => {
+    const th = document.createElement('th');
+    th.textContent = a.isPK ? a.name + ' \uD83D\uDD11' : a.name;
+    if (a.isPK) th.className = 'pk-col';
+    thRow.appendChild(th);
+  });
+
+  // Rebuild input cells for both rows
+  [t1Row, t2Row].forEach((row, ri) => {
+    while (row.children.length > 1) row.removeChild(row.lastChild);
+    attrs.forEach(a => {
+      const td = document.createElement('td');
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'tuple-val-input';
+      input.dataset.tuple = ri + 1;
+      input.dataset.attr = a.name;
+      input.placeholder = '–';
+      input.value = saved[ri][a.name] || '';
+      td.appendChild(input);
+      row.appendChild(td);
+    });
+  });
+
+  document.getElementById('check-result-box').style.display = 'none';
+}
+
+function checkTuples() {
+  const attrs = getAttrs();
+  const pkAttrs = attrs.filter(a => a.isPK);
+  const nonPkAttrs = attrs.filter(a => !a.isPK);
+
+  if (pkAttrs.length === 0) {
+    alert('Bitte markiere mindestens ein Attribut als Primärschlüssel (PK).');
+    return;
+  }
+
+  // Collect values
+  const vals = [{}, {}];
+  document.querySelectorAll('[data-tuple]').forEach(inp => {
+    vals[inp.dataset.tuple - 1][inp.dataset.attr] = inp.value.trim();
+  });
+  const t1 = vals[0], t2 = vals[1];
+
+  // Check for empty fields
+  const hasEmpty = attrs.some(a => !t1[a.name] || !t2[a.name]);
+  if (hasEmpty) {
+    alert('Bitte fülle alle Felder für beide Tupel aus.');
+    return;
+  }
+
+  const allSame = attrs.every(a => t1[a.name] === t2[a.name]);
+  const pkSame = pkAttrs.every(a => t1[a.name] === t2[a.name]);
+  const conflicts = nonPkAttrs.filter(a => t1[a.name] !== t2[a.name]);
+
+  // Build comparison table rows
+  const tableRows = attrs.map(a => {
+    const v1 = t1[a.name], v2 = t2[a.name];
+    const same = v1 === v2;
+    const isConflict = pkSame && !same && !a.isPK;
+    const isPKCell = a.isPK;
+
+    let c1 = '', c2 = '', indClass = 'diff', indText = '≠ verschieden';
+    if (isConflict) {
+      c1 = c2 = 'cell-conflict'; indClass = 'conflict'; indText = '⚠ Konflikt!';
+    } else if (same && isPKCell) {
+      c1 = c2 = 'cell-match-pk'; indClass = 'same-pk'; indText = '= gleich (PK)';
+    } else if (same) {
+      c1 = c2 = 'cell-match'; indClass = 'same'; indText = '= gleich';
+    }
+
+    return `<tr>
+      <th class="${isPKCell ? 'pk-th' : ''}">${isPKCell ? '🔑 ' : ''}${a.name}</th>
+      <td class="${c1}">${v1}</td>
+      <td class="${c2}">${v2}</td>
+      <td class="diff-indicator ${indClass}">${indText}</td>
+    </tr>`;
+  }).join('');
+
+  // Determine verdict
+  let verdict, title, icon, explanation;
+
+  if (allSame) {
+    verdict = 'identical';
+    icon = '♾️';
+    title = 'Identische Tupel';
+    explanation = `Beide Tupel sind <strong>vollständig identisch</strong>. Sie stehen nicht in direktem Widerspruch, aber <strong>identische Duplikate</strong> sind in einer Relation nicht erlaubt (Verletzung der Eindeutigkeit) und bezeichnen <strong>Redundanz</strong>.`;
+  } else if (!pkSame) {
+    verdict = 'ok';
+    icon = '✅';
+    title = 'Widerspruchsfrei';
+    const pkList = pkAttrs.map(a => `«${a.name}»`).join(' + ');
+    explanation = `Die Tupel sind <strong>widerspruchsfrei</strong>. Der Primärschlüssel (${pkList}) ist in beiden Tupeln <strong>verschieden</strong> – sie beschreiben damit unterschiedliche Entitäten. Es liegt kein Widerspruch vor.`;
+  } else {
+    verdict = 'widerspruch';
+    icon = '⚠️';
+    title = 'Widerspruch!';
+    const pkList = pkAttrs.map(a => `«${a.name}» = "${t1[a.name]}"`).join(', ');
+    const confList = conflicts.map(a => `<strong>«${a.name}»</strong>`).join(', ');
+    explanation = `Die Tupel stehen in <strong>Widerspruch</strong>!<br>
+      Beide haben denselben Primärschlüssel (${pkList}), aber unterschiedliche Werte bei: ${confList}.<br><br>
+      Der Primärschlüssel muss jeden Datensatz <em>eindeutig</em> identifizieren – das bedeutet, er bestimmt funktional alle anderen Attribute (<strong>PK → alle Attribute</strong>). Zwei Tupel mit gleichem PK dürfen sich in keinem anderen Attribut unterscheiden. Diese Bedingung ist hier verletzt.`;
+  }
+
+  const resultBox = document.getElementById('check-result-box');
+  resultBox.style.display = 'block';
+  resultBox.innerHTML = `
+    <div class="verdict-banner ${verdict}">
+      <span class="verdict-icon">${icon}</span>
+      <span>${title}</span>
+    </div>
+    <div class="compare-table-wrap">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Attribut</th>
+            <th class="t1-th">Tupel 1 (T₁)</th>
+            <th class="t2-th">Tupel 2 (T₂)</th>
+            <th>Vergleich</th>
+          </tr>
+        </thead>
+        <tbody>${tableRows}</tbody>
+      </table>
+    </div>
+    <div class="verdict-explain">${explanation}</div>
+  `;
+  resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ══════════════════════════════════════════
+//  ÜBERSICHT
+// ══════════════════════════════════════════
+function renderOverview() {
+  const grid = document.getElementById('overview-grid');
+  if (grid.children.length > 0) return; // already rendered
+  TERMS.forEach(t => {
+    const card = document.createElement('div');
+    card.className = 'overview-card';
+    card.innerHTML = `<div class="overview-term">${t.term}</div><div class="overview-def">${t.definition}</div>`;
+    grid.appendChild(card);
+  });
+}
+
+// ══════════════════════════════════════════
+//  UTILS
+// ══════════════════════════════════════════
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ══════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════
+renderCard();
+buildQuiz();
+renderQuestion();
+initCheckView();
+</script>
+</body>
+</html>

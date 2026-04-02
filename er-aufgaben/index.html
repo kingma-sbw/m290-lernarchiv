@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache">
+  <title>ER-Diagramm Aufgaben · M290</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    :root {
+      --bg:        #f5f2eb;
+      --ink:       #1a1a18;
+      --ink-dim:   #6b6860;
+      --ink-faint: #b8b4aa;
+      --rule:      #d9d5cc;
+      --card-bg:   #ffffff;
+      --accent-er: #1a3a8f;   /* navy – ER Aufgaben */
+      --green:     #1a6b3a;
+      --orange:    #8f3a1a;
+      --serif:     'DM Serif Display', Georgia, serif;
+      --mono:      'DM Mono', monospace;
+      --sans:      'DM Sans', sans-serif;
+      /* difficulty */
+      --easy:   #1a6b3a;
+      --medium: #7a5a00;
+      --hard:   #8f1a1a;
+      --expert: #1a1a8f;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    }
+
+    .top-rule { height: 3px; background: var(--ink); }
+
+    /* ── Back link ── */
+    .back-bar {
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 1.2rem 2rem 0;
+      opacity: 0;
+      animation: fadeUp 0.4s ease 0.05s forwards;
+    }
+    .back-link {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-dim);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: color 0.15s;
+    }
+    .back-link:hover { color: var(--ink); }
+
+    /* ── Masthead ── */
+    masthead {
+      display: block;
+      padding: 2rem 2rem 0;
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .kicker {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-dim);
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      opacity: 0;
+      animation: fadeUp 0.5s ease 0.1s forwards;
+    }
+    .kicker::before {
+      content: '';
+      display: inline-block;
+      width: 28px; height: 1px;
+      background: var(--ink-dim);
+    }
+    h1 {
+      font-family: var(--serif);
+      font-size: clamp(2.2rem, 5vw, 3.8rem);
+      line-height: 1.05;
+      color: var(--ink);
+      margin-bottom: 0.75rem;
+      opacity: 0;
+      animation: fadeUp 0.55s ease 0.2s forwards;
+    }
+    h1 em { font-style: italic; color: var(--ink-dim); }
+    .subtitle {
+      font-size: 0.95rem;
+      color: var(--ink-dim);
+      font-weight: 300;
+      max-width: 520px;
+      line-height: 1.65;
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeUp 0.55s ease 0.3s forwards;
+    }
+
+    .rule {
+      border: none;
+      border-top: 1px solid var(--rule);
+      margin: 0 auto 2rem;
+      max-width: 900px;
+      opacity: 0;
+      animation: fadeIn 0.4s ease 0.38s forwards;
+    }
+
+    /* ── Controls ── */
+    .controls {
+      max-width: 900px;
+      margin: 0 auto;
+      width: calc(100% - 4rem);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.5s ease 0.42s forwards;
+    }
+    .filter-group {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.35rem 0.85rem;
+      border: 1px solid var(--rule);
+      background: var(--card-bg);
+      color: var(--ink-dim);
+      cursor: pointer;
+      border-radius: 2px;
+      transition: all 0.15s;
+    }
+    .filter-btn:hover { border-color: var(--ink-dim); color: var(--ink); }
+    .filter-btn.active {
+      background: var(--ink);
+      color: var(--bg);
+      border-color: var(--ink);
+    }
+    .filter-btn.diff-easy.active   { background: var(--easy);   border-color: var(--easy); }
+    .filter-btn.diff-medium.active { background: var(--medium); border-color: var(--medium); }
+    .filter-btn.diff-hard.active   { background: var(--hard);   border-color: var(--hard); }
+    .filter-btn.diff-expert.active { background: var(--expert); border-color: var(--expert); }
+
+    .controls-right {
+      margin-left: auto;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--ink-faint);
+      letter-spacing: 0.08em;
+    }
+
+    /* ── Progress bar ── */
+    .progress-bar-wrap {
+      max-width: 900px;
+      margin: 0 auto 1.5rem;
+      width: calc(100% - 4rem);
+      opacity: 0;
+      animation: fadeIn 0.5s ease 0.5s forwards;
+    }
+    .progress-meta {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      color: var(--ink-faint);
+      letter-spacing: 0.08em;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.4rem;
+    }
+    .progress-track {
+      height: 2px;
+      background: var(--rule);
+      border-radius: 1px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--accent-er);
+      border-radius: 1px;
+      transition: width 0.4s ease;
+    }
+
+    /* ── Task list ── */
+    .task-list {
+      max-width: 900px;
+      margin: 0 auto;
+      width: calc(100% - 4rem);
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      background: var(--rule);
+      border: 1px solid var(--rule);
+      opacity: 0;
+      animation: fadeUp 0.6s ease 0.5s forwards;
+    }
+
+    .task-row {
+      background: var(--card-bg);
+      cursor: pointer;
+      transition: background 0.15s;
+      position: relative;
+    }
+    .task-row:hover { background: #fafaf7; }
+    .task-row.done { background: #f9fdf9; }
+    .task-row.expanded { background: #fafaf7; }
+
+    .task-header {
+      padding: 1.25rem 1.75rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .task-num {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      color: var(--ink-faint);
+      letter-spacing: 0.1em;
+      flex-shrink: 0;
+      width: 2.5rem;
+    }
+
+    .diff-pill {
+      font-family: var(--mono);
+      font-size: 0.58rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.55rem;
+      border-radius: 2px;
+      flex-shrink: 0;
+      font-weight: 500;
+    }
+    .diff-easy   { background: #e6f4ec; color: var(--easy); }
+    .diff-medium { background: #fef9e6; color: var(--medium); }
+    .diff-hard   { background: #fdeaea; color: var(--hard); }
+    .diff-expert { background: #eaebfd; color: var(--expert); }
+
+    .task-title-wrap { flex: 1; }
+    .task-title {
+      font-family: var(--serif);
+      font-size: 1.1rem;
+      color: var(--ink);
+      line-height: 1.2;
+      margin-bottom: 0.15rem;
+    }
+    .task-meta {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      color: var(--ink-faint);
+      letter-spacing: 0.06em;
+    }
+
+    .task-check {
+      width: 1.4rem;
+      height: 1.4rem;
+      border: 1.5px solid var(--rule);
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      color: transparent;
+      font-size: 0.7rem;
+    }
+    .task-row.done .task-check {
+      background: var(--easy);
+      border-color: var(--easy);
+      color: white;
+    }
+
+    .task-chevron {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--ink-faint);
+      transition: transform 0.2s;
+      flex-shrink: 0;
+    }
+    .task-row.expanded .task-chevron { transform: rotate(90deg); }
+
+    /* ── Task body (expanded) ── */
+    .task-body {
+      border-top: 1px solid var(--rule);
+      padding: 1.5rem 1.75rem 1.5rem calc(1.75rem + 3.5rem);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+    @media (max-width: 640px) {
+      .task-body { grid-template-columns: 1fr; padding-left: 1.75rem; }
+    }
+
+    .scenario-block h3 {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-bottom: 0.75rem;
+    }
+    .scenario-text {
+      font-size: 0.88rem;
+      line-height: 1.7;
+      color: var(--ink-dim);
+    }
+    .scenario-text strong { color: var(--ink); font-weight: 500; }
+
+    .requirements-block h3 {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-bottom: 0.75rem;
+    }
+
+    .req-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .req-list li {
+      font-size: 0.84rem;
+      color: var(--ink-dim);
+      line-height: 1.5;
+      padding-left: 1rem;
+      position: relative;
+    }
+    .req-list li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--ink-faint);
+    }
+
+    .hints-block {
+      grid-column: 1 / -1;
+      border-top: 1px solid var(--rule);
+      padding-top: 1.25rem;
+    }
+    .hints-block h3 {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-bottom: 0.75rem;
+    }
+    .hint-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .hint-pill {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      padding: 0.25rem 0.65rem;
+      background: var(--bg);
+      border: 1px solid var(--rule);
+      border-radius: 2px;
+      color: var(--ink-dim);
+      letter-spacing: 0.05em;
+    }
+
+    .actions-bar {
+      grid-column: 1 / -1;
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      flex-wrap: wrap;
+      padding-top: 1rem;
+      border-top: 1px solid var(--rule);
+      margin-top: 0.5rem;
+    }
+
+    .btn-er {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.55rem 1.2rem;
+      background: var(--accent-er);
+      color: white;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: opacity 0.15s;
+    }
+    .btn-er:hover { opacity: 0.85; }
+
+    .btn-done {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.55rem 1.2rem;
+      background: transparent;
+      color: var(--ink-dim);
+      border: 1px solid var(--rule);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.15s;
+    }
+    .btn-done:hover { border-color: var(--easy); color: var(--easy); }
+    .task-row.done .btn-done {
+      border-color: var(--easy);
+      color: var(--easy);
+      background: #f0faf3;
+    }
+
+    .task-time {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      color: var(--ink-faint);
+      margin-left: auto;
+      letter-spacing: 0.06em;
+    }
+
+    /* entity tags in scenario */
+    .etag {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      padding: 0.1rem 0.4rem;
+      background: #eef2ff;
+      color: var(--accent-er);
+      border-radius: 2px;
+      border: 1px solid #c7d2fe;
+      font-weight: 500;
+    }
+
+    /* ── Empty state ── */
+    .empty-state {
+      max-width: 900px;
+      margin: 2rem auto;
+      width: calc(100% - 4rem);
+      text-align: center;
+      padding: 3rem;
+      border: 1px dashed var(--rule);
+      background: var(--card-bg);
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--ink-faint);
+      letter-spacing: 0.08em;
+    }
+
+    /* ── Footer ── */
+    footer {
+      margin-top: auto;
+      padding: 2.5rem 2rem;
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeIn 0.5s ease 0.7s forwards;
+    }
+    .footer-brand { font-family: var(--mono); font-size: 0.7rem; color: var(--ink-faint); letter-spacing: 0.08em; }
+    .footer-rule  { flex: 1; height: 1px; background: var(--rule); min-width: 40px; }
+    .footer-note  { font-family: var(--mono); font-size: 0.65rem; color: var(--ink-faint); letter-spacing: 0.06em; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; } to { opacity: 1; }
+    }
+
+    @media (max-width: 540px) {
+      masthead { padding: 1.5rem 1.25rem 0; }
+      .controls, .task-list, .progress-bar-wrap { width: calc(100% - 2.5rem); }
+      .back-bar { padding: 1rem 1.25rem 0; }
+      footer { padding: 2rem 1.25rem; }
+      .task-header { padding: 1rem 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="top-rule"></div>
+
+<div id="app">
+
+  <div class="back-bar">
+    <a href="../" class="back-link">← Lern-Archiv</a>
+  </div>
+
+  <masthead>
+    <p class="kicker">M290 · ER-Diagramme</p>
+    <h1>Aufgaben <em>ER-Design</em></h1>
+    <p class="subtitle">
+      Übe das Erstellen von Entity-Relationship-Diagrammen anhand realer Szenarien —
+      von einfachen Bibliotheksdaten bis zu komplexen Unternehmenssystemen.
+    </p>
+  </masthead>
+
+  <hr class="rule">
+
+  <!-- Controls -->
+  <div class="controls">
+    <div class="filter-group">
+      <button
+        class="filter-btn"
+        :class="{ active: activeFilter === 'all' }"
+        @click="activeFilter = 'all'">
+        Alle ({{ tasks.length }})
+      </button>
+      <button
+        v-for="d in difficulties"
+        :key="d.key"
+        class="filter-btn"
+        :class="['diff-' + d.key, { active: activeFilter === d.key }]"
+        @click="activeFilter = d.key">
+        {{ d.label }} ({{ tasks.filter(t => t.difficulty === d.key).length }})
+      </button>
+    </div>
+    <div class="controls-right">
+      {{ doneCount }} / {{ tasks.length }} erledigt
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-bar-wrap">
+    <div class="progress-meta">
+      <span>Fortschritt</span>
+      <span>{{ Math.round(doneCount / tasks.length * 100) }}%</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" :style="{ width: (doneCount / tasks.length * 100) + '%' }"></div>
+    </div>
+  </div>
+
+  <!-- Task list -->
+  <div class="task-list" v-if="filteredTasks.length">
+    <div
+      v-for="(task, idx) in filteredTasks"
+      :key="task.id"
+      class="task-row"
+      :class="{ done: task.done, expanded: expandedId === task.id }">
+
+      <!-- Header row -->
+      <div class="task-header" @click="toggle(task.id)">
+        <span class="task-num">{{ String(task.id).padStart(2,'0') }}</span>
+        <span class="diff-pill" :class="'diff-' + task.difficulty">
+          {{ diffLabel(task.difficulty) }}
+        </span>
+        <div class="task-title-wrap">
+          <div class="task-title">{{ task.title }}</div>
+          <div class="task-meta">{{ task.context }} · {{ task.entities.length }} Entitäten · ~{{ task.minutes }} min</div>
+        </div>
+        <div class="task-check">✓</div>
+        <span class="task-chevron">›</span>
+      </div>
+
+      <!-- Expanded body -->
+      <div class="task-body" v-if="expandedId === task.id" @click.stop>
+
+        <div class="scenario-block">
+          <h3>Szenario</h3>
+          <p class="scenario-text" v-html="task.scenario"></p>
+        </div>
+
+        <div class="requirements-block">
+          <h3>Anforderungen</h3>
+          <ul class="req-list">
+            <li v-for="r in task.requirements" :key="r">{{ r }}</li>
+          </ul>
+        </div>
+
+        <div class="hints-block">
+          <h3>Erwartete Entitäten &amp; Schlüsselkonzepte</h3>
+          <div class="hint-pills">
+            <span class="hint-pill" v-for="e in task.entities" :key="e">{{ e }}</span>
+          </div>
+        </div>
+
+        <div class="actions-bar">
+          <a :href="erEditorUrl(task)" class="btn-er" target="_blank">
+            📐 Im ER-Editor öffnen →
+          </a>
+          <button class="btn-done" @click="toggleDone(task)">
+            <span v-if="!task.done">☐ Als erledigt markieren</span>
+            <span v-else>✓ Erledigt</span>
+          </button>
+          <span class="task-time">⏱ ca. {{ task.minutes }} Minuten</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty -->
+  <div class="empty-state" v-else>
+    Keine Aufgaben für diesen Filter.
+  </div>
+
+  <footer>
+    <span class="footer-brand">ER-AUFGABEN</span>
+    <div class="footer-rule"></div>
+    <span class="footer-note">m290 · Datenbanken · BFS Lernbegleitung</span>
+  </footer>
+
+</div>
+
+<script>
+const { createApp, ref, computed } = Vue;
+
+// ─── Aufgaben-Datenbank ───────────────────────────────────────────────────────
+const TASKS = [
+
+  // ── EINFACH ────────────────────────────────────────────────────────────────
+
+  {
+    id: 1,
+    title: "Bibliothek",
+    context: "Öffentliche Stadtbibliothek",
+    difficulty: "easy",
+    minutes: 15,
+    scenario: `Eine kleine Stadtbibliothek möchte ihre <strong>Bücher</strong> und
+      <strong>Mitglieder</strong> digital verwalten. Mitglieder können Bücher
+      ausleihen und zurückgeben. Jedes Buch hat einen Titel, eine ISBN und
+      einen Autor. Mitglieder sind mit Name und Adresse registriert.`,
+    requirements: [
+      "Entitäten und ihre wichtigsten Attribute bestimmen",
+      "Beziehung «leiht aus» mit Kardinalität definieren",
+      "Primärschlüssel für jede Entität festlegen",
+      "Ausleihdatum als Attribut der Beziehung ergänzen",
+    ],
+    entities: ["Buch", "Mitglied", "Ausleihe (Beziehungstabelle)"],
+  },
+
+  {
+    id: 2,
+    title: "Tierarztpraxis",
+    context: "Lokale Tierarztpraxis",
+    difficulty: "easy",
+    minutes: 15,
+    scenario: `Eine Tierarztpraxis verwaltet ihre <strong>Patienten</strong> (Tiere)
+      und deren <strong>Besitzer</strong>. Ein Tier gehört genau einem Besitzer,
+      ein Besitzer kann mehrere Tiere haben. Für jede Behandlung wird ein
+      <strong>Eintrag</strong> mit Datum und Diagnose gespeichert.`,
+    requirements: [
+      "Tier-Entität mit Art, Name, Geburtsdatum",
+      "Besitzer-Entität mit Kontaktdaten",
+      "1:n-Beziehung zwischen Besitzer und Tier",
+      "Behandlung als eigene Entität mit Datum und Diagnose",
+    ],
+    entities: ["Tier", "Besitzer", "Behandlung", "Tierarzt"],
+  },
+
+  {
+    id: 3,
+    title: "Schulverwaltung",
+    context: "Berufsschule / BFS",
+    difficulty: "easy",
+    minutes: 20,
+    scenario: `Eine Berufsschule verwaltet <strong>Schüler*innen</strong>,
+      <strong>Klassen</strong> und <strong>Lehrpersonen</strong>.
+      Jede Klasse hat eine Klassenlehrperson. Schüler*innen besuchen genau
+      eine Klasse. Lehrpersonen unterrichten mehrere Klassen.`,
+    requirements: [
+      "Schüler*in: Vorname, Nachname, Geburtsdatum, Lehrjahr",
+      "Klasse: Bezeichnung, Raum, Schuljahr",
+      "Lehrperson: Name, Fächer",
+      "Kardinalitäten aller Beziehungen korrekt bestimmen",
+    ],
+    entities: ["Schüler*in", "Klasse", "Lehrperson"],
+  },
+
+  // ── MITTEL ─────────────────────────────────────────────────────────────────
+
+  {
+    id: 4,
+    title: "Online-Shop",
+    context: "E-Commerce Plattform",
+    difficulty: "medium",
+    minutes: 25,
+    scenario: `Ein Online-Shop verkauft <strong>Produkte</strong> verschiedener
+      <strong>Kategorien</strong> an <strong>Kunden</strong>.
+      Kunden können <strong>Bestellungen</strong> aufgeben, die mehrere Produkte
+      in unterschiedlichen Mengen enthalten. Produkte haben Preise, Lagerbestand
+      und gehören zu einer Kategorie. Jede Bestellung hat einen Status
+      (offen, versendet, geliefert).`,
+    requirements: [
+      "Produkt mit Kategorie (1:n-Beziehung)",
+      "Bestellung mit Status und Bestelldatum",
+      "n:m-Beziehung zwischen Bestellung und Produkt (mit Menge & Einzelpreis)",
+      "Kunde mit Login-Daten und Lieferadresse",
+      "Zwischentabelle Bestellposition korrekt modellieren",
+    ],
+    entities: ["Kunde", "Bestellung", "Bestellposition", "Produkt", "Kategorie"],
+  },
+
+  {
+    id: 5,
+    title: "Vereinsverwaltung",
+    context: "Sportverein / Hobby-Club",
+    difficulty: "medium",
+    minutes: 25,
+    scenario: `Ein Sportverein verwaltet seine <strong>Mitglieder</strong>,
+      <strong>Abteilungen</strong> (z.B. Fussball, Tennis) und
+      <strong>Veranstaltungen</strong>. Mitglieder können in mehreren
+      Abteilungen aktiv sein. Jede Abteilung hat einen Leiter (selbst Mitglied).
+      Für Veranstaltungen wird eine Anmeldeliste geführt.`,
+    requirements: [
+      "Mitglied kann mehrere Abteilungen haben (n:m)",
+      "Abteilungsleiter als selbstreferenzielle Beziehung oder FK",
+      "Veranstaltung mit Datum, Ort, max. Teilnehmerzahl",
+      "Anmeldung als Beziehungstabelle mit Anmeldedatum",
+      "Mitgliedsbeitrag und Eintrittsdatum beim Mitglied",
+    ],
+    entities: ["Mitglied", "Abteilung", "Mitglied_Abteilung", "Veranstaltung", "Anmeldung"],
+  },
+
+  {
+    id: 6,
+    title: "Hotelbuchung",
+    context: "Boutique Hotel",
+    difficulty: "medium",
+    minutes: 30,
+    scenario: `Ein Hotel möchte <strong>Zimmer</strong>, <strong>Gäste</strong>
+      und <strong>Buchungen</strong> verwalten. Zimmer haben eine Kategorie
+      (Einzel, Doppel, Suite) und einen Tagespreis. Gäste können mehrere
+      Buchungen haben. Eine Buchung umfasst Check-in, Check-out und kann
+      optionale <strong>Zusatzleistungen</strong> (Frühstück, Spa) enthalten.`,
+    requirements: [
+      "Zimmer mit Kategorie, Preis, Etage, Verfügbarkeit",
+      "Gast mit Kontaktdaten und Nationalität",
+      "Buchung mit Check-in/out, Gesamtpreis, Status",
+      "Zusatzleistungen als eigene Entität (n:m zu Buchung)",
+      "Saison/Preismodell optional ergänzen",
+    ],
+    entities: ["Gast", "Zimmer", "Zimmerkategorie", "Buchung", "Zusatzleistung"],
+  },
+
+  // ── SCHWER ─────────────────────────────────────────────────────────────────
+
+  {
+    id: 7,
+    title: "Krankenhaus",
+    context: "Spital / Klinik",
+    difficulty: "hard",
+    minutes: 40,
+    scenario: `Ein Krankenhaus verwaltet <strong>Patienten</strong>,
+      <strong>Ärzte</strong>, <strong>Stationen</strong>, <strong>Behandlungen</strong>
+      und <strong>Medikamente</strong>. Patienten werden auf Stationen aufgenommen
+      und von mehreren Ärzten behandelt. Ärzte haben Fachgebiete. Behandlungen
+      können Medikamente mit Dosierung umfassen. Einige Ärzte sind
+      Stationsleiter.`,
+    requirements: [
+      "Patient: Aufnahme, Entlassung, Diagnosen (mehrere möglich)",
+      "Arzt mit Fachgebiet; Stationsleiter als optionale Rolle",
+      "Station mit Kapazität und Abteilung",
+      "n:m zwischen Patient und Arzt (Behandlung)",
+      "Medikament mit ATC-Code, Dosierungseinheit",
+      "Verschreibung als Beziehungstabelle Patient–Medikament–Arzt",
+    ],
+    entities: ["Patient", "Arzt", "Station", "Behandlung", "Medikament", "Verschreibung", "Fachgebiet"],
+  },
+
+  {
+    id: 8,
+    title: "Streaming-Plattform",
+    context: "Video/Musik Streaming",
+    difficulty: "hard",
+    minutes: 40,
+    scenario: `Eine Streaming-Plattform verwaltet <strong>Nutzer</strong>,
+      <strong>Inhalte</strong> (Filme, Serien, Episoden), <strong>Abonnements</strong>
+      und <strong>Wiedergabehistorie</strong>. Nutzer können Inhalte bewerten
+      und auf Watchlists setzen. Inhalte haben Genres, Altersfreigaben und
+      gehören zu Produktionsfirmen. Serien bestehen aus Staffeln und Episoden.`,
+    requirements: [
+      "Inhalt als Basisentität mit Spezialisierung (Film / Serie)",
+      "Serie → Staffel → Episode (Hierarchie abbilden)",
+      "Nutzer mit Abo-Modell (Basic, Premium) und Profilen",
+      "Wiedergabehistorie mit Zeitstempel und Fortschritt",
+      "Bewertung und Watchlist als Beziehungstabellen",
+      "Genre und Inhalte als n:m-Beziehung",
+    ],
+    entities: ["Nutzer", "Profil", "Abo", "Inhalt", "Film", "Serie", "Staffel", "Episode", "Genre", "Produktionsfirma", "Verlauf", "Bewertung"],
+  },
+
+  // ── EXPERTE ────────────────────────────────────────────────────────────────
+
+  {
+    id: 9,
+    title: "Lieferketten-Management",
+    context: "Produktionsunternehmen / ERP",
+    difficulty: "expert",
+    minutes: 60,
+    scenario: `Ein Produktionsunternehmen verwaltet seine gesamte
+      <strong>Lieferkette</strong>: von <strong>Lieferanten</strong> über
+      <strong>Rohmaterialien</strong> und <strong>Lager</strong> bis zu
+      <strong>Fertigprodukten</strong> und <strong>Kundenaufträgen</strong>.
+      Produktionsaufträge transformieren Materialien zu Produkten.
+      Mehrere Lagerorte existieren. Qualitätsprüfungen werden dokumentiert.`,
+    requirements: [
+      "Lieferant mit Zertifizierungen und Bewertung",
+      "Material und Produkt als Stückliste (BOM: Bill of Materials)",
+      "Lager mit Standort, Kapazität, Lagerpositionen",
+      "Bestellung (Einkauf) und Kundenauftrag (Verkauf) separat",
+      "Produktionsauftrag mit Status, Maschine, Mitarbeiter",
+      "Qualitätsprüfung mit Prüfprotokoll und Ergebnis",
+      "Alle Kardinalitäten und Fremdschlüssel vollständig",
+    ],
+    entities: ["Lieferant", "Material", "Produkt", "Stückliste", "Lager", "Lagerposition", "Bestellung", "Kundenauftrag", "Produktionsauftrag", "Maschine", "Mitarbeiter", "Qualitätsprüfung"],
+  },
+
+  {
+    id: 10,
+    title: "Flughafen-System",
+    context: "Internationaler Flughafen",
+    difficulty: "expert",
+    minutes: 60,
+    scenario: `Ein Flughafen-Management-System verwaltet
+      <strong>Flüge</strong>, <strong>Flugzeuge</strong>,
+      <strong>Passagiere</strong>, <strong>Gates</strong>,
+      <strong>Personal</strong> und <strong>Gepäck</strong>.
+      Airlines betreiben Flüge mit bestimmten Flugzeugtypen. Passagiere
+      buchen Tickets mit Sitzklassen. Crew-Mitglieder (Piloten, Kabine)
+      sind Flügen zugeteilt. Gepäck wird pro Passagier und Flug verfolgt.
+      Verspätungen und Statusänderungen werden protokolliert.`,
+    requirements: [
+      "Airline, Flugzeugtyp und konkretes Flugzeug unterscheiden",
+      "Flug mit Abflug/Ankunft, Gate, Status, Verzögerungsprotokoll",
+      "Passagier mit Buchung, Sitzklasse, Sitzplatznummer",
+      "Crew-Zuteilung mit Rolle (Kapitän, Copilot, Kabine)",
+      "Gepäck mit Tracking-Status und Gewicht",
+      "Gate mit Terminal und Verfügbarkeitsplan",
+      "Minimum 10 Entitäten, alle Beziehungen begründen",
+    ],
+    entities: ["Airline", "Flugzeugtyp", "Flugzeug", "Flug", "Gate", "Terminal", "Passagier", "Buchung", "Ticket", "Gepäck", "Crew-Mitglied", "Crew-Zuteilung", "Statusprotokoll"],
+  },
+
+];
+
+// ─── App ──────────────────────────────────────────────────────────────────────
+createApp({
+  setup() {
+    const tasks = ref(TASKS.map(t => ({
+      ...t,
+      done: JSON.parse(localStorage.getItem('er-done-' + t.id) || 'false'),
+    })));
+
+    const difficulties = [
+      { key: 'easy',   label: 'Einfach' },
+      { key: 'medium', label: 'Mittel' },
+      { key: 'hard',   label: 'Schwer' },
+      { key: 'expert', label: 'Experte' },
+    ];
+
+    const activeFilter = ref('all');
+    const expandedId   = ref(null);
+
+    const filteredTasks = computed(() =>
+      activeFilter.value === 'all'
+        ? tasks.value
+        : tasks.value.filter(t => t.difficulty === activeFilter.value)
+    );
+
+    const doneCount = computed(() => tasks.value.filter(t => t.done).length);
+
+    function diffLabel(key) {
+      return difficulties.find(d => d.key === key)?.label ?? key;
+    }
+
+    function toggle(id) {
+      expandedId.value = expandedId.value === id ? null : id;
+    }
+
+    function toggleDone(task) {
+      task.done = !task.done;
+      localStorage.setItem('er-done-' + task.id, JSON.stringify(task.done));
+    }
+
+    function erEditorUrl(task) {
+      // Opens ER editor; in real deployment: '../er-designer/'
+      return '../er-designer/';
+    }
+
+    return { tasks, filteredTasks, difficulties, activeFilter,
+             expandedId, doneCount, diffLabel, toggle, toggleDone, erEditorUrl };
+  }
+}).mount('#app');
+</script>
+
+</body>
+</html>
