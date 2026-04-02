@@ -547,9 +547,18 @@ function renderConnections() {
   }
 }
 
+const LS_KEY = 'chen-editor-state';
+
+function persist() {
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify({ shapes, connections, uid, vb }));
+  } catch (_) {}
+}
+
 function renderAll() {
   renderConnections();
   renderShapes();
+  persist();
 }
 
 // ── Tool switching ────────────────────────────────────────────────────────────
@@ -575,6 +584,19 @@ function setTool(t) {
   document.getElementById('status-msg').textContent = HINTS[t] || '';
   renderAll();
 }
+
+// ── Restore from localStorage ─────────────────────────────────────────────────
+try {
+  const saved = localStorage.getItem(LS_KEY);
+  if (saved) {
+    const d = JSON.parse(saved);
+    shapes      = d.shapes      ?? [];
+    connections = d.connections ?? [];
+    uid         = d.uid         ?? (Math.max(0, ...shapes.map(s => s.id), ...connections.map(c => c.id)) + 1);
+    if (d.vb) { vb.x = d.vb.x; vb.y = d.vb.y; vb.w = d.vb.w; vb.h = d.vb.h; applyVB(); }
+  }
+} catch (_) {}
+
 setTool('select');
 
 // ── Place shape on canvas click ───────────────────────────────────────────────
