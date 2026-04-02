@@ -34,290 +34,170 @@
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
     }
 
-    /* ── Top rule ── */
     .top-rule { height: 3px; background: var(--ink); flex-shrink: 0; }
 
     /* ── Header ── */
     header {
-      height: 50px;
-      padding: 0 1.5rem;
-      background: var(--bg);
-      border-bottom: 1px solid var(--rule);
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      flex-shrink: 0;
-      z-index: 100;
+      height: 50px; padding: 0 1.5rem;
+      background: var(--bg); border-bottom: 1px solid var(--rule);
+      display: flex; align-items: center; gap: 1rem; flex-shrink: 0;
     }
     .header-back {
-      font-family: var(--mono);
-      font-size: 0.65rem;
-      color: var(--ink-dim);
-      text-decoration: none;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      transition: color 0.15s;
-      white-space: nowrap;
+      font-family: var(--mono); font-size: 0.65rem; color: var(--ink-dim);
+      text-decoration: none; letter-spacing: 0.12em; text-transform: uppercase;
+      display: flex; align-items: center; gap: 0.4rem; transition: color 0.15s;
     }
     .header-back:hover { color: var(--ink); }
     .header-sep { color: var(--rule); }
-    .header-title {
-      font-family: var(--serif);
-      font-size: 1.15rem;
-      line-height: 1;
-    }
+    .header-title { font-family: var(--serif); font-size: 1.15rem; line-height: 1; }
     .header-title em { font-style: italic; color: var(--ink-dim); }
     .header-badge {
-      font-family: var(--mono);
-      font-size: 0.6rem;
-      color: var(--ink-dim);
-      background: var(--surface);
-      border: 1px solid var(--rule);
-      padding: 0.18rem 0.5rem;
-      border-radius: 2px;
-      letter-spacing: 0.06em;
+      font-family: var(--mono); font-size: 0.6rem; color: var(--ink-dim);
+      background: var(--surface); border: 1px solid var(--rule);
+      padding: 0.18rem 0.5rem; border-radius: 2px; letter-spacing: 0.06em;
     }
 
     /* ── Toolbar ── */
     .toolbar {
-      height: 42px;
-      padding: 0 1rem;
-      background: var(--surface);
-      border-bottom: 1px solid var(--rule);
-      display: flex;
-      align-items: center;
-      gap: 0.35rem;
-      flex-shrink: 0;
-      overflow-x: auto;
-      scrollbar-width: none;
+      height: 42px; padding: 0 1rem;
+      background: var(--surface); border-bottom: 1px solid var(--rule);
+      display: flex; align-items: center; gap: 0.35rem;
+      flex-shrink: 0; overflow-x: auto; scrollbar-width: none;
     }
     .toolbar::-webkit-scrollbar { display: none; }
-
     .tb-sep { width: 1px; height: 22px; background: var(--rule); margin: 0 0.25rem; flex-shrink: 0; }
     .tb-label {
-      font-family: var(--mono);
-      font-size: 0.57rem;
-      color: var(--ink-faint);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      white-space: nowrap;
-      padding: 0 0.2rem;
+      font-family: var(--mono); font-size: 0.57rem; color: var(--ink-faint);
+      letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap; padding: 0 0.2rem;
     }
-
     .tb-btn {
-      font-family: var(--mono);
-      font-size: 0.62rem;
-      letter-spacing: 0.06em;
-      padding: 0.3rem 0.7rem;
-      border: 1px solid var(--rule);
-      background: var(--bg);
-      color: var(--ink-dim);
-      cursor: pointer;
-      border-radius: 2px;
-      white-space: nowrap;
-      transition: all 0.12s;
-      display: flex;
-      align-items: center;
-      gap: 0.3rem;
-      flex-shrink: 0;
+      font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.06em;
+      padding: 0.3rem 0.75rem; border: 1px solid var(--rule);
+      background: var(--bg); color: var(--ink-dim); cursor: pointer; border-radius: 2px;
+      white-space: nowrap; transition: all 0.12s;
+      display: flex; align-items: center; gap: 0.35rem; flex-shrink: 0;
     }
     .tb-btn:hover { border-color: var(--ink-dim); color: var(--ink); background: var(--surface); }
-    .tb-btn.active {
-      background: var(--ink);
-      color: var(--bg);
-      border-color: var(--ink);
-    }
-    .tb-btn.active.tool-connect { background: var(--accent); border-color: var(--accent); }
+    .tb-btn.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+    .tb-btn.active.is-connect { background: var(--accent); border-color: var(--accent); }
     .tb-btn.danger { color: #8f1a1a; border-color: #e8b0b0; }
-    .tb-btn.danger:hover { background: #fdeaea; }
-
-    /* shape icons in toolbar */
+    .tb-btn.danger:hover { background: #fdeaea; border-color: #c88; }
     .shape-icon { display: inline-flex; align-items: center; justify-content: center; }
 
     /* ── Canvas ── */
     .canvas-wrap {
-      flex: 1;
-      overflow: hidden;
-      position: relative;
-      cursor: default;
-      background: var(--surface);
-      border-bottom: 1px solid var(--rule);
+      flex: 1; overflow: hidden; position: relative;
+      cursor: default; background: var(--surface);
     }
-    .canvas-wrap.mode-connect { cursor: crosshair; }
     .canvas-wrap.mode-place   { cursor: cell; }
+    .canvas-wrap.mode-connect { cursor: crosshair; }
     .canvas-wrap.mode-pan     { cursor: grabbing; }
 
-    #canvas {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
+    #canvas { width: 100%; height: 100%; display: block; }
 
-    /* ── SVG shape styles ── */
-    .shape-hit {
-      fill: transparent;
-      stroke: none;
-      cursor: move;
-    }
+    /* ── SVG styles ── */
     .shape-geo {
-      fill: var(--surface);
-      stroke: var(--ink);
-      stroke-width: 2;
+      stroke-width: 1.8;
     }
-    .shape-geo.selected {
-      stroke: var(--accent);
-      stroke-width: 2.5;
-      filter: drop-shadow(0 0 4px rgba(26,58,143,0.3));
-    }
-    .shape-geo.connecting-source {
-      stroke: #1a6b3a;
-      stroke-width: 2.5;
-    }
+    /* Entity: black fill, dark-grey stroke */
+    .shape-geo.t-entity     { fill: #b0b0a8; stroke: #444; }
+    /* Attribute: near-black fill, same stroke */
+    .shape-geo.t-attribute  { fill: #2a2a28; stroke: #555; }
+    .shape-geo.t-key-attr   { fill: #2a2a28; stroke: #555; }
+    /* Relationship: orange fill, darker orange stroke */
+    .shape-geo.t-relationship { fill: #c95f00; stroke: #8f4000; }
+
+    .shape-geo.sel { stroke-width: 2.5; filter: drop-shadow(0 0 5px rgba(255,255,255,.35)); }
+    .shape-geo.t-entity.sel       { stroke: #aaa; }
+    .shape-geo.t-attribute.sel    { stroke: #aaa; }
+    .shape-geo.t-key-attr.sel     { stroke: #aaa; }
+    .shape-geo.t-relationship.sel { stroke: #fff3; }
+
+    .shape-geo.src { stroke-width: 2.5; stroke: #5ecf5e !important; }
+
+    .shape-hit { fill: transparent; stroke: none; cursor: pointer; }
+
     .shape-label {
-      font-family: var(--sans);
-      font-size: 13px;
-      fill: var(--ink);
-      pointer-events: none;
-      dominant-baseline: middle;
-      text-anchor: middle;
-      user-select: none;
+      font-family: var(--sans); font-size: 13px; font-weight: 600;
+      pointer-events: none; dominant-baseline: middle; text-anchor: middle; user-select: none;
     }
-    .shape-label.underline { text-decoration: underline; }
-    .shape-label.dim { fill: var(--ink-dim); font-size: 11px; }
+    /* Light text on dark shapes */
+    .shape-label.t-entity      { fill: #000000; }
+    .shape-label.t-attribute   { fill: #ffffff; }
+    .shape-label.t-key-attr    { fill: #ffffff; }
+    /* Dark text on orange */
+    .shape-label.t-relationship { fill: #ffffff; }
+    .shape-label.ul { text-decoration: underline; }
 
-    .conn-line {
-      stroke: #888;
-      stroke-width: 1.5;
-      fill: none;
-      cursor: pointer;
-    }
+    .conn-line { stroke: #999; stroke-width: 1.5; fill: none; cursor: pointer; }
     .conn-line:hover { stroke: var(--accent); stroke-width: 2; }
-    .conn-line.selected { stroke: var(--accent); stroke-width: 2; }
+    .conn-line.sel   { stroke: var(--accent); stroke-width: 2; }
 
-    .conn-label {
-      font-family: var(--mono);
-      font-size: 13px;
-      fill: var(--ink-dim);
-      pointer-events: none;
-      dominant-baseline: middle;
-      text-anchor: middle;
-      user-select: none;
-      font-weight: 500;
+    .conn-card {
+      font-family: var(--mono); font-size: 13px; fill: var(--ink-dim);
+      pointer-events: none; dominant-baseline: middle; text-anchor: middle;
+      user-select: none; font-weight: 500;
     }
 
     /* ── Status bar ── */
     .status-bar {
-      height: 28px;
-      padding: 0 1.25rem;
-      background: var(--bg);
-      border-top: 1px solid var(--rule);
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-      flex-shrink: 0;
+      height: 28px; padding: 0 1.25rem;
+      background: var(--bg); border-top: 1px solid var(--rule);
+      display: flex; align-items: center; gap: 1.5rem; flex-shrink: 0;
     }
-    .status-msg {
-      font-family: var(--mono);
-      font-size: 0.62rem;
-      color: var(--ink-dim);
-      letter-spacing: 0.06em;
-    }
-    .status-hint {
-      font-family: var(--mono);
-      font-size: 0.58rem;
-      color: var(--ink-faint);
-      letter-spacing: 0.06em;
-      margin-left: auto;
-    }
+    .status-msg  { font-family: var(--mono); font-size: 0.62rem; color: var(--ink-dim); letter-spacing: 0.06em; }
+    .status-hint { font-family: var(--mono); font-size: 0.58rem; color: var(--ink-faint); letter-spacing: 0.06em; margin-left: auto; }
 
-    /* ── Modal overlay ── */
+    /* ── Modal ── */
     .overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(26,26,24,0.45);
-      z-index: 300;
-      align-items: center;
-      justify-content: center;
+      display: none; position: fixed; inset: 0;
+      background: rgba(26,26,24,.45); z-index: 300;
+      align-items: center; justify-content: center;
     }
     .overlay.open { display: flex; }
     .modal {
-      background: var(--surface);
-      border: 1px solid var(--rule);
-      padding: 1.5rem;
-      width: 340px;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
+      background: var(--surface); border: 1px solid var(--rule);
+      padding: 1.5rem; width: 320px;
+      display: flex; flex-direction: column; gap: 1rem;
     }
-    .modal h2 {
-      font-family: var(--serif);
-      font-size: 1.2rem;
-      color: var(--ink);
-    }
+    .modal h2 { font-family: var(--serif); font-size: 1.2rem; }
     .modal label {
-      font-family: var(--mono);
-      font-size: 0.62rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--ink-dim);
-      display: block;
-      margin-bottom: 0.4rem;
+      font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--ink-dim); display: block; margin-bottom: 0.4rem;
     }
     .modal input {
-      width: 100%;
-      font-family: var(--sans);
-      font-size: 0.9rem;
-      padding: 0.45rem 0.7rem;
-      border: 1px solid var(--rule);
-      background: var(--bg);
-      color: var(--ink);
-      outline: none;
+      width: 100%; font-family: var(--sans); font-size: 0.9rem;
+      padding: 0.45rem 0.7rem; border: 1px solid var(--rule);
+      background: var(--bg); color: var(--ink); outline: none;
     }
     .modal input:focus { border-color: var(--accent); }
     .modal-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
     .modal-footer {
-      display: flex;
-      gap: 0.5rem;
-      justify-content: flex-end;
-      padding-top: 0.25rem;
-      border-top: 1px solid var(--rule);
+      display: flex; gap: 0.5rem; justify-content: flex-end;
+      padding-top: 0.25rem; border-top: 1px solid var(--rule);
     }
-    .modal-footer .btn-cancel {
+    .btn-cancel {
       font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.1em;
       text-transform: uppercase; padding: 0.45rem 1rem;
       border: 1px solid var(--rule); background: var(--bg); color: var(--ink-dim); cursor: pointer;
-      transition: all 0.12s;
     }
-    .modal-footer .btn-cancel:hover { border-color: var(--ink-dim); color: var(--ink); }
-    .modal-footer .btn-ok {
+    .btn-cancel:hover { border-color: var(--ink-dim); color: var(--ink); }
+    .btn-ok {
       font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.1em;
       text-transform: uppercase; padding: 0.45rem 1rem;
       border: none; background: var(--ink); color: var(--bg); cursor: pointer;
-      transition: opacity 0.12s;
     }
-    .modal-footer .btn-ok:hover { opacity: 0.8; }
+    .btn-ok:hover { opacity: 0.8; }
 
     /* ── Toast ── */
     #toast {
-      position: fixed;
-      bottom: 2.5rem;
-      left: 50%;
+      position: fixed; bottom: 2.5rem; left: 50%;
       transform: translateX(-50%) translateY(10px);
-      background: var(--ink);
-      color: var(--bg);
-      font-family: var(--mono);
-      font-size: 0.65rem;
-      letter-spacing: 0.08em;
-      padding: 0.5rem 1.1rem;
-      border-radius: 2px;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.2s, transform 0.2s;
-      z-index: 400;
+      background: var(--ink); color: var(--bg);
+      font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.08em;
+      padding: 0.5rem 1.1rem; border-radius: 2px;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s; z-index: 400;
     }
     #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
@@ -326,7 +206,6 @@
 
 <div class="top-rule"></div>
 
-<!-- Header -->
 <header>
   <a href="../" class="header-back">← Lern-Archiv</a>
   <span class="header-sep">|</span>
@@ -334,98 +213,54 @@
   <span class="header-badge">M290 · ER-Modell</span>
 </header>
 
-<!-- Toolbar -->
-<div class="toolbar" id="toolbar">
-
-  <span class="tb-label">Werkzeug</span>
-  <button class="tb-btn" id="tool-select"  onclick="setTool('select')"  title="Auswählen (S)">
-    ↖ Auswählen
-  </button>
-  <button class="tb-btn tool-connect" id="tool-connect" onclick="setTool('connect')" title="Verbinden (C)">
-    ⌒ Verbinden
-  </button>
+<div class="toolbar">
+  <span class="tb-label">Modus</span>
+  <button class="tb-btn" id="tool-select"  onclick="setTool('select')"  title="Auswählen · S">↖ Auswählen</button>
+  <button class="tb-btn is-connect" id="tool-connect" onclick="setTool('connect')" title="Verbinden · C">⌒ Verbinden</button>
 
   <div class="tb-sep"></div>
-  <span class="tb-label">Entitäten</span>
+  <span class="tb-label">Platzieren</span>
 
-  <button class="tb-btn" id="tool-entity"      onclick="setTool('entity')"       title="Entität (E)">
+  <button class="tb-btn" id="tool-entity" onclick="setTool('entity')" title="Entität · E">
     <svg class="shape-icon" width="18" height="14" viewBox="0 0 18 14">
       <rect x="1" y="1" width="16" height="12" fill="none" stroke="currentColor" stroke-width="1.5"/>
     </svg>
     Entität
   </button>
-  <button class="tb-btn" id="tool-weak-entity"  onclick="setTool('weak-entity')"  title="Schwache Entität (W)">
-    <svg class="shape-icon" width="18" height="14" viewBox="0 0 18 14">
-      <rect x="1" y="1" width="16" height="12" fill="none" stroke="currentColor" stroke-width="1.5"/>
-      <rect x="3" y="3" width="12" height="8"  fill="none" stroke="currentColor" stroke-width="1"/>
-    </svg>
-    Schwache E.
-  </button>
 
-  <div class="tb-sep"></div>
-  <span class="tb-label">Beziehungen</span>
-
-  <button class="tb-btn" id="tool-relationship"  onclick="setTool('relationship')"  title="Beziehung (R)">
+  <button class="tb-btn" id="tool-relationship" onclick="setTool('relationship')" title="Beziehung · R">
     <svg class="shape-icon" width="18" height="14" viewBox="0 0 18 14">
       <polygon points="9,1 17,7 9,13 1,7" fill="none" stroke="currentColor" stroke-width="1.5"/>
     </svg>
     Beziehung
   </button>
-  <button class="tb-btn" id="tool-ident-rel"     onclick="setTool('ident-rel')"     title="Identifizierende Beziehung (I)">
-    <svg class="shape-icon" width="18" height="14" viewBox="0 0 18 14">
-      <polygon points="9,1 17,7 9,13 1,7"   fill="none" stroke="currentColor" stroke-width="1.5"/>
-      <polygon points="9,3.5 14.5,7 9,10.5 3.5,7" fill="none" stroke="currentColor" stroke-width="1"/>
-    </svg>
-    Id. Bez.
-  </button>
 
-  <div class="tb-sep"></div>
-  <span class="tb-label">Attribute</span>
-
-  <button class="tb-btn" id="tool-attribute"     onclick="setTool('attribute')"     title="Attribut (A)">
+  <button class="tb-btn" id="tool-attribute" onclick="setTool('attribute')" title="Attribut · A">
     <svg class="shape-icon" width="18" height="14" viewBox="0 0 18 14">
       <ellipse cx="9" cy="7" rx="8" ry="6" fill="none" stroke="currentColor" stroke-width="1.5"/>
     </svg>
     Attribut
   </button>
-  <button class="tb-btn" id="tool-key-attr"      onclick="setTool('key-attr')"      title="Schlüssel-Attribut (K)">
+
+  <button class="tb-btn" id="tool-key-attr" onclick="setTool('key-attr')" title="Schlüssel-Attribut · K">
     <svg class="shape-icon" width="18" height="14" viewBox="0 0 18 14">
       <ellipse cx="9" cy="7" rx="8" ry="6" fill="none" stroke="currentColor" stroke-width="1.5"/>
-      <line x1="3" y1="10" x2="15" y2="10" stroke="currentColor" stroke-width="1"/>
+      <line x1="2.5" y1="10.5" x2="15.5" y2="10.5" stroke="currentColor" stroke-width="1.2"/>
     </svg>
     Schlüssel-A.
   </button>
-  <button class="tb-btn" id="tool-derived-attr"  onclick="setTool('derived-attr')"  title="Abgeleitetes Attribut (D)">
-    <svg class="shape-icon" width="18" height="14" viewBox="0 0 18 14">
-      <ellipse cx="9" cy="7" rx="8" ry="6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4,2"/>
-    </svg>
-    Abgeleitet
-  </button>
-  <button class="tb-btn" id="tool-multival-attr" onclick="setTool('multival-attr')" title="Mehrwertiges Attribut (M)">
-    <svg class="shape-icon" width="18" height="14" viewBox="0 0 18 14">
-      <ellipse cx="9" cy="7" rx="8"  ry="6"  fill="none" stroke="currentColor" stroke-width="1.5"/>
-      <ellipse cx="9" cy="7" rx="5.5" ry="3.8" fill="none" stroke="currentColor" stroke-width="1"/>
-    </svg>
-    Mehrwertig
-  </button>
 
   <div class="tb-sep"></div>
 
-  <button class="tb-btn danger" onclick="deleteSelected()" title="Auswahl löschen (Del)">
-    ✕ Löschen
-  </button>
-  <button class="tb-btn danger" onclick="clearAll()" title="Alles löschen">
-    ⊘ Alles
-  </button>
+  <button class="tb-btn danger" onclick="deleteSelected()" title="Löschen · Entf">✕ Löschen</button>
+  <button class="tb-btn danger" onclick="clearAll()">⊘ Alles</button>
 
   <div class="tb-sep"></div>
 
-  <button class="tb-btn" onclick="saveJSON()" title="Speichern (Ctrl+S)">💾 Speichern</button>
-  <button class="tb-btn" onclick="loadJSON()" title="Laden">📂 Laden</button>
-
+  <button class="tb-btn" onclick="saveJSON()" title="Ctrl+S">💾 Speichern</button>
+  <button class="tb-btn" onclick="loadJSON()">📂 Laden</button>
 </div>
 
-<!-- Canvas -->
 <div class="canvas-wrap" id="canvas-wrap">
   <svg id="canvas" xmlns="http://www.w3.org/2000/svg">
     <defs>
@@ -439,13 +274,12 @@
   </svg>
 </div>
 
-<!-- Status bar -->
 <div class="status-bar">
-  <span class="status-msg" id="status-msg">Werkzeug wählen oder Shape platzieren</span>
-  <span class="status-hint">Doppelklick = umbenennen · Entf = löschen · Scroll = zoom · Leertaste+Drag = verschieben</span>
+  <span class="status-msg" id="status-msg"></span>
+  <span class="status-hint">Doppelklick = umbenennen · Entf = löschen · Scroll = zoom · Leertaste+Drag = pan</span>
 </div>
 
-<!-- Label edit modal -->
+<!-- Label modal -->
 <div class="overlay" id="label-overlay">
   <div class="modal">
     <h2 id="label-modal-title">Bezeichnung</h2>
@@ -460,18 +294,18 @@
   </div>
 </div>
 
-<!-- Connection cardinality modal -->
+<!-- Cardinality modal (only for entity↔relationship lines) -->
 <div class="overlay" id="card-overlay">
   <div class="modal">
     <h2>Kardinalität</h2>
     <div class="modal-row">
       <div>
-        <label id="card-label-from">Von-Seite</label>
-        <input type="text" id="card-input-from" placeholder="1" autocomplete="off">
+        <label id="card-lbl-from">Von</label>
+        <input type="text" id="card-from" placeholder="1" autocomplete="off">
       </div>
       <div>
-        <label id="card-label-to">Zu-Seite</label>
-        <input type="text" id="card-input-to" placeholder="N" autocomplete="off">
+        <label id="card-lbl-to">Zu</label>
+        <input type="text" id="card-to" placeholder="N" autocomplete="off">
       </div>
     </div>
     <div class="modal-footer">
@@ -488,23 +322,23 @@
 'use strict';
 
 // ── State ────────────────────────────────────────────────────────────────────
-let shapes      = [];   // {id, type, x, y, label}
-let connections = [];   // {id, from, to, cardFrom, cardTo}
+let shapes      = [];  // { id, type, x, y, label }
+let connections = [];  // { id, from, to, cardFrom, cardTo }
 let uid = 1;
 const nextId = () => uid++;
 
-// ── Tool & interaction state ─────────────────────────────────────────────────
+// ── Interaction state ─────────────────────────────────────────────────────────
 let currentTool    = 'select';
-let selectedShape  = null;   // shape id
-let selectedConn   = null;   // conn id
-let connectSource  = null;   // shape id (first click in connect mode)
-let dragging       = null;   // {id, ox, oy, sx, sy}  (shape, offset, start)
-let panning        = null;   // {startX, startY, vbx0, vby0}
+let selectedShape  = null;
+let selectedConn   = null;
+let connectSource  = null;
+let dragging       = null;  // { id, ox, oy }
+let panning        = null;  // { startX, startY, vbx0, vby0 }
 let spaceDown      = false;
 let editingShapeId = null;
 let editingConnId  = null;
 
-// ── ViewBox ──────────────────────────────────────────────────────────────────
+// ── ViewBox ───────────────────────────────────────────────────────────────────
 let vb = { x: -100, y: -80, w: 1200, h: 750 };
 
 const canvas     = document.getElementById('canvas');
@@ -512,72 +346,67 @@ const wrap       = document.getElementById('canvas-wrap');
 const connLayer  = document.getElementById('conn-layer');
 const shapeLayer = document.getElementById('shape-layer');
 
-function updateViewBox() {
-  canvas.setAttribute('viewBox', `${vb.x} ${vb.y} ${vb.w} ${vb.h}`);
-}
-updateViewBox();
+function applyVB() { canvas.setAttribute('viewBox', `${vb.x} ${vb.y} ${vb.w} ${vb.h}`); }
+applyVB();
 
-// ── SVG coordinate helper ─────────────────────────────────────────────────────
 function svgPt(e) {
   const pt = canvas.createSVGPoint();
-  pt.x = e.clientX;
-  pt.y = e.clientY;
+  pt.x = e.clientX; pt.y = e.clientY;
   return pt.matrixTransform(canvas.getScreenCTM().inverse());
 }
 
 // ── Shape geometry ────────────────────────────────────────────────────────────
-const SHAPE_SIZE = {
-  'entity':        { hw: 65,  hh: 28 },
-  'weak-entity':   { hw: 65,  hh: 28 },
-  'relationship':  { hw: 76,  hh: 42 },
-  'ident-rel':     { hw: 76,  hh: 42 },
-  'attribute':     { rx: 60,  ry: 30 },
-  'key-attr':      { rx: 60,  ry: 30 },
-  'derived-attr':  { rx: 60,  ry: 30 },
-  'multival-attr': { rx: 60,  ry: 30 },
+const SZ = {
+  entity:       { hw: 65, hh: 28 },
+  relationship: { hw: 72, hh: 38 },
+  attribute:    { rx: 55, ry: 26 },
+  'key-attr':   { rx: 55, ry: 26 },
 };
 
-function isEllipse(type)  { return type.endsWith('attr'); }
-function isDiamond(type)  { return type === 'relationship' || type === 'ident-rel'; }
-function isRect(type)     { return type === 'entity' || type === 'weak-entity'; }
+const isAttr    = t => t === 'attribute' || t === 'key-attr';
+const isDiamond = t => t === 'relationship';
+const isRect    = t => t === 'entity';
+const isEllipse = t => isAttr(t);
 
-// Returns point on shape border in direction of (tx,ty) from shape center
-function borderPoint(shape, tx, ty) {
-  const {x: cx, y: cy} = shape;
+// Intersection of line from (cx,cy)→(tx,ty) with shape border
+function borderPt(shape, tx, ty) {
+  const { x: cx, y: cy, type } = shape;
   const dx = tx - cx, dy = ty - cy;
-  if (Math.abs(dx) < 0.001 && Math.abs(dy) < 0.001) return {x: cx, y: cy};
-  const sz = SHAPE_SIZE[shape.type];
+  if (Math.abs(dx) < 0.01 && Math.abs(dy) < 0.01) return { x: cx, y: cy };
+  const sz = SZ[type];
 
-  if (isEllipse(shape.type)) {
-    const angle = Math.atan2(dy, dx);
-    return { x: cx + sz.rx * Math.cos(angle), y: cy + sz.ry * Math.sin(angle) };
+  if (isEllipse(type)) {
+    const a = Math.atan2(dy, dx);
+    return { x: cx + sz.rx * Math.cos(a), y: cy + sz.ry * Math.sin(a) };
   }
-  if (isDiamond(shape.type)) {
-    // L1-norm parameterization for diamond
+  if (isDiamond(type)) {
     const t = 1 / (Math.abs(dx) / sz.hw + Math.abs(dy) / sz.hh);
     return { x: cx + t * dx, y: cy + t * dy };
   }
-  // Rectangle (default)
-  const slope = dy / dx;
+  // rect
+  const s = dy / dx;
   let bx, by;
   if (Math.abs(dx) * sz.hh >= Math.abs(dy) * sz.hw) {
     bx = cx + (dx > 0 ? sz.hw : -sz.hw);
-    by = cy + slope * (bx - cx);
+    by = cy + s * (bx - cx);
   } else {
     by = cy + (dy > 0 ? sz.hh : -sz.hh);
-    bx = cx + (by - cy) / slope;
+    bx = cx + (by - cy) / s;
   }
   return { x: bx, y: by };
 }
 
-// ── Rendering ─────────────────────────────────────────────────────────────────
-function renderAll() {
-  renderConnections();
-  renderShapes();
-  setStatus();
+// Does this connection involve ONLY entities and/or relationships (no attributes)?
+// Only those lines get cardinality labels.
+function connNeedsCardinality(conn) {
+  const src = shapes.find(s => s.id === conn.from);
+  const tgt = shapes.find(s => s.id === conn.to);
+  if (!src || !tgt) return false;
+  return !isAttr(src.type) && !isAttr(tgt.type);
 }
 
-function makeEl(tag, attrs = {}) {
+// ── Render ────────────────────────────────────────────────────────────────────
+function mk(tag, attrs = {}) {
   const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
   for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
   return el;
@@ -586,80 +415,72 @@ function makeEl(tag, attrs = {}) {
 function renderShapes() {
   shapeLayer.innerHTML = '';
   for (const s of shapes) {
-    const g = makeEl('g');
-    g.dataset.id = s.id;
-    const isSelected = (selectedShape === s.id);
-    const isConnSrc  = (connectSource === s.id);
-
-    let geo;
-    const sz = SHAPE_SIZE[s.type];
-    const geoClass = 'shape-geo' + (isSelected ? ' selected' : '') + (isConnSrc ? ' connecting-source' : '');
+    const g   = mk('g');
+    const sel = selectedShape === s.id;
+    const src = connectSource  === s.id;
+    const tc  = 't-' + s.type;
+    const cls = 'shape-geo ' + tc + (sel ? ' sel' : '') + (src ? ' src' : '');
+    const sz  = SZ[s.type];
 
     if (isRect(s.type)) {
-      // Outer rectangle
-      geo = makeEl('rect', {
-        x: s.x - sz.hw, y: s.y - sz.hh,
-        width: sz.hw * 2, height: sz.hh * 2,
-        class: geoClass,
-      });
-      g.appendChild(geo);
-      if (s.type === 'weak-entity') {
-        const inner = makeEl('rect', {
-          x: s.x - sz.hw + 6, y: s.y - sz.hh + 5,
-          width: (sz.hw - 6) * 2, height: (sz.hh - 5) * 2,
-          class: 'shape-geo', 'stroke-width': '1.2',
-        });
-        g.appendChild(inner);
-      }
+      g.appendChild(mk('rect', {
+        x: s.x - sz.hw, y: s.y - sz.hh, width: sz.hw * 2, height: sz.hh * 2, class: cls,
+      }));
     } else if (isDiamond(s.type)) {
-      const pts = `${s.x},${s.y - sz.hh} ${s.x + sz.hw},${s.y} ${s.x},${s.y + sz.hh} ${s.x - sz.hw},${s.y}`;
-      geo = makeEl('polygon', { points: pts, class: geoClass });
-      g.appendChild(geo);
-      if (s.type === 'ident-rel') {
-        const iHw = sz.hw - 10, iHh = sz.hh - 8;
-        const iPts = `${s.x},${s.y - iHh} ${s.x + iHw},${s.y} ${s.x},${s.y + iHh} ${s.x - iHw},${s.y}`;
-        g.appendChild(makeEl('polygon', { points: iPts, class: 'shape-geo', 'stroke-width': '1.2' }));
-      }
+      const pts = `${s.x},${s.y-sz.hh} ${s.x+sz.hw},${s.y} ${s.x},${s.y+sz.hh} ${s.x-sz.hw},${s.y}`;
+      g.appendChild(mk('polygon', { points: pts, class: cls }));
     } else {
-      // Ellipse
-      geo = makeEl('ellipse', { cx: s.x, cy: s.y, rx: sz.rx, ry: sz.ry, class: geoClass });
-      if (s.type === 'derived-attr') geo.setAttribute('stroke-dasharray', '6,3');
+      const geo = mk('ellipse', { cx: s.x, cy: s.y, rx: sz.rx, ry: sz.ry, class: cls });
       g.appendChild(geo);
-      if (s.type === 'multival-attr') {
-        g.appendChild(makeEl('ellipse', {
-          cx: s.x, cy: s.y, rx: sz.rx - 9, ry: sz.ry - 8,
-          class: 'shape-geo', 'stroke-width': '1.2',
-        }));
-      }
     }
 
-    // Label
-    const labelClass = 'shape-label' + (s.type === 'key-attr' ? ' underline' : '');
-    const txt = makeEl('text', { x: s.x, y: s.y, class: labelClass });
-    txt.textContent = s.label || defaultLabel(s.type);
-    g.appendChild(txt);
+    // Label — underline for key-attr
+    const lbl = mk('text', { x: s.x, y: s.y, class: 'shape-label ' + tc + (s.type === 'key-attr' ? ' ul' : '') });
+    lbl.textContent = s.label;
+    g.appendChild(lbl);
 
-    // Hit area (invisible, for clicking/dragging)
+    // Invisible hit area (larger than shape, good click target)
     let hit;
     if (isEllipse(s.type)) {
-      hit = makeEl('ellipse', { cx: s.x, cy: s.y, rx: sz.rx + 6, ry: sz.ry + 6, class: 'shape-hit' });
+      hit = mk('ellipse', { cx: s.x, cy: s.y, rx: sz.rx + 8, ry: sz.ry + 8, class: 'shape-hit' });
     } else if (isDiamond(s.type)) {
-      const hw2 = sz.hw + 6, hh2 = sz.hh + 6;
-      hit = makeEl('polygon', {
-        points: `${s.x},${s.y - hh2} ${s.x + hw2},${s.y} ${s.x},${s.y + hh2} ${s.x - hw2},${s.y}`,
+      const hw2 = sz.hw + 8, hh2 = sz.hh + 8;
+      hit = mk('polygon', {
+        points: `${s.x},${s.y-hh2} ${s.x+hw2},${s.y} ${s.x},${s.y+hh2} ${s.x-hw2},${s.y}`,
         class: 'shape-hit',
       });
     } else {
-      hit = makeEl('rect', {
-        x: s.x - sz.hw - 6, y: s.y - sz.hh - 6,
-        width: (sz.hw + 6) * 2, height: (sz.hh + 6) * 2,
+      hit = mk('rect', {
+        x: s.x - sz.hw - 8, y: s.y - sz.hh - 8,
+        width: (sz.hw + 8) * 2, height: (sz.hh + 8) * 2,
         class: 'shape-hit',
       });
     }
     g.appendChild(hit);
 
-    g.addEventListener('mousedown', e => onShapeMouseDown(e, s.id));
-    g.addEventListener('dblclick',  e => { e.stopPropagation(); openLabelModal(s.id); });
+    // mousedown only for drag (select mode)
+    g.addEventListener('mousedown', e => {
+      if (currentTool !== 'select') return;
+      e.stopPropagation();
+      selectedShape = s.id;
+      selectedConn  = null;
+      const pt = svgPt(e);
+      dragging = { id: s.id, ox: pt.x - s.x, oy: pt.y - s.y };
+      renderAll();
+    });
+
+    // click for connect mode — separated from mousedown to avoid DOM rebuild race
+    g.addEventListener('click', e => {
+      if (currentTool !== 'connect') return;
+      e.stopPropagation();
+      handleConnectClick(s.id);
+    });
+
+    g.addEventListener('dblclick', e => {
+      e.stopPropagation();
+      openLabelModal(s.id);
+    });
+
     shapeLayer.appendChild(g);
   }
 }
@@ -671,34 +492,38 @@ function renderConnections() {
     const tgt = shapes.find(s => s.id === c.to);
     if (!src || !tgt) continue;
 
-    const p1 = borderPoint(src, tgt.x, tgt.y);
-    const p2 = borderPoint(tgt, src.x, src.y);
+    const p1 = borderPt(src, tgt.x, tgt.y);
+    const p2 = borderPt(tgt, src.x, src.y);
 
-    // Line
-    const line = makeEl('line', {
+    const line = mk('line', {
       x1: p1.x, y1: p1.y, x2: p2.x, y2: p2.y,
-      class: 'conn-line' + (selectedConn === c.id ? ' selected' : ''),
+      class: 'conn-line' + (selectedConn === c.id ? ' sel' : ''),
     });
-    line.dataset.id = c.id;
-    line.addEventListener('click', e => { e.stopPropagation(); onConnClick(c.id); });
+    line.addEventListener('click', e => {
+      e.stopPropagation();
+      if (currentTool === 'select') {
+        selectedConn  = c.id;
+        selectedShape = null;
+        renderAll();
+        if (connNeedsCardinality(c)) openCardModal(c.id);
+      }
+    });
     connLayer.appendChild(line);
 
-    // Cardinality labels — perpendicular offset
-    if (c.cardFrom || c.cardTo) {
-      const mx = p2.x - p1.x, my = p2.y - p1.y;
-      const len = Math.hypot(mx, my) || 1;
-      const px = -my / len * 14, py = mx / len * 14;
-      const t = 0.13;
+    // Cardinality labels — only for entity↔relationship connections
+    if (connNeedsCardinality(c) && (c.cardFrom || c.cardTo)) {
+      const dx = p2.x - p1.x, dy = p2.y - p1.y;
+      const len = Math.hypot(dx, dy) || 1;
+      // perpendicular offset
+      const px = -dy / len * 15, py = dx / len * 15;
 
       if (c.cardFrom) {
-        const lx = p1.x + mx * t + px, ly = p1.y + my * t + py;
-        const lbl = makeEl('text', { x: lx, y: ly, class: 'conn-label' });
+        const lbl = mk('text', { x: p1.x + dx * 0.12 + px, y: p1.y + dy * 0.12 + py, class: 'conn-card' });
         lbl.textContent = c.cardFrom;
         connLayer.appendChild(lbl);
       }
       if (c.cardTo) {
-        const lx = p2.x - mx * t + px, ly = p2.y - my * t + py;
-        const lbl = makeEl('text', { x: lx, y: ly, class: 'conn-label' });
+        const lbl = mk('text', { x: p2.x - dx * 0.12 + px, y: p2.y - dy * 0.12 + py, class: 'conn-card' });
         lbl.textContent = c.cardTo;
         connLayer.appendChild(lbl);
       }
@@ -706,116 +531,75 @@ function renderConnections() {
   }
 }
 
-// ── Status text ───────────────────────────────────────────────────────────────
-const TOOL_HINTS = {
-  select:        'Klicken = auswählen · Ziehen = verschieben',
-  connect:       'Klicke die Quell-Form, dann die Ziel-Form',
-  entity:        'Klicke auf die Zeichenfläche, um eine Entität zu platzieren',
-  'weak-entity': 'Klicke auf die Zeichenfläche, um eine schwache Entität zu platzieren',
-  relationship:  'Klicke auf die Zeichenfläche, um eine Beziehung zu platzieren',
-  'ident-rel':   'Klicke auf die Zeichenfläche, um eine identifizierende Beziehung zu platzieren',
-  attribute:     'Klicke auf die Zeichenfläche, um ein Attribut zu platzieren',
-  'key-attr':    'Klicke auf die Zeichenfläche, um ein Schlüssel-Attribut zu platzieren',
-  'derived-attr':'Klicke auf die Zeichenfläche, um ein abgeleitetes Attribut zu platzieren',
-  'multival-attr':'Klicke auf die Zeichenfläche, um ein mehrwertiges Attribut zu platzieren',
-};
-function setStatus(msg) {
-  document.getElementById('status-msg').textContent =
-    msg ?? (TOOL_HINTS[currentTool] || '');
+function renderAll() {
+  renderConnections();
+  renderShapes();
 }
 
 // ── Tool switching ────────────────────────────────────────────────────────────
-const SHAPE_TOOLS = new Set(['entity','weak-entity','relationship','ident-rel',
-  'attribute','key-attr','derived-attr','multival-attr']);
+const PLACE_TOOLS = new Set(['entity', 'relationship', 'attribute', 'key-attr']);
+const HINTS = {
+  select:       'Klicken = auswählen · Ziehen = verschieben · Doppelklick = umbenennen',
+  connect:      'Klicke zuerst die Quell-Form, dann die Ziel-Form',
+  entity:       'Klick auf die Fläche platziert eine Entität',
+  relationship: 'Klick auf die Fläche platziert eine Beziehung',
+  attribute:    'Klick auf die Fläche platziert ein Attribut',
+  'key-attr':   'Klick auf die Fläche platziert ein Schlüssel-Attribut',
+};
 
 function setTool(t) {
   currentTool   = t;
   connectSource = null;
   selectedShape = null;
   selectedConn  = null;
-
   document.querySelectorAll('.tb-btn').forEach(b => b.classList.remove('active'));
   const btn = document.getElementById('tool-' + t);
   if (btn) btn.classList.add('active');
-
-  wrap.className = 'canvas-wrap' + (t === 'connect' ? ' mode-connect' : SHAPE_TOOLS.has(t) ? ' mode-place' : '');
+  wrap.className = 'canvas-wrap' + (t === 'connect' ? ' mode-connect' : PLACE_TOOLS.has(t) ? ' mode-place' : '');
+  document.getElementById('status-msg').textContent = HINTS[t] || '';
   renderAll();
-  setStatus();
 }
 setTool('select');
 
-// ── Default labels ────────────────────────────────────────────────────────────
+// ── Place shape on canvas click ───────────────────────────────────────────────
 const DEFAULT_LABELS = {
-  'entity':        'Entität',
-  'weak-entity':   'Schwache E.',
-  'relationship':  'Beziehung',
-  'ident-rel':     'Id. Bez.',
-  'attribute':     'Attribut',
-  'key-attr':      'PK',
-  'derived-attr':  'Abgeleitet',
-  'multival-attr': 'Mehrwertig',
+  entity: 'Entität', relationship: 'Beziehung', attribute: 'Attribut', 'key-attr': 'PK',
 };
-function defaultLabel(type) { return DEFAULT_LABELS[type] || ''; }
 
-// ── Canvas: place shape ───────────────────────────────────────────────────────
 canvas.addEventListener('click', e => {
-  if (e.target === canvas || e.target.id === 'grid-bg') {
-    selectedShape = null;
-    selectedConn  = null;
-    if (SHAPE_TOOLS.has(currentTool)) {
-      const pt = svgPt(e);
-      const shape = { id: nextId(), type: currentTool, x: pt.x, y: pt.y, label: defaultLabel(currentTool) };
-      shapes.push(shape);
-      renderAll();
-      toast('Platziert — Doppelklick zum Umbenennen');
-    } else {
-      renderAll();
-    }
-  }
+  // Only react to bare canvas clicks (not shape clicks which stopPropagation)
+  if (!PLACE_TOOLS.has(currentTool)) return;
+  if (e.target !== canvas && e.target.id !== 'grid-bg') return;
+  const pt = svgPt(e);
+  shapes.push({ id: nextId(), type: currentTool, x: pt.x, y: pt.y, label: DEFAULT_LABELS[currentTool] });
+  renderAll();
+  toast('Platziert — Doppelklick zum Umbenennen');
 });
 
-// ── Shape mouse down (select / drag start) ────────────────────────────────────
-function onShapeMouseDown(e, id) {
-  e.stopPropagation();
-  if (currentTool === 'connect') {
-    handleConnectClick(id);
-    return;
-  }
-  if (currentTool !== 'select') return;
-
-  selectedShape = id;
-  selectedConn  = null;
-  const shape   = shapes.find(s => s.id === id);
-  const pt      = svgPt(e);
-
-  dragging = { id, ox: pt.x - shape.x, oy: pt.y - shape.y };
-  renderAll();
-}
-
+// ── Drag (select mode only) ───────────────────────────────────────────────────
 window.addEventListener('mousemove', e => {
   if (dragging) {
-    const shape = shapes.find(s => s.id === dragging.id);
-    if (!shape) return;
-    const pt = svgPt(e);
-    shape.x = pt.x - dragging.ox;
-    shape.y = pt.y - dragging.oy;
-    renderAll();
+    const s = shapes.find(s => s.id === dragging.id);
+    if (s) {
+      const pt = svgPt(e);
+      s.x = pt.x - dragging.ox;
+      s.y = pt.y - dragging.oy;
+      renderAll();
+    }
     return;
   }
   if (panning) {
-    const dx = e.clientX - panning.startX;
-    const dy = e.clientY - panning.startY;
     const scale = vb.w / wrap.clientWidth;
-    vb.x = panning.vbx0 - dx * scale;
-    vb.y = panning.vby0 - dy * scale;
-    updateViewBox();
+    vb.x = panning.vbx0 - (e.clientX - panning.startX) * scale;
+    vb.y = panning.vby0 - (e.clientY - panning.startY) * scale;
+    applyVB();
   }
 });
 
 window.addEventListener('mouseup', () => {
   dragging = null;
   panning  = null;
-  wrap.classList.remove('mode-pan');
+  if (!spaceDown) wrap.classList.remove('mode-pan');
 });
 
 // ── Pan (space+drag or middle mouse) ─────────────────────────────────────────
@@ -827,60 +611,51 @@ canvas.addEventListener('mousedown', e => {
   }
 });
 
-document.addEventListener('keydown', e => {
-  if (e.key === ' ') { spaceDown = true; e.preventDefault(); }
-});
-document.addEventListener('keyup', e => {
-  if (e.key === ' ') spaceDown = false;
-});
-
-// ── Zoom (scroll wheel) ───────────────────────────────────────────────────────
+// ── Zoom ──────────────────────────────────────────────────────────────────────
 canvas.addEventListener('wheel', e => {
   e.preventDefault();
   const pt = svgPt(e);
-  const factor = e.deltaY > 0 ? 1.12 : 0.89;
-  vb.w *= factor;
-  vb.h *= factor;
-  vb.x = pt.x - (pt.x - vb.x) * factor;
-  vb.y = pt.y - (pt.y - vb.y) * factor;
-  updateViewBox();
+  const f  = e.deltaY > 0 ? 1.12 : 0.89;
+  vb.w *= f; vb.h *= f;
+  vb.x = pt.x - (pt.x - vb.x) * f;
+  vb.y = pt.y - (pt.y - vb.y) * f;
+  applyVB();
 }, { passive: false });
 
-// ── Connect mode ──────────────────────────────────────────────────────────────
+// ── Connect ───────────────────────────────────────────────────────────────────
+// Handled via click events on shapes (see renderShapes), NOT mousedown,
+// so renderAll() doesn't race with the browser event queue.
 function handleConnectClick(id) {
   if (!connectSource) {
     connectSource = id;
-    setStatus('Quell-Form gewählt — klicke jetzt die Ziel-Form');
-    renderAll();
+    document.getElementById('status-msg').textContent = 'Quell-Form gewählt — klicke die Ziel-Form';
+    renderAll();  // just highlights the source, no connection yet
     return;
   }
   if (connectSource === id) {
+    // clicked same shape → cancel
     connectSource = null;
-    setStatus();
+    document.getElementById('status-msg').textContent = HINTS.connect;
     renderAll();
     return;
   }
-  // Check duplicate
-  const exists = connections.find(
-    c => (c.from === connectSource && c.to === id) ||
-         (c.from === id && c.to === connectSource)
+  const dup = connections.find(c =>
+    (c.from === connectSource && c.to === id) ||
+    (c.from === id && c.to === connectSource)
   );
-  if (exists) { toast('Verbindung existiert bereits'); connectSource = null; renderAll(); return; }
+  if (dup) { toast('Verbindung existiert bereits'); connectSource = null; renderAll(); return; }
 
   const conn = { id: nextId(), from: connectSource, to: id, cardFrom: '', cardTo: '' };
   connections.push(conn);
+
+  const needsCard = connNeedsCardinality(conn);
   connectSource = null;
   renderAll();
-  toast('Verbunden — klicke die Linie für Kardinalität');
-}
 
-// ── Connection click ──────────────────────────────────────────────────────────
-function onConnClick(id) {
-  if (currentTool === 'select') {
-    selectedConn  = id;
-    selectedShape = null;
-    renderAll();
-    openCardModal(id);
+  if (needsCard) {
+    openCardModal(conn.id);
+  } else {
+    toast('Verbunden');
   }
 }
 
@@ -898,7 +673,7 @@ function deleteSelected() {
 }
 
 function clearAll() {
-  if (shapes.length === 0 && connections.length === 0) return;
+  if (!shapes.length && !connections.length) return;
   if (!confirm('Zeichenfläche wirklich leeren?')) return;
   shapes = []; connections = []; selectedShape = null; selectedConn = null;
   renderAll();
@@ -907,22 +682,23 @@ function clearAll() {
 
 // ── Label modal ───────────────────────────────────────────────────────────────
 function openLabelModal(shapeId) {
-  const shape = shapes.find(s => s.id === shapeId);
-  if (!shape) return;
+  const s = shapes.find(s => s.id === shapeId);
+  if (!s) return;
   editingShapeId = shapeId;
-  document.getElementById('label-modal-title').textContent = 'Bezeichnung · ' + (shape.type in DEFAULT_LABELS ? DEFAULT_LABELS[shape.type] : shape.type);
-  document.getElementById('label-input').value = shape.label || '';
+  const titles = { entity: 'Entität', relationship: 'Beziehung', attribute: 'Attribut', 'key-attr': 'Schlüssel-Attribut' };
+  document.getElementById('label-modal-title').textContent = 'Bezeichnung · ' + (titles[s.type] || s.type);
+  document.getElementById('label-input').value = s.label;
   document.getElementById('label-overlay').classList.add('open');
-  setTimeout(() => document.getElementById('label-input').select(), 50);
+  setTimeout(() => document.getElementById('label-input').select(), 40);
 }
 function closeLabelModal() {
   document.getElementById('label-overlay').classList.remove('open');
   editingShapeId = null;
 }
 function commitLabel() {
-  const shape = shapes.find(s => s.id === editingShapeId);
-  if (shape) {
-    shape.label = document.getElementById('label-input').value.trim() || defaultLabel(shape.type);
+  const s = shapes.find(s => s.id === editingShapeId);
+  if (s) {
+    s.label = document.getElementById('label-input').value.trim() || DEFAULT_LABELS[s.type];
     renderAll();
   }
   closeLabelModal();
@@ -930,80 +706,74 @@ function commitLabel() {
 
 // ── Cardinality modal ─────────────────────────────────────────────────────────
 function openCardModal(connId) {
-  const conn = connections.find(c => c.id === connId);
-  if (!conn) return;
+  const c   = connections.find(c => c.id === connId);
+  if (!c) return;
   editingConnId = connId;
-  const src = shapes.find(s => s.id === conn.from);
-  const tgt = shapes.find(s => s.id === conn.to);
-  document.getElementById('card-label-from').textContent = src?.label || 'Von';
-  document.getElementById('card-label-to').textContent   = tgt?.label || 'Zu';
-  document.getElementById('card-input-from').value = conn.cardFrom || '';
-  document.getElementById('card-input-to').value   = conn.cardTo   || '';
+  const src = shapes.find(s => s.id === c.from);
+  const tgt = shapes.find(s => s.id === c.to);
+  document.getElementById('card-lbl-from').textContent = src?.label || 'Von';
+  document.getElementById('card-lbl-to').textContent   = tgt?.label || 'Zu';
+  document.getElementById('card-from').value = c.cardFrom || '';
+  document.getElementById('card-to').value   = c.cardTo   || '';
   document.getElementById('card-overlay').classList.add('open');
-  setTimeout(() => document.getElementById('card-input-from').focus(), 50);
+  setTimeout(() => document.getElementById('card-from').focus(), 40);
 }
 function closeCardModal() {
   document.getElementById('card-overlay').classList.remove('open');
   editingConnId = null;
 }
 function commitCard() {
-  const conn = connections.find(c => c.id === editingConnId);
-  if (conn) {
-    conn.cardFrom = document.getElementById('card-input-from').value.trim();
-    conn.cardTo   = document.getElementById('card-input-to').value.trim();
+  const c = connections.find(c => c.id === editingConnId);
+  if (c) {
+    c.cardFrom = document.getElementById('card-from').value.trim();
+    c.cardTo   = document.getElementById('card-to').value.trim();
     renderAll();
   }
   closeCardModal();
 }
 
-// ── Keyboard shortcuts ────────────────────────────────────────────────────────
+// ── Keyboard ──────────────────────────────────────────────────────────────────
 document.addEventListener('keydown', e => {
+  if (e.key === ' ') { spaceDown = true; e.preventDefault(); return; }
+
   const tag = document.activeElement.tagName;
   if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+
   switch (e.key) {
-    case 's': case 'S': if (!e.ctrlKey && !e.metaKey) setTool('select');      break;
-    case 'c': case 'C': if (!e.ctrlKey && !e.metaKey) setTool('connect');     break;
+    case 's': case 'S': if (!e.ctrlKey && !e.metaKey) { setTool('select');       break; } return;
+    case 'c': case 'C': if (!e.ctrlKey && !e.metaKey) { setTool('connect');      break; } return;
     case 'e': case 'E': setTool('entity');       break;
-    case 'w': case 'W': setTool('weak-entity');  break;
     case 'r': case 'R': setTool('relationship'); break;
-    case 'i': case 'I': setTool('ident-rel');    break;
     case 'a': case 'A': setTool('attribute');    break;
     case 'k': case 'K': setTool('key-attr');     break;
-    case 'd': case 'D': setTool('derived-attr'); break;
-    case 'm': case 'M': setTool('multival-attr');break;
     case 'Delete':
-    case 'Backspace':
-      if (!e.ctrlKey) { e.preventDefault(); deleteSelected(); }
-      break;
+    case 'Backspace': e.preventDefault(); deleteSelected(); break;
     case 'Escape':
-      connectSource = null;
-      selectedShape = null;
-      selectedConn  = null;
-      if (!SHAPE_TOOLS.has(currentTool)) setTool('select');
-      renderAll();
+      connectSource = null; selectedShape = null; selectedConn = null;
+      setTool('select');
       break;
   }
   if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveJSON(); }
 });
+document.addEventListener('keyup', e => { if (e.key === ' ') spaceDown = false; });
 
-// Enter in modals
 document.getElementById('label-input').addEventListener('keydown', e => {
   if (e.key === 'Enter') commitLabel();
   if (e.key === 'Escape') closeLabelModal();
 });
-document.getElementById('card-input-to').addEventListener('keydown', e => {
-  if (e.key === 'Enter') commitCard();
+document.getElementById('card-from').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('card-to').focus();
 });
-document.getElementById('card-input-from').addEventListener('keydown', e => {
-  if (e.key === 'Enter') document.getElementById('card-input-to').focus();
+document.getElementById('card-to').addEventListener('keydown', e => {
+  if (e.key === 'Enter') commitCard();
+  if (e.key === 'Escape') closeCardModal();
 });
 
 // ── Save / Load ───────────────────────────────────────────────────────────────
 function saveJSON() {
-  const data = JSON.stringify({ shapes, connections, uid }, null, 2);
-  const blob = new Blob([data], { type: 'application/json' });
-  const a    = document.createElement('a');
-  a.href     = URL.createObjectURL(blob);
+  const blob = new Blob([JSON.stringify({ shapes, connections, uid }, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
   a.download = 'chen-diagramm.json';
   a.click();
   URL.revokeObjectURL(a.href);
@@ -1011,19 +781,18 @@ function saveJSON() {
 }
 function loadJSON() { document.getElementById('file-input').click(); }
 function onFileLoad(e) {
-  const f = e.target.files[0];
-  if (!f) return;
+  const f = e.target.files[0]; if (!f) return;
   const r = new FileReader();
   r.onload = ev => {
     try {
       const d = JSON.parse(ev.target.result);
       shapes      = d.shapes      ?? [];
       connections = d.connections ?? [];
-      uid         = d.uid         ?? (Math.max(0, ...shapes.map(s=>s.id), ...connections.map(c=>c.id)) + 1);
+      uid = d.uid ?? (Math.max(0, ...shapes.map(s => s.id), ...connections.map(c => c.id)) + 1);
       selectedShape = null; selectedConn = null; connectSource = null;
       renderAll();
       toast('Geladen');
-    } catch { toast('Fehler beim Laden der Datei'); }
+    } catch { toast('Fehler beim Laden'); }
   };
   r.readAsText(f);
   e.target.value = '';
@@ -1039,7 +808,6 @@ function toast(msg) {
   toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
 }
 
-// ── Initial render ────────────────────────────────────────────────────────────
 renderAll();
 </script>
 </body>
