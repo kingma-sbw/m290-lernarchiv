@@ -82,7 +82,23 @@
     .tb-btn.active.is-connect { background: var(--accent); border-color: var(--accent); }
     .tb-btn.danger { color: #8f1a1a; border-color: #e8b0b0; }
     .tb-btn.danger:hover { background: #fdeaea; border-color: #c88; }
+    .tb-btn.sm {
+      font-size: 0.56rem; padding: 0.2rem 0.5rem;
+      color: var(--ink-faint); border-color: transparent; background: transparent;
+    }
+    .tb-btn.sm:hover { color: var(--ink-dim); border-color: var(--rule); background: var(--bg); }
+    .tb-btn.sm.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+    .tb-btn.sm.is-connect.active { background: var(--accent); border-color: var(--accent); }
     .shape-icon { display: inline-flex; align-items: center; justify-content: center; }
+
+    /* Hide text labels early, keep icons */
+    @media (max-width: 1200px) {
+      .tb-label { display: none; }
+      .tb-sep   { display: none; }
+      .tb-text  { display: none; }
+      .toolbar  { gap: 0.25rem; padding: 0 0.5rem; }
+      .tb-btn   { padding: 0.3rem 0.5rem; }
+    }
 
     /* ── Canvas ── */
     .canvas-wrap {
@@ -215,50 +231,50 @@
 
 <div class="toolbar">
   <span class="tb-label">Modus</span>
-  <button class="tb-btn" id="tool-select"  onclick="setTool('select')"  title="Auswählen · S">↖ Auswählen</button>
-  <button class="tb-btn is-connect" id="tool-connect" onclick="setTool('connect')" title="Verbinden · C">⌒ Verbinden</button>
+  <button class="tb-btn sm" id="tool-select"  onclick="setTool('select')"  title="Auswählen · S">↖ <span class="tb-text">Auswählen</span></button>
+  <button class="tb-btn sm is-connect" id="tool-connect" onclick="setTool('connect')" title="Verbinden · C">⌒ <span class="tb-text">Verbinden</span></button>
 
   <div class="tb-sep"></div>
   <span class="tb-label">Platzieren</span>
 
   <button class="tb-btn" id="tool-entity" onclick="setTool('entity')" title="Entität · E">
-    <svg class="shape-icon" width="18" height="14" viewBox="0 0 18 14">
+    <svg class="shape-icon" width="28" height="22" viewBox="0 0 18 14">
       <rect x="1" y="1" width="16" height="12" fill="none" stroke="currentColor" stroke-width="1.5"/>
     </svg>
-    Entität
+    <span class="tb-text">Entität</span>
   </button>
 
   <button class="tb-btn" id="tool-relationship" onclick="setTool('relationship')" title="Beziehung · R">
-    <svg class="shape-icon" width="18" height="14" viewBox="0 0 18 14">
+    <svg class="shape-icon" width="28" height="22" viewBox="0 0 18 14">
       <polygon points="9,1 17,7 9,13 1,7" fill="none" stroke="currentColor" stroke-width="1.5"/>
     </svg>
-    Beziehung
+    <span class="tb-text">Beziehung</span>
   </button>
 
   <button class="tb-btn" id="tool-attribute" onclick="setTool('attribute')" title="Attribut · A">
-    <svg class="shape-icon" width="18" height="14" viewBox="0 0 18 14">
+    <svg class="shape-icon" width="28" height="22" viewBox="0 0 18 14">
       <ellipse cx="9" cy="7" rx="8" ry="6" fill="none" stroke="currentColor" stroke-width="1.5"/>
     </svg>
-    Attribut
+    <span class="tb-text">Attribut</span>
   </button>
 
   <button class="tb-btn" id="tool-key-attr" onclick="setTool('key-attr')" title="Schlüssel-Attribut · K">
-    <svg class="shape-icon" width="18" height="14" viewBox="0 0 18 14">
+    <svg class="shape-icon" width="28" height="22" viewBox="0 0 18 14">
       <ellipse cx="9" cy="7" rx="8" ry="6" fill="none" stroke="currentColor" stroke-width="1.5"/>
       <line x1="2.5" y1="10.5" x2="15.5" y2="10.5" stroke="currentColor" stroke-width="1.2"/>
     </svg>
-    Schlüssel-A.
+    <span class="tb-text">Schlüssel-A.</span>
   </button>
 
   <div class="tb-sep"></div>
 
-  <button class="tb-btn danger" onclick="deleteSelected()" title="Löschen · Entf">✕ Löschen</button>
-  <button class="tb-btn danger" onclick="clearAll()">⊘ Alles</button>
+  <button class="tb-btn danger" onclick="deleteSelected()" title="Löschen · Entf">✕ <span class="tb-text">Löschen</span></button>
+  <button class="tb-btn danger" onclick="clearAll()">⊘ <span class="tb-text">Alles</span></button>
 
   <div class="tb-sep"></div>
 
-  <button class="tb-btn" onclick="saveJSON()" title="Ctrl+S">💾 Speichern</button>
-  <button class="tb-btn" onclick="loadJSON()">📂 Laden</button>
+  <button class="tb-btn sm" onclick="saveJSON()" title="Ctrl+S">💾 <span class="tb-text">Speichern</span></button>
+  <button class="tb-btn sm" onclick="loadJSON()">📂 <span class="tb-text">Laden</span></button>
 </div>
 
 <div class="canvas-wrap" id="canvas-wrap">
