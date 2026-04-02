@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache">
+  <title>Musterlösungen ER-Aufgaben · M290</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    :root {
+      --bg:        #f5f2eb;
+      --ink:       #1a1a18;
+      --ink-dim:   #6b6860;
+      --ink-faint: #b8b4aa;
+      --rule:      #d9d5cc;
+      --card-bg:   #ffffff;
+      --accent:    #5a1a8f;
+      --serif:     'DM Serif Display', Georgia, serif;
+      --mono:      'DM Mono', monospace;
+      --sans:      'DM Sans', sans-serif;
+      --starter:#4a4a4a;
+      --easy:   #1a6b3a;
+      --medium: #7a5a00;
+      --hard:   #8f1a1a;
+      --expert: #1a1a8f;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    }
+
+    .top-rule { height: 3px; background: var(--ink); }
+
+    .back-bar {
+      max-width: 900px; margin: 0 auto; width: 100%;
+      padding: 1.2rem 2rem 0;
+      opacity: 0; animation: fadeUp 0.4s ease 0.05s forwards;
+    }
+    .back-link {
+      font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--ink-dim); text-decoration: none;
+      display: inline-flex; align-items: center; gap: 0.5rem; transition: color 0.15s;
+    }
+    .back-link:hover { color: var(--ink); }
+
+    masthead {
+      display: block; padding: 2rem 2rem 0;
+      max-width: 900px; margin: 0 auto; width: 100%;
+    }
+    .kicker {
+      font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--ink-dim); margin-bottom: 0.75rem;
+      display: flex; align-items: center; gap: 0.75rem;
+      opacity: 0; animation: fadeUp 0.5s ease 0.1s forwards;
+    }
+    .kicker::before {
+      content: ''; display: inline-block; width: 28px; height: 1px; background: var(--ink-dim);
+    }
+    h1 {
+      font-family: var(--serif); font-size: clamp(2.2rem, 5vw, 3.8rem);
+      line-height: 1.05; color: var(--ink); margin-bottom: 0.75rem;
+      opacity: 0; animation: fadeUp 0.55s ease 0.2s forwards;
+    }
+    h1 em { font-style: italic; color: var(--ink-dim); }
+    .subtitle {
+      font-size: 0.95rem; color: var(--ink-dim); font-weight: 300;
+      max-width: 520px; line-height: 1.65; margin-bottom: 2rem;
+      opacity: 0; animation: fadeUp 0.55s ease 0.3s forwards;
+    }
+
+    /* warning banner */
+    .warning-bar {
+      max-width: 900px; margin: 0 auto 1.5rem; width: calc(100% - 4rem);
+      background: #fef9e6; border: 1px solid #e8d98a; padding: 0.75rem 1.25rem;
+      font-family: var(--mono); font-size: 0.7rem; color: #7a5a00;
+      letter-spacing: 0.06em; line-height: 1.6;
+      opacity: 0; animation: fadeUp 0.5s ease 0.38s forwards;
+    }
+
+    .rule {
+      border: none; border-top: 1px solid var(--rule);
+      margin: 0 auto 2rem; max-width: 900px;
+      opacity: 0; animation: fadeIn 0.4s ease 0.38s forwards;
+    }
+
+    /* Controls */
+    .controls {
+      max-width: 900px; margin: 0 auto; width: calc(100% - 4rem);
+      display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+      opacity: 0; animation: fadeUp 0.5s ease 0.42s forwards;
+    }
+    .filter-group { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+    .filter-btn {
+      font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.1em;
+      text-transform: uppercase; padding: 0.35rem 0.85rem;
+      border: 1px solid var(--rule); background: var(--card-bg);
+      color: var(--ink-dim); cursor: pointer; border-radius: 2px; transition: all 0.15s;
+    }
+    .filter-btn:hover { border-color: var(--ink-dim); color: var(--ink); }
+    .filter-btn.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+    .filter-btn.diff-starter.active { background: var(--starter); border-color: var(--starter); }
+    .filter-btn.diff-easy.active   { background: var(--easy);    border-color: var(--easy); }
+    .filter-btn.diff-medium.active { background: var(--medium);  border-color: var(--medium); }
+    .filter-btn.diff-hard.active   { background: var(--hard);    border-color: var(--hard); }
+    .filter-btn.diff-expert.active { background: var(--expert);  border-color: var(--expert); }
+
+    /* Task list */
+    .task-list {
+      max-width: 900px; margin: 0 auto; width: calc(100% - 4rem);
+      display: flex; flex-direction: column; gap: 1px;
+      background: var(--rule); border: 1px solid var(--rule);
+      opacity: 0; animation: fadeUp 0.6s ease 0.5s forwards;
+    }
+
+    .task-row {
+      background: var(--card-bg); cursor: pointer; transition: background 0.15s;
+    }
+    .task-row:hover { background: #fafaf7; }
+    .task-row.expanded { background: #fafaf7; }
+
+    .task-header {
+      padding: 1.25rem 1.75rem;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .task-num {
+      font-family: var(--mono); font-size: 0.6rem; color: var(--ink-faint);
+      letter-spacing: 0.1em; flex-shrink: 0; width: 2.5rem;
+    }
+    .diff-pill {
+      font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.1em;
+      text-transform: uppercase; padding: 0.2rem 0.55rem;
+      border-radius: 2px; flex-shrink: 0; font-weight: 500;
+    }
+    .diff-starter { background: #efefef; color: var(--starter); }
+    .diff-easy    { background: #e6f4ec; color: var(--easy); }
+    .diff-medium  { background: #fef9e6; color: var(--medium); }
+    .diff-hard    { background: #fdeaea; color: var(--hard); }
+    .diff-expert  { background: #eaebfd; color: var(--expert); }
+
+    .task-title-wrap { flex: 1; }
+    .task-title {
+      font-family: var(--serif); font-size: 1.1rem; color: var(--ink);
+      line-height: 1.2; margin-bottom: 0.15rem;
+    }
+    .task-meta {
+      font-family: var(--mono); font-size: 0.62rem; color: var(--ink-faint); letter-spacing: 0.06em;
+    }
+    .task-chevron {
+      font-family: var(--mono); font-size: 0.7rem; color: var(--ink-faint);
+      transition: transform 0.2s; flex-shrink: 0;
+    }
+    .task-row.expanded .task-chevron { transform: rotate(90deg); }
+
+    /* Expanded body */
+    .task-body {
+      border-top: 1px solid var(--rule);
+      padding: 1.5rem 1.75rem 1.5rem calc(1.75rem + 3.5rem);
+    }
+    @media (max-width: 640px) { .task-body { padding-left: 1.75rem; } }
+
+    .solution-label {
+      font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--ink-faint); margin-bottom: 0.75rem;
+    }
+
+    /* SQL block */
+    .sql-wrap {
+      position: relative;
+      background: #0d1117;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+    .sql-code {
+      font-family: var(--mono); font-size: 0.72rem; color: #a6e3a1;
+      line-height: 1.65; padding: 1.25rem 1.25rem 1rem;
+      white-space: pre; overflow-x: auto;
+      max-height: 400px; overflow-y: auto;
+    }
+    .copy-btn {
+      position: absolute; top: 0.6rem; right: 0.6rem;
+      font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.1em;
+      text-transform: uppercase; padding: 0.3rem 0.7rem;
+      background: #313244; color: #cdd6f4; border: none;
+      border-radius: 3px; cursor: pointer; transition: background 0.15s;
+    }
+    .copy-btn:hover { background: #45475a; }
+    .copy-btn.copied { background: #1a6b3a; color: white; }
+
+    /* Decisions */
+    .decisions {
+      margin-top: 1rem;
+      display: flex; flex-direction: column; gap: 0.4rem;
+    }
+    .decision {
+      font-size: 0.82rem; color: var(--ink-dim); line-height: 1.55;
+      padding-left: 1rem; position: relative;
+    }
+    .decision::before {
+      content: '→'; position: absolute; left: 0;
+      font-family: var(--mono); font-size: 0.7rem; color: var(--ink-faint);
+    }
+
+    /* Import button */
+    .import-hint {
+      margin-top: 1rem; padding: 0.75rem 1rem;
+      background: var(--bg); border: 1px solid var(--rule);
+      font-family: var(--mono); font-size: 0.65rem; color: var(--ink-dim);
+      letter-spacing: 0.05em; line-height: 1.6;
+    }
+    .import-hint a { color: var(--accent); text-decoration: none; }
+    .import-hint a:hover { text-decoration: underline; }
+
+    footer {
+      margin-top: auto; padding: 2.5rem 2rem;
+      max-width: 900px; margin-left: auto; margin-right: auto; width: 100%;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 1rem; flex-wrap: wrap;
+      opacity: 0; animation: fadeIn 0.5s ease 0.7s forwards;
+    }
+    .footer-brand { font-family: var(--mono); font-size: 0.7rem; color: var(--ink-faint); letter-spacing: 0.08em; }
+    .footer-rule  { flex: 1; height: 1px; background: var(--rule); min-width: 40px; }
+    .footer-note  { font-family: var(--mono); font-size: 0.65rem; color: var(--ink-faint); letter-spacing: 0.06em; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    @media (max-width: 540px) {
+      masthead { padding: 1.5rem 1.25rem 0; }
+      .controls, .task-list { width: calc(100% - 2.5rem); }
+      .back-bar { padding: 1rem 1.25rem 0; }
+      footer { padding: 2rem 1.25rem; }
+      .warning-bar { width: calc(100% - 2.5rem); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="top-rule"></div>
+
+<div id="app">
+
+  <div class="back-bar">
+    <a href="../" class="back-link">← ER-Aufgaben</a>
+  </div>
+
+  <masthead>
+    <p class="kicker">M290 · Musterlösungen</p>
+    <h1>ER-Aufgaben <em>Lösungen</em></h1>
+    <p class="subtitle">
+      Referenzlösungen als MariaDB-DDL — importierbar in den ER-Editor.
+      Erst selbst versuchen, dann vergleichen.
+    </p>
+  </masthead>
+
+  <hr class="rule">
+
+  <div class="warning-bar">
+    ⚠ Diese Seite ist nicht verlinkt — sie dient als Referenz nach eigenem Lösungsversuch.
+    Musterlösungen sind nicht die einzig richtige Antwort; alternative Modellierungen können ebenso korrekt sein.
+  </div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <div class="filter-group">
+      <button class="filter-btn" :class="{ active: activeFilter === 'all' }" @click="activeFilter = 'all'">
+        Alle ({{ solutions.length }})
+      </button>
+      <button
+        v-for="d in difficulties" :key="d.key"
+        class="filter-btn"
+        :class="['diff-' + d.key, { active: activeFilter === d.key }]"
+        @click="activeFilter = d.key">
+        {{ d.label }} ({{ solutions.filter(s => s.difficulty === d.key).length }})
+      </button>
+    </div>
+  </div>
+
+  <!-- Solution list -->
+  <div class="task-list">
+    <div
+      v-for="sol in filtered" :key="sol.id"
+      class="task-row"
+      :class="{ expanded: expandedId === sol.id }">
+
+      <div class="task-header" @click="toggle(sol.id)">
+        <span class="task-num">{{ String(sol.id).padStart(2,'0') }}</span>
+        <span class="diff-pill" :class="'diff-' + sol.difficulty">{{ diffLabel(sol.difficulty) }}</span>
+        <div class="task-title-wrap">
+          <div class="task-title">{{ sol.title }}</div>
+          <div class="task-meta">{{ sol.context }} · {{ sol.tables }} Tabellen</div>
+        </div>
+        <span class="task-chevron">›</span>
+      </div>
+
+      <div class="task-body" v-if="expandedId === sol.id" @click.stop>
+        <div class="solution-label">Musterlösung — MariaDB DDL</div>
+
+        <div class="sql-wrap">
+          <pre class="sql-code">{{ sol.sql }}</pre>
+          <button
+            class="copy-btn"
+            :class="{ copied: copiedId === sol.id }"
+            @click="copy(sol)">
+            {{ copiedId === sol.id ? '✓ Kopiert' : 'Kopieren' }}
+          </button>
+        </div>
+
+        <div class="decisions">
+          <div class="decision" v-for="d in sol.decisions" :key="d">{{ d }}</div>
+        </div>
+
+        <div class="import-hint">
+          SQL kopieren → <a href="../../er-designer/" target="_blank">ER-Editor öffnen</a>
+          → «Import SQL» → einfügen → importieren
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span class="footer-brand">MUSTERLÖSUNGEN</span>
+    <div class="footer-rule"></div>
+    <span class="footer-note">m290 · Datenbanken · BFS</span>
+  </footer>
+
+</div>
+
+<script>
+const { createApp, ref, computed } = Vue;
+
+const SOLUTIONS = [
+
+  // ── BASIS ──────────────────────────────────────────────────────────────────
+
+  {
+    id: 11,
+    title: 'Person',
+    context: 'Einzelne Entität',
+    difficulty: 'starter',
+    tables: 1,
+    decisions: [
+      'person_id INT AUTO_INCREMENT als PK — eindeutig, stabil, unabhängig vom Namen',
+      'geburtsdatum DATE statt VARCHAR — erlaubt Altersberechnungen und Sortierung',
+      'groesse DECIMAL(5,2) — ermöglicht Nachkommastellen (z.B. 172.50 cm)',
+      'aktiv BOOLEAN — sauberer als VARCHAR(«ja»/«nein») oder INT(0/1)',
+      'email VARCHAR(100) — RFC-konform reichen 254 Zeichen, 100 ist praxistauglich',
+    ],
+    sql: `CREATE TABLE person (
+  person_id    INT           NOT NULL AUTO_INCREMENT,
+  vorname      VARCHAR(50)   NOT NULL,
+  nachname     VARCHAR(50)   NOT NULL,
+  geburtsdatum DATE          NOT NULL,
+  email        VARCHAR(100)  NOT NULL,
+  groesse      DECIMAL(5,2),
+  aktiv        BOOLEAN       NOT NULL DEFAULT TRUE,
+  PRIMARY KEY (person_id)
+);`,
+  },
+
+  {
+    id: 12,
+    title: 'Produkt & Kategorie',
+    context: 'Einfaches Warenlager',
+    difficulty: 'starter',
+    tables: 2,
+    decisions: [
+      'Kategorie als eigene Tabelle — vermeidet Textduplikate in jedem Produkt',
+      'kategorie_id FK in Produkt — 1:n-Beziehung (eine Kategorie, viele Produkte)',
+      'preis DECIMAL(10,2) — Geldbeträge niemals als FLOAT (Rundungsfehler)',
+      'lagerbestand INT NOT NULL DEFAULT 0 — kein NULL, 0 ist der sinnvolle Startwert',
+      'ablaufdatum DATE nullable — nicht alle Produkte haben ein Ablaufdatum',
+    ],
+    sql: `CREATE TABLE kategorie (
+  kategorie_id  INT          NOT NULL AUTO_INCREMENT,
+  bezeichnung   VARCHAR(100) NOT NULL,
+  PRIMARY KEY (kategorie_id)
+);
+
+CREATE TABLE produkt (
+  produkt_id    INT           NOT NULL AUTO_INCREMENT,
+  name          VARCHAR(100)  NOT NULL,
+  preis         DECIMAL(10,2) NOT NULL,
+  lagerbestand  INT           NOT NULL DEFAULT 0,
+  ablaufdatum   DATE,
+  verfuegbar    BOOLEAN       NOT NULL DEFAULT TRUE,
+  kategorie_id  INT           NOT NULL,
+  PRIMARY KEY (produkt_id),
+  FOREIGN KEY (kategorie_id) REFERENCES kategorie(kategorie_id)
+);`,
+  },
+
+  {
+    id: 13,
+    title: 'Benutzer & Notiz',
+    context: 'Notiz-App',
+    difficulty: 'starter',
+    tables: 2,
+    decisions: [
+      'benutzer_id FK in Notiz — jede Notiz gehört genau einem Benutzer (1:n)',
+      'inhalt TEXT statt VARCHAR — Notizen können beliebig lang sein',
+      'erstellt_am DATE — reicht hier aus; TIMESTAMP wäre für genaue Zeitstempel',
+      'wichtig BOOLEAN NOT NULL DEFAULT FALSE — expliziter Startwert verhindert NULL-Logik',
+    ],
+    sql: `CREATE TABLE benutzer (
+  benutzer_id   INT          NOT NULL AUTO_INCREMENT,
+  benutzername  VARCHAR(50)  NOT NULL,
+  email         VARCHAR(100) NOT NULL,
+  erstellt_am   DATE         NOT NULL,
+  PRIMARY KEY (benutzer_id)
+);
+
+CREATE TABLE notiz (
+  notiz_id      INT          NOT NULL AUTO_INCREMENT,
+  titel         VARCHAR(100) NOT NULL,
+  inhalt        TEXT,
+  erstellt_am   DATE         NOT NULL,
+  wichtig       BOOLEAN      NOT NULL DEFAULT FALSE,
+  benutzer_id   INT          NOT NULL,
+  PRIMARY KEY (notiz_id),
+  FOREIGN KEY (benutzer_id) REFERENCES benutzer(benutzer_id)
+);`,
+  },
+
+  // ── EINFACH ────────────────────────────────────────────────────────────────
+
+  {
+    id: 1,
+    title: 'Bibliothek',
+    context: 'Öffentliche Stadtbibliothek',
+    difficulty: 'easy',
+    tables: 3,
+    decisions: [
+      'Ausleihe als eigene Tabelle — löst n:m zwischen Mitglied und Buch auf',
+      'Ausleihdatum in Ausleihe, nicht in Buch — ein Buch kann mehrfach ausgeliehen werden',
+      'rueckgabedatum nullable — bei aktiver Ausleihe noch nicht bekannt',
+      'isbn VARCHAR(20) — ISBN-13 hat 13 Stellen, VARCHAR schlägt BIGINT wegen führender Nullen',
+    ],
+    sql: `CREATE TABLE mitglied (
+  mitglied_id   INT          NOT NULL AUTO_INCREMENT,
+  vorname       VARCHAR(50)  NOT NULL,
+  nachname      VARCHAR(50)  NOT NULL,
+  adresse       VARCHAR(255),
+  PRIMARY KEY (mitglied_id)
+);
+
+CREATE TABLE buch (
+  buch_id       INT          NOT NULL AUTO_INCREMENT,
+  titel         VARCHAR(255) NOT NULL,
+  isbn          VARCHAR(20)  NOT NULL,
+  autor         VARCHAR(100) NOT NULL,
+  PRIMARY KEY (buch_id)
+);
+
+CREATE TABLE ausleihe (
+  ausleihe_id    INT  NOT NULL AUTO_INCREMENT,
+  mitglied_id    INT  NOT NULL,
+  buch_id        INT  NOT NULL,
+  ausleihdatum   DATE NOT NULL,
+  rueckgabedatum DATE,
+  PRIMARY KEY (ausleihe_id),
+  FOREIGN KEY (mitglied_id) REFERENCES mitglied(mitglied_id),
+  FOREIGN KEY (buch_id)     REFERENCES buch(buch_id)
+);`,
+  },
+
+  {
+    id: 2,
+    title: 'Tierarztpraxis',
+    context: 'Lokale Tierarztpraxis',
+    difficulty: 'easy',
+    tables: 4,
+    decisions: [
+      'Tier hat FK auf Besitzer — 1 Besitzer : n Tiere',
+      'Behandlung löst n:m zwischen Tier und Tierarzt auf',
+      'diagnose TEXT nullable — nicht jede Untersuchung hat eine Diagnose',
+      'geburtsdatum in Tier nullable — nicht immer bekannt',
+    ],
+    sql: `CREATE TABLE besitzer (
+  besitzer_id   INT          NOT NULL AUTO_INCREMENT,
+  vorname       VARCHAR(50)  NOT NULL,
+  nachname      VARCHAR(50)  NOT NULL,
+  telefon       VARCHAR(20),
+  email         VARCHAR(100),
+  PRIMARY KEY (besitzer_id)
+);
+
+CREATE TABLE tier (
+  tier_id       INT         NOT NULL AUTO_INCREMENT,
+  name          VARCHAR(50) NOT NULL,
+  art           VARCHAR(50) NOT NULL,
+  geburtsdatum  DATE,
+  besitzer_id   INT         NOT NULL,
+  PRIMARY KEY (tier_id),
+  FOREIGN KEY (besitzer_id) REFERENCES besitzer(besitzer_id)
+);
+
+CREATE TABLE tierarzt (
+  tierarzt_id   INT         NOT NULL AUTO_INCREMENT,
+  vorname       VARCHAR(50) NOT NULL,
+  nachname      VARCHAR(50) NOT NULL,
+  PRIMARY KEY (tierarzt_id)
+);
+
+CREATE TABLE behandlung (
+  behandlung_id INT  NOT NULL AUTO_INCREMENT,
+  tier_id       INT  NOT NULL,
+  tierarzt_id   INT  NOT NULL,
+  datum         DATE NOT NULL,
+  diagnose      TEXT,
+  PRIMARY KEY (behandlung_id),
+  FOREIGN KEY (tier_id)     REFERENCES tier(tier_id),
+  FOREIGN KEY (tierarzt_id) REFERENCES tierarzt(tierarzt_id)
+);`,
+  },
+
+  {
+    id: 3,
+    title: 'Schulverwaltung',
+    context: 'Berufsschule / BFS',
+    difficulty: 'easy',
+    tables: 4,
+    decisions: [
+      'klassenlp_id in Klasse — Klassenlehrperson als einfacher FK (1:1 pro Klasse)',
+      'Schüler hat FK auf Klasse — genau 1 Klasse pro Schüler*in',
+      'Unterricht-Tabelle für n:m — Lehrperson unterrichtet mehrere Klassen',
+      'schuljahr VARCHAR(9) — Format «2024/2025» direkt lesbar, kein Parsing nötig',
+    ],
+    sql: `CREATE TABLE lehrperson (
+  lehrperson_id INT          NOT NULL AUTO_INCREMENT,
+  vorname       VARCHAR(50)  NOT NULL,
+  nachname      VARCHAR(50)  NOT NULL,
+  faecher       VARCHAR(255),
+  PRIMARY KEY (lehrperson_id)
+);
+
+CREATE TABLE klasse (
+  klasse_id     INT         NOT NULL AUTO_INCREMENT,
+  bezeichnung   VARCHAR(20) NOT NULL,
+  raum          VARCHAR(20),
+  schuljahr     VARCHAR(9),
+  klassenlp_id  INT         NOT NULL,
+  PRIMARY KEY (klasse_id),
+  FOREIGN KEY (klassenlp_id) REFERENCES lehrperson(lehrperson_id)
+);
+
+CREATE TABLE schueler (
+  schueler_id   INT         NOT NULL AUTO_INCREMENT,
+  vorname       VARCHAR(50) NOT NULL,
+  nachname      VARCHAR(50) NOT NULL,
+  geburtsdatum  DATE,
+  lehrjahr      INT,
+  klasse_id     INT         NOT NULL,
+  PRIMARY KEY (schueler_id),
+  FOREIGN KEY (klasse_id) REFERENCES klasse(klasse_id)
+);
+
+CREATE TABLE unterricht (
+  lehrperson_id INT NOT NULL,
+  klasse_id     INT NOT NULL,
+  fach          VARCHAR(50),
+  PRIMARY KEY (lehrperson_id, klasse_id),
+  FOREIGN KEY (lehrperson_id) REFERENCES lehrperson(lehrperson_id),
+  FOREIGN KEY (klasse_id)     REFERENCES klasse(klasse_id)
+);`,
+  },
+
+  // ── MITTEL ─────────────────────────────────────────────────────────────────
+
+  {
+    id: 4,
+    title: 'Online-Shop',
+    context: 'E-Commerce Plattform',
+    difficulty: 'medium',
+    tables: 5,
+    decisions: [
+      'Bestellposition als Zwischentabelle — löst n:m Bestellung↔Produkt auf',
+      'einzelpreis in Bestellposition — Preisänderungen dürfen alte Bestellungen nicht verändern',
+      'status VARCHAR mit fixen Werten — in MariaDB alternativ ENUM(\'offen\',\'versendet\',\'geliefert\')',
+      'passwort_hash VARCHAR(255) — Klartext-Passwörter werden nie gespeichert',
+      'lagerbestand im Produkt — wird bei Bestellung dekrementiert',
+    ],
+    sql: `CREATE TABLE kategorie (
+  kategorie_id  INT          NOT NULL AUTO_INCREMENT,
+  name          VARCHAR(100) NOT NULL,
+  PRIMARY KEY (kategorie_id)
+);
+
+CREATE TABLE produkt (
+  produkt_id    INT           NOT NULL AUTO_INCREMENT,
+  name          VARCHAR(255)  NOT NULL,
+  preis         DECIMAL(10,2) NOT NULL,
+  lagerbestand  INT           NOT NULL DEFAULT 0,
+  kategorie_id  INT           NOT NULL,
+  PRIMARY KEY (produkt_id),
+  FOREIGN KEY (kategorie_id) REFERENCES kategorie(kategorie_id)
+);
+
+CREATE TABLE kunde (
+  kunde_id      INT          NOT NULL AUTO_INCREMENT,
+  vorname       VARCHAR(50)  NOT NULL,
+  nachname      VARCHAR(50)  NOT NULL,
+  email         VARCHAR(100) NOT NULL,
+  passwort_hash VARCHAR(255) NOT NULL,
+  lieferadresse VARCHAR(255),
+  PRIMARY KEY (kunde_id)
+);
+
+CREATE TABLE bestellung (
+  bestellung_id INT  NOT NULL AUTO_INCREMENT,
+  kunde_id      INT  NOT NULL,
+  bestelldatum  DATE NOT NULL,
+  status        VARCHAR(20) NOT NULL DEFAULT 'offen',
+  PRIMARY KEY (bestellung_id),
+  FOREIGN KEY (kunde_id) REFERENCES kunde(kunde_id)
+);
+
+CREATE TABLE bestellposition (
+  position_id   INT           NOT NULL AUTO_INCREMENT,
+  bestellung_id INT           NOT NULL,
+  produkt_id    INT           NOT NULL,
+  menge         INT           NOT NULL DEFAULT 1,
+  einzelpreis   DECIMAL(10,2) NOT NULL,
+  PRIMARY KEY (position_id),
+  FOREIGN KEY (bestellung_id) REFERENCES bestellung(bestellung_id),
+  FOREIGN KEY (produkt_id)    REFERENCES produkt(produkt_id)
+);`,
+  },
+
+  {
+    id: 5,
+    title: 'Vereinsverwaltung',
+    context: 'Sportverein / Hobby-Club',
+    difficulty: 'medium',
+    tables: 5,
+    decisions: [
+      'leiter_id in Abteilung als nullable FK auf Mitglied — Selbstreferenz, nicht immer gesetzt',
+      'mitglied_abteilung löst n:m auf — ein Mitglied kann in mehreren Abteilungen sein',
+      'UNIQUE KEY auf Anmeldung (mitglied_id, veranstaltung_id) — verhindert Doppel-Anmeldungen',
+      'beitrag DECIMAL(8,2) in Mitglied — Geldbeträge niemals FLOAT',
+    ],
+    sql: `CREATE TABLE mitglied (
+  mitglied_id    INT           NOT NULL AUTO_INCREMENT,
+  vorname        VARCHAR(50)   NOT NULL,
+  nachname       VARCHAR(50)   NOT NULL,
+  email          VARCHAR(100),
+  eintrittsdatum DATE          NOT NULL,
+  beitrag        DECIMAL(8,2)  NOT NULL,
+  PRIMARY KEY (mitglied_id)
+);
+
+CREATE TABLE abteilung (
+  abteilung_id   INT          NOT NULL AUTO_INCREMENT,
+  name           VARCHAR(100) NOT NULL,
+  leiter_id      INT,
+  PRIMARY KEY (abteilung_id),
+  FOREIGN KEY (leiter_id) REFERENCES mitglied(mitglied_id)
+);
+
+CREATE TABLE mitglied_abteilung (
+  mitglied_id    INT  NOT NULL,
+  abteilung_id   INT  NOT NULL,
+  beitrittsdatum DATE,
+  PRIMARY KEY (mitglied_id, abteilung_id),
+  FOREIGN KEY (mitglied_id)  REFERENCES mitglied(mitglied_id),
+  FOREIGN KEY (abteilung_id) REFERENCES abteilung(abteilung_id)
+);
+
+CREATE TABLE veranstaltung (
+  veranstaltung_id INT          NOT NULL AUTO_INCREMENT,
+  titel            VARCHAR(255) NOT NULL,
+  datum            DATE         NOT NULL,
+  ort              VARCHAR(255),
+  max_teilnehmer   INT,
+  abteilung_id     INT,
+  PRIMARY KEY (veranstaltung_id),
+  FOREIGN KEY (abteilung_id) REFERENCES abteilung(abteilung_id)
+);
+
+CREATE TABLE anmeldung (
+  anmeldung_id     INT  NOT NULL AUTO_INCREMENT,
+  mitglied_id      INT  NOT NULL,
+  veranstaltung_id INT  NOT NULL,
+  anmeldedatum     DATE NOT NULL,
+  PRIMARY KEY (anmeldung_id),
+  UNIQUE KEY uq_anmeldung (mitglied_id, veranstaltung_id),
+  FOREIGN KEY (mitglied_id)      REFERENCES mitglied(mitglied_id),
+  FOREIGN KEY (veranstaltung_id) REFERENCES veranstaltung(veranstaltung_id)
+);`,
+  },
+
+  {
+    id: 6,
+    title: 'Hotelbuchung',
+    context: 'Boutique Hotel',
+    difficulty: 'medium',
+    tables: 6,
+    decisions: [
+      'Zimmerkategorie als eigene Tabelle — Tagespreis zentral pflegbar',
+      'gesamtpreis in Buchung — wird bei Check-in berechnet und festgeschrieben',
+      'buchung_leistung löst n:m Buchung↔Zusatzleistung auf',
+      'status VARCHAR — Zustandsmaschine: aktiv → abgeschlossen | storniert',
+      'verfuegbar BOOLEAN in Zimmer — schnelle Filterung ohne Buchungsabfrage',
+    ],
+    sql: `CREATE TABLE zimmerkategorie (
+  kategorie_id  INT           NOT NULL AUTO_INCREMENT,
+  bezeichnung   VARCHAR(50)   NOT NULL,
+  tagespreis    DECIMAL(8,2)  NOT NULL,
+  PRIMARY KEY (kategorie_id)
+);
+
+CREATE TABLE zimmer (
+  zimmer_id     INT         NOT NULL AUTO_INCREMENT,
+  zimmernummer  VARCHAR(10) NOT NULL,
+  etage         INT         NOT NULL,
+  verfuegbar    BOOLEAN     NOT NULL DEFAULT TRUE,
+  kategorie_id  INT         NOT NULL,
+  PRIMARY KEY (zimmer_id),
+  FOREIGN KEY (kategorie_id) REFERENCES zimmerkategorie(kategorie_id)
+);
+
+CREATE TABLE gast (
+  gast_id       INT          NOT NULL AUTO_INCREMENT,
+  vorname       VARCHAR(50)  NOT NULL,
+  nachname      VARCHAR(50)  NOT NULL,
+  email         VARCHAR(100),
+  telefon       VARCHAR(20),
+  nationalitaet VARCHAR(50),
+  PRIMARY KEY (gast_id)
+);
+
+CREATE TABLE buchung (
+  buchung_id    INT           NOT NULL AUTO_INCREMENT,
+  gast_id       INT           NOT NULL,
+  zimmer_id     INT           NOT NULL,
+  checkin       DATE          NOT NULL,
+  checkout      DATE          NOT NULL,
+  gesamtpreis   DECIMAL(10,2),
+  status        VARCHAR(20)   NOT NULL DEFAULT 'aktiv',
+  PRIMARY KEY (buchung_id),
+  FOREIGN KEY (gast_id)   REFERENCES gast(gast_id),
+  FOREIGN KEY (zimmer_id) REFERENCES zimmer(zimmer_id)
+);
+
+CREATE TABLE zusatzleistung (
+  leistung_id   INT           NOT NULL AUTO_INCREMENT,
+  bezeichnung   VARCHAR(100)  NOT NULL,
+  preis         DECIMAL(8,2)  NOT NULL,
+  PRIMARY KEY (leistung_id)
+);
+
+CREATE TABLE buchung_leistung (
+  buchung_id    INT NOT NULL,
+  leistung_id   INT NOT NULL,
+  PRIMARY KEY (buchung_id, leistung_id),
+  FOREIGN KEY (buchung_id)  REFERENCES buchung(buchung_id),
+  FOREIGN KEY (leistung_id) REFERENCES zusatzleistung(leistung_id)
+);`,
+  },
+
+  // ── SCHWER ─────────────────────────────────────────────────────────────────
+
+  {
+    id: 7,
+    title: 'Krankenhaus',
+    context: 'Spital / Klinik',
+    difficulty: 'hard',
+    tables: 7,
+    decisions: [
+      'leiter_id in Station als nullable FK auf Arzt — Stationsleiter ist selbst Arzt',
+      'Behandlung löst n:m Patient↔Arzt auf, enthält Datum und Diagnose',
+      'Verschreibung verknüpft Patient, Medikament und Arzt (ternäre Beziehung)',
+      'atc_code VARCHAR(10) — WHO-Standard für Medikamente, alphanumerisch',
+      'station_id in Patient nullable — Patient kann stationär oder ambulant sein',
+    ],
+    sql: `CREATE TABLE fachgebiet (
+  fachgebiet_id INT          NOT NULL AUTO_INCREMENT,
+  bezeichnung   VARCHAR(100) NOT NULL,
+  PRIMARY KEY (fachgebiet_id)
+);
+
+CREATE TABLE station (
+  station_id    INT          NOT NULL AUTO_INCREMENT,
+  name          VARCHAR(100) NOT NULL,
+  abteilung     VARCHAR(100),
+  kapazitaet    INT          NOT NULL,
+  leiter_id     INT,
+  PRIMARY KEY (station_id)
+);
+
+CREATE TABLE arzt (
+  arzt_id       INT         NOT NULL AUTO_INCREMENT,
+  vorname       VARCHAR(50) NOT NULL,
+  nachname      VARCHAR(50) NOT NULL,
+  fachgebiet_id INT,
+  PRIMARY KEY (arzt_id),
+  FOREIGN KEY (fachgebiet_id) REFERENCES fachgebiet(fachgebiet_id)
+);
+
+ALTER TABLE station
+  ADD FOREIGN KEY (leiter_id) REFERENCES arzt(arzt_id);
+
+CREATE TABLE patient (
+  patient_id    INT         NOT NULL AUTO_INCREMENT,
+  vorname       VARCHAR(50) NOT NULL,
+  nachname      VARCHAR(50) NOT NULL,
+  geburtsdatum  DATE,
+  aufnahme      DATE        NOT NULL,
+  entlassung    DATE,
+  station_id    INT,
+  PRIMARY KEY (patient_id),
+  FOREIGN KEY (station_id) REFERENCES station(station_id)
+);
+
+CREATE TABLE behandlung (
+  behandlung_id INT  NOT NULL AUTO_INCREMENT,
+  patient_id    INT  NOT NULL,
+  arzt_id       INT  NOT NULL,
+  datum         DATE NOT NULL,
+  diagnose      TEXT,
+  PRIMARY KEY (behandlung_id),
+  FOREIGN KEY (patient_id) REFERENCES patient(patient_id),
+  FOREIGN KEY (arzt_id)    REFERENCES arzt(arzt_id)
+);
+
+CREATE TABLE medikament (
+  medikament_id INT          NOT NULL AUTO_INCREMENT,
+  name          VARCHAR(255) NOT NULL,
+  atc_code      VARCHAR(10),
+  einheit       VARCHAR(20)  NOT NULL,
+  PRIMARY KEY (medikament_id)
+);
+
+CREATE TABLE verschreibung (
+  verschreibung_id INT         NOT NULL AUTO_INCREMENT,
+  patient_id       INT         NOT NULL,
+  medikament_id    INT         NOT NULL,
+  arzt_id          INT         NOT NULL,
+  dosierung        VARCHAR(50),
+  datum            DATE        NOT NULL,
+  PRIMARY KEY (verschreibung_id),
+  FOREIGN KEY (patient_id)    REFERENCES patient(patient_id),
+  FOREIGN KEY (medikament_id) REFERENCES medikament(medikament_id),
+  FOREIGN KEY (arzt_id)       REFERENCES arzt(arzt_id)
+);`,
+  },
+
+  {
+    id: 8,
+    title: 'Streaming-Plattform',
+    context: 'Video/Musik Streaming',
+    difficulty: 'hard',
+    tables: 12,
+    decisions: [
+      'inhalt als Basisentität — Film und Serie teilen Basisattribute (Titel, Jahr, Freigabe)',
+      'film und staffel referenzieren inhalt_id — Spezialisierung ohne separate Hierarchie',
+      'fortschritt INT (Sekunden) in verlauf — präziser als Prozent, unabhängig von Länge',
+      'TIMESTAMP für verlauf.zeitstempel — automatische Aktualiserung bei UPDATE',
+      'Bewertung und Watchlist mit zusammengesetztem PK (profil_id, inhalt_id) — keine Duplikate',
+    ],
+    sql: `CREATE TABLE produktionsfirma (
+  firma_id     INT          NOT NULL AUTO_INCREMENT,
+  name         VARCHAR(255) NOT NULL,
+  land         VARCHAR(50),
+  PRIMARY KEY (firma_id)
+);
+
+CREATE TABLE genre (
+  genre_id     INT         NOT NULL AUTO_INCREMENT,
+  bezeichnung  VARCHAR(50) NOT NULL,
+  PRIMARY KEY (genre_id)
+);
+
+CREATE TABLE inhalt (
+  inhalt_id          INT          NOT NULL AUTO_INCREMENT,
+  titel              VARCHAR(255) NOT NULL,
+  erscheinungsjahr   INT,
+  altersfreigabe     INT,
+  typ                VARCHAR(10)  NOT NULL,
+  firma_id           INT,
+  PRIMARY KEY (inhalt_id),
+  FOREIGN KEY (firma_id) REFERENCES produktionsfirma(firma_id)
+);
+
+CREATE TABLE inhalt_genre (
+  inhalt_id    INT NOT NULL,
+  genre_id     INT NOT NULL,
+  PRIMARY KEY (inhalt_id, genre_id),
+  FOREIGN KEY (inhalt_id) REFERENCES inhalt(inhalt_id),
+  FOREIGN KEY (genre_id)  REFERENCES genre(genre_id)
+);
+
+CREATE TABLE film (
+  inhalt_id    INT NOT NULL,
+  dauer_min    INT,
+  PRIMARY KEY (inhalt_id),
+  FOREIGN KEY (inhalt_id) REFERENCES inhalt(inhalt_id)
+);
+
+CREATE TABLE staffel (
+  staffel_id    INT NOT NULL AUTO_INCREMENT,
+  inhalt_id     INT NOT NULL,
+  staffelnummer INT NOT NULL,
+  PRIMARY KEY (staffel_id),
+  FOREIGN KEY (inhalt_id) REFERENCES inhalt(inhalt_id)
+);
+
+CREATE TABLE episode (
+  episode_id      INT          NOT NULL AUTO_INCREMENT,
+  staffel_id      INT          NOT NULL,
+  episodennummer  INT          NOT NULL,
+  titel           VARCHAR(255),
+  dauer_min       INT,
+  PRIMARY KEY (episode_id),
+  FOREIGN KEY (staffel_id) REFERENCES staffel(staffel_id)
+);
+
+CREATE TABLE abo (
+  abo_id        INT           NOT NULL AUTO_INCREMENT,
+  bezeichnung   VARCHAR(20)   NOT NULL,
+  preis_monat   DECIMAL(6,2)  NOT NULL,
+  PRIMARY KEY (abo_id)
+);
+
+CREATE TABLE nutzer (
+  nutzer_id     INT          NOT NULL AUTO_INCREMENT,
+  email         VARCHAR(100) NOT NULL,
+  passwort_hash VARCHAR(255) NOT NULL,
+  abo_id        INT,
+  PRIMARY KEY (nutzer_id),
+  FOREIGN KEY (abo_id) REFERENCES abo(abo_id)
+);
+
+CREATE TABLE profil (
+  profil_id     INT         NOT NULL AUTO_INCREMENT,
+  nutzer_id     INT         NOT NULL,
+  name          VARCHAR(50) NOT NULL,
+  PRIMARY KEY (profil_id),
+  FOREIGN KEY (nutzer_id) REFERENCES nutzer(nutzer_id)
+);
+
+CREATE TABLE verlauf (
+  verlauf_id    INT       NOT NULL AUTO_INCREMENT,
+  profil_id     INT       NOT NULL,
+  inhalt_id     INT       NOT NULL,
+  zeitstempel   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  fortschritt   INT       NOT NULL DEFAULT 0,
+  PRIMARY KEY (verlauf_id),
+  FOREIGN KEY (profil_id) REFERENCES profil(profil_id),
+  FOREIGN KEY (inhalt_id) REFERENCES inhalt(inhalt_id)
+);
+
+CREATE TABLE bewertung (
+  profil_id     INT NOT NULL,
+  inhalt_id     INT NOT NULL,
+  sterne        INT NOT NULL,
+  PRIMARY KEY (profil_id, inhalt_id),
+  FOREIGN KEY (profil_id) REFERENCES profil(profil_id),
+  FOREIGN KEY (inhalt_id) REFERENCES inhalt(inhalt_id)
+);
+
+CREATE TABLE watchlist (
+  profil_id     INT  NOT NULL,
+  inhalt_id     INT  NOT NULL,
+  hinzugefuegt  DATE,
+  PRIMARY KEY (profil_id, inhalt_id),
+  FOREIGN KEY (profil_id) REFERENCES profil(profil_id),
+  FOREIGN KEY (inhalt_id) REFERENCES inhalt(inhalt_id)
+);`,
+  },
+
+  // ── EXPERTE ────────────────────────────────────────────────────────────────
+
+  {
+    id: 9,
+    title: 'Lieferketten-Management',
+    context: 'Produktionsunternehmen / ERP',
+    difficulty: 'expert',
+    tables: 12,
+    decisions: [
+      'stueckliste als n:m mit Menge — ein Produkt besteht aus mehreren Materialien in variablen Mengen',
+      'lagerposition trennt Lager von Bestand — ein Material kann in mehreren Lagern liegen',
+      'einkaufsbestellung und kundenauftrag getrennt — unterschiedliche Geschäftsprozesse',
+      'qualitaetspruefung referenziert Produktionsauftrag — Prüfung immer einem PA zugeordnet',
+      'bewertung DECIMAL(3,1) — z.B. 4.5, nicht INT, für Zwischenwerte',
+    ],
+    sql: `CREATE TABLE lieferant (
+  lieferant_id     INT           NOT NULL AUTO_INCREMENT,
+  name             VARCHAR(255)  NOT NULL,
+  land             VARCHAR(50),
+  bewertung        DECIMAL(3,1),
+  zertifizierungen VARCHAR(255),
+  PRIMARY KEY (lieferant_id)
+);
+
+CREATE TABLE material (
+  material_id    INT          NOT NULL AUTO_INCREMENT,
+  bezeichnung    VARCHAR(255) NOT NULL,
+  einheit        VARCHAR(20)  NOT NULL,
+  mindestbestand INT          NOT NULL DEFAULT 0,
+  lieferant_id   INT,
+  PRIMARY KEY (material_id),
+  FOREIGN KEY (lieferant_id) REFERENCES lieferant(lieferant_id)
+);
+
+CREATE TABLE produkt (
+  produkt_id    INT           NOT NULL AUTO_INCREMENT,
+  bezeichnung   VARCHAR(255)  NOT NULL,
+  artikelnummer VARCHAR(50)   NOT NULL,
+  verkaufspreis DECIMAL(10,2),
+  PRIMARY KEY (produkt_id)
+);
+
+CREATE TABLE stueckliste (
+  produkt_id    INT           NOT NULL,
+  material_id   INT           NOT NULL,
+  menge         DECIMAL(10,3) NOT NULL,
+  PRIMARY KEY (produkt_id, material_id),
+  FOREIGN KEY (produkt_id)  REFERENCES produkt(produkt_id),
+  FOREIGN KEY (material_id) REFERENCES material(material_id)
+);
+
+CREATE TABLE lager (
+  lager_id      INT          NOT NULL AUTO_INCREMENT,
+  name          VARCHAR(100) NOT NULL,
+  standort      VARCHAR(255),
+  kapazitaet    INT,
+  PRIMARY KEY (lager_id)
+);
+
+CREATE TABLE lagerposition (
+  position_id   INT           NOT NULL AUTO_INCREMENT,
+  lager_id      INT           NOT NULL,
+  material_id   INT,
+  produkt_id    INT,
+  bestand       DECIMAL(10,3) NOT NULL DEFAULT 0,
+  PRIMARY KEY (position_id),
+  FOREIGN KEY (lager_id)    REFERENCES lager(lager_id),
+  FOREIGN KEY (material_id) REFERENCES material(material_id),
+  FOREIGN KEY (produkt_id)  REFERENCES produkt(produkt_id)
+);
+
+CREATE TABLE einkaufsbestellung (
+  bestellung_id INT           NOT NULL AUTO_INCREMENT,
+  lieferant_id  INT           NOT NULL,
+  bestelldatum  DATE          NOT NULL,
+  lieferdatum   DATE,
+  status        VARCHAR(20)   NOT NULL DEFAULT 'offen',
+  material_id   INT           NOT NULL,
+  menge         DECIMAL(10,3) NOT NULL,
+  einzelpreis   DECIMAL(10,2),
+  PRIMARY KEY (bestellung_id),
+  FOREIGN KEY (lieferant_id) REFERENCES lieferant(lieferant_id),
+  FOREIGN KEY (material_id)  REFERENCES material(material_id)
+);
+
+CREATE TABLE kundenauftrag (
+  auftrag_id    INT  NOT NULL AUTO_INCREMENT,
+  kundennr      VARCHAR(50) NOT NULL,
+  auftragsdatum DATE        NOT NULL,
+  lieferdatum   DATE,
+  status        VARCHAR(20) NOT NULL DEFAULT 'offen',
+  produkt_id    INT         NOT NULL,
+  menge         INT         NOT NULL,
+  PRIMARY KEY (auftrag_id),
+  FOREIGN KEY (produkt_id) REFERENCES produkt(produkt_id)
+);
+
+CREATE TABLE mitarbeiter (
+  mitarbeiter_id INT         NOT NULL AUTO_INCREMENT,
+  vorname        VARCHAR(50) NOT NULL,
+  nachname       VARCHAR(50) NOT NULL,
+  rolle          VARCHAR(100),
+  PRIMARY KEY (mitarbeiter_id)
+);
+
+CREATE TABLE maschine (
+  maschine_id   INT          NOT NULL AUTO_INCREMENT,
+  bezeichnung   VARCHAR(100) NOT NULL,
+  kapazitaet_std DECIMAL(5,2),
+  PRIMARY KEY (maschine_id)
+);
+
+CREATE TABLE produktionsauftrag (
+  pa_id          INT         NOT NULL AUTO_INCREMENT,
+  produkt_id     INT         NOT NULL,
+  maschine_id    INT,
+  mitarbeiter_id INT,
+  startdatum     DATE,
+  enddatum       DATE,
+  menge          INT         NOT NULL,
+  status         VARCHAR(20) NOT NULL DEFAULT 'geplant',
+  PRIMARY KEY (pa_id),
+  FOREIGN KEY (produkt_id)     REFERENCES produkt(produkt_id),
+  FOREIGN KEY (maschine_id)    REFERENCES maschine(maschine_id),
+  FOREIGN KEY (mitarbeiter_id) REFERENCES mitarbeiter(mitarbeiter_id)
+);
+
+CREATE TABLE qualitaetspruefung (
+  pruefung_id    INT         NOT NULL AUTO_INCREMENT,
+  pa_id          INT         NOT NULL,
+  datum          DATE        NOT NULL,
+  pruefprotokoll TEXT,
+  ergebnis       VARCHAR(20) NOT NULL,
+  mitarbeiter_id INT,
+  PRIMARY KEY (pruefung_id),
+  FOREIGN KEY (pa_id)          REFERENCES produktionsauftrag(pa_id),
+  FOREIGN KEY (mitarbeiter_id) REFERENCES mitarbeiter(mitarbeiter_id)
+);`,
+  },
+
+  {
+    id: 10,
+    title: 'Flughafen-System',
+    context: 'Internationaler Flughafen',
+    difficulty: 'expert',
+    tables: 13,
+    decisions: [
+      'Airline, Flugzeugtyp und Flugzeug getrennt — Typ ist ein Template, Flugzeug ist eine Instanz',
+      'abflugzeit TIMESTAMP, zweiter TIMESTAMP (ankunftzeit) mit NULL DEFAULT NULL — MariaDB-Regel',
+      'statusprotokoll als eigene Tabelle — Verlaufshistorie, nicht nur aktueller Status',
+      'buchung enthält einzelpreis — Ticketpreise ändern sich, gebuchter Preis muss fixiert sein',
+      'crew_zuteilung mit Rolle — n:m zwischen Crew und Flug, Rolle differenziert Kapitän/Kabine',
+    ],
+    sql: `CREATE TABLE airline (
+  airline_id    INT         NOT NULL AUTO_INCREMENT,
+  name          VARCHAR(255) NOT NULL,
+  iata_code     VARCHAR(3)  NOT NULL,
+  land          VARCHAR(50),
+  PRIMARY KEY (airline_id)
+);
+
+CREATE TABLE flugzeugtyp (
+  typ_id        INT          NOT NULL AUTO_INCREMENT,
+  bezeichnung   VARCHAR(100) NOT NULL,
+  sitzplaetze   INT          NOT NULL,
+  PRIMARY KEY (typ_id)
+);
+
+CREATE TABLE flugzeug (
+  flugzeug_id   INT         NOT NULL AUTO_INCREMENT,
+  kennzeichen   VARCHAR(20) NOT NULL,
+  typ_id        INT         NOT NULL,
+  airline_id    INT         NOT NULL,
+  PRIMARY KEY (flugzeug_id),
+  FOREIGN KEY (typ_id)     REFERENCES flugzeugtyp(typ_id),
+  FOREIGN KEY (airline_id) REFERENCES airline(airline_id)
+);
+
+CREATE TABLE terminal (
+  terminal_id   INT         NOT NULL AUTO_INCREMENT,
+  bezeichnung   VARCHAR(10) NOT NULL,
+  PRIMARY KEY (terminal_id)
+);
+
+CREATE TABLE gate (
+  gate_id       INT         NOT NULL AUTO_INCREMENT,
+  bezeichnung   VARCHAR(10) NOT NULL,
+  terminal_id   INT         NOT NULL,
+  PRIMARY KEY (gate_id),
+  FOREIGN KEY (terminal_id) REFERENCES terminal(terminal_id)
+);
+
+CREATE TABLE flug (
+  flug_id       INT         NOT NULL AUTO_INCREMENT,
+  flugnummer    VARCHAR(10) NOT NULL,
+  airline_id    INT         NOT NULL,
+  flugzeug_id   INT,
+  herkunft      VARCHAR(10) NOT NULL,
+  ziel          VARCHAR(10) NOT NULL,
+  abflugzeit    TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  ankunftzeit   TIMESTAMP   NULL DEFAULT NULL,
+  gate_id       INT,
+  status        VARCHAR(20) NOT NULL DEFAULT 'geplant',
+  PRIMARY KEY (flug_id),
+  FOREIGN KEY (airline_id)  REFERENCES airline(airline_id),
+  FOREIGN KEY (flugzeug_id) REFERENCES flugzeug(flugzeug_id),
+  FOREIGN KEY (gate_id)     REFERENCES gate(gate_id)
+);
+
+CREATE TABLE statusprotokoll (
+  protokoll_id  INT         NOT NULL AUTO_INCREMENT,
+  flug_id       INT         NOT NULL,
+  zeitpunkt     TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  status        VARCHAR(20) NOT NULL,
+  verzoegerung  INT,
+  PRIMARY KEY (protokoll_id),
+  FOREIGN KEY (flug_id) REFERENCES flug(flug_id)
+);
+
+CREATE TABLE passagier (
+  passagier_id  INT         NOT NULL AUTO_INCREMENT,
+  vorname       VARCHAR(50) NOT NULL,
+  nachname      VARCHAR(50) NOT NULL,
+  passnummer    VARCHAR(20) NOT NULL,
+  nationalitaet VARCHAR(50),
+  PRIMARY KEY (passagier_id)
+);
+
+CREATE TABLE buchung (
+  buchung_id    INT           NOT NULL AUTO_INCREMENT,
+  passagier_id  INT           NOT NULL,
+  flug_id       INT           NOT NULL,
+  sitzklasse    VARCHAR(20)   NOT NULL,
+  sitzplatznummer VARCHAR(5),
+  buchungsdatum DATE          NOT NULL,
+  preis         DECIMAL(10,2),
+  PRIMARY KEY (buchung_id),
+  FOREIGN KEY (passagier_id) REFERENCES passagier(passagier_id),
+  FOREIGN KEY (flug_id)      REFERENCES flug(flug_id)
+);
+
+CREATE TABLE gepaeck (
+  gepaeck_id    INT           NOT NULL AUTO_INCREMENT,
+  buchung_id    INT           NOT NULL,
+  gewicht_kg    DECIMAL(5,2),
+  tracking_code VARCHAR(50)   NOT NULL,
+  status        VARCHAR(30)   NOT NULL DEFAULT 'eingecheckt',
+  PRIMARY KEY (gepaeck_id),
+  FOREIGN KEY (buchung_id) REFERENCES buchung(buchung_id)
+);
+
+CREATE TABLE crew_mitglied (
+  crew_id       INT         NOT NULL AUTO_INCREMENT,
+  vorname       VARCHAR(50) NOT NULL,
+  nachname      VARCHAR(50) NOT NULL,
+  lizenz        VARCHAR(50),
+  airline_id    INT,
+  PRIMARY KEY (crew_id),
+  FOREIGN KEY (airline_id) REFERENCES airline(airline_id)
+);
+
+CREATE TABLE crew_zuteilung (
+  crew_id       INT         NOT NULL,
+  flug_id       INT         NOT NULL,
+  rolle         VARCHAR(30) NOT NULL,
+  PRIMARY KEY (crew_id, flug_id),
+  FOREIGN KEY (crew_id) REFERENCES crew_mitglied(crew_id),
+  FOREIGN KEY (flug_id) REFERENCES flug(flug_id)
+);`,
+  },
+
+];
+
+createApp({
+  setup() {
+    const solutions  = ref(SOLUTIONS);
+    const activeFilter = ref('all');
+    const expandedId   = ref(null);
+    const copiedId     = ref(null);
+
+    const difficulties = [
+      { key: 'starter', label: 'Basis' },
+      { key: 'easy',    label: 'Einfach' },
+      { key: 'medium',  label: 'Mittel' },
+      { key: 'hard',    label: 'Schwer' },
+      { key: 'expert',  label: 'Experte' },
+    ];
+
+    const filtered = computed(() =>
+      activeFilter.value === 'all'
+        ? solutions.value
+        : solutions.value.filter(s => s.difficulty === activeFilter.value)
+    );
+
+    function diffLabel(key) {
+      return difficulties.find(d => d.key === key)?.label ?? key;
+    }
+
+    function toggle(id) {
+      expandedId.value = expandedId.value === id ? null : id;
+    }
+
+    function copy(sol) {
+      navigator.clipboard.writeText(sol.sql).then(() => {
+        copiedId.value = sol.id;
+        setTimeout(() => { copiedId.value = null; }, 2000);
+      });
+    }
+
+    return { solutions, filtered, difficulties, activeFilter, expandedId, copiedId,
+             diffLabel, toggle, copy };
+  }
+}).mount('#app');
+</script>
+
+</body>
+</html>
