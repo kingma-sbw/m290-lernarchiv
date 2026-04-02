@@ -23,6 +23,7 @@
       --mono:      'DM Mono', monospace;
       --sans:      'DM Sans', sans-serif;
       /* difficulty */
+      --starter:#4a4a4a;
       --easy:   #1a6b3a;
       --medium: #7a5a00;
       --hard:   #8f1a1a;
@@ -161,6 +162,7 @@
       color: var(--bg);
       border-color: var(--ink);
     }
+    .filter-btn.diff-starter.active { background: var(--starter); border-color: var(--starter); }
     .filter-btn.diff-easy.active   { background: var(--easy);   border-color: var(--easy); }
     .filter-btn.diff-medium.active { background: var(--medium); border-color: var(--medium); }
     .filter-btn.diff-hard.active   { background: var(--hard);   border-color: var(--hard); }
@@ -254,6 +256,7 @@
       flex-shrink: 0;
       font-weight: 500;
     }
+    .diff-starter { background: #efefef; color: var(--starter); }
     .diff-easy   { background: #e6f4ec; color: var(--easy); }
     .diff-medium { background: #fef9e6; color: var(--medium); }
     .diff-hard   { background: #fdeaea; color: var(--hard); }
@@ -646,6 +649,68 @@ const { createApp, ref, computed } = Vue;
 // ─── Aufgaben-Datenbank ───────────────────────────────────────────────────────
 const TASKS = [
 
+  // ── BASIS ──────────────────────────────────────────────────────────────────
+
+  {
+    id: 11,
+    title: "Person",
+    context: "Einzelne Entität",
+    difficulty: "starter",
+    minutes: 10,
+    scenario: `Modelliere eine einzige Entität <strong>Person</strong>.
+      Jede Person hat einen Vornamen, einen Nachnamen, ein Geburtsdatum,
+      eine E-Mail-Adresse, eine Körpergrösse in cm und einen aktiv-Status.
+      Überlege für jedes Attribut, welcher Datentyp am besten passt.`,
+    requirements: [
+      "Entität Person mit Primärschlüssel (INT)",
+      "Vorname, Nachname als VARCHAR",
+      "Geburtsdatum als DATE",
+      "E-Mail als VARCHAR mit sinnvoller Länge",
+      "Körpergrösse als DECIMAL(5,2) oder INT",
+      "Aktiv-Status als BOOLEAN",
+    ],
+    entities: ["Person"],
+  },
+
+  {
+    id: 12,
+    title: "Produkt & Kategorie",
+    context: "Einfaches Warenlager",
+    difficulty: "starter",
+    minutes: 10,
+    scenario: `Ein kleines Lager verwaltet <strong>Produkte</strong> und deren
+      <strong>Kategorien</strong>. Jedes Produkt gehört genau einer Kategorie.
+      Ein Produkt hat einen Namen, einen Preis, einen Lagerbestand,
+      ein Ablaufdatum und einen Verfügbarkeits-Flag.`,
+    requirements: [
+      "Kategorie: kategorie_id (INT PK), bezeichnung (VARCHAR)",
+      "Produkt: produkt_id (INT PK), name (VARCHAR), preis (DECIMAL), lagerbestand (INT), ablaufdatum (DATE), verfuegbar (BOOLEAN)",
+      "1:n-Beziehung: eine Kategorie hat viele Produkte",
+      "Fremdschlüssel in Produkt korrekt einzeichnen",
+    ],
+    entities: ["Kategorie", "Produkt"],
+  },
+
+  {
+    id: 13,
+    title: "Benutzer & Notiz",
+    context: "Notiz-App",
+    difficulty: "starter",
+    minutes: 12,
+    scenario: `Eine einfache Notiz-App verwaltet <strong>Benutzer</strong>
+      und deren <strong>Notizen</strong>. Ein Benutzer kann viele Notizen
+      erstellen, jede Notiz gehört genau einem Benutzer. Notizen haben
+      einen Titel, einen Textinhalt, ein Erstellungsdatum und einen
+      «wichtig»-Flag.`,
+    requirements: [
+      "Benutzer: benutzer_id (INT PK), benutzername (VARCHAR), email (VARCHAR), erstellt_am (DATE)",
+      "Notiz: notiz_id (INT PK), titel (VARCHAR), inhalt (TEXT), erstellt_am (DATE), wichtig (BOOLEAN)",
+      "1:n-Beziehung: ein Benutzer hat viele Notizen",
+      "Fremdschlüssel benutzer_id in Notiz einzeichnen",
+    ],
+    entities: ["Benutzer", "Notiz"],
+  },
+
   // ── EINFACH ────────────────────────────────────────────────────────────────
 
   {
@@ -881,6 +946,7 @@ createApp({
     })));
 
     const difficulties = [
+      { key: 'starter', label: 'Basis' },
       { key: 'easy',   label: 'Einfach' },
       { key: 'medium', label: 'Mittel' },
       { key: 'hard',   label: 'Schwer' },
