@@ -1,0 +1,3 @@
+[submodule "er-designer"]
+	path = er-designer
+	url = https://github.com/kingma-sbw/erm-editor
