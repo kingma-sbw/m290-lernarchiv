@@ -1,0 +1,104 @@
+{
+  "shapes": [
+    {
+      "id": 1,
+      "type": "entity",
+      "x": 161.25,
+      "y": 283.75,
+      "label": "Person"
+    },
+    {
+      "id": 2,
+      "type": "attribute",
+      "x": 298.75,
+      "y": 178.75,
+      "label": "Vorname"
+    },
+    {
+      "id": 3,
+      "type": "attribute",
+      "x": 452.5,
+      "y": 181.25,
+      "label": "Nachname"
+    },
+    {
+      "id": 4,
+      "type": "attribute",
+      "x": 362.5,
+      "y": 273.75,
+      "label": "E-Mail"
+    },
+    {
+      "id": 5,
+      "type": "attribute",
+      "x": 307.5,
+      "y": 371.25,
+      "label": "Körpergrösse"
+    },
+    {
+      "id": 6,
+      "type": "attribute",
+      "x": 177.5,
+      "y": 413.75,
+      "label": "Aktiv"
+    },
+    {
+      "id": 9,
+      "type": "key-attr",
+      "x": 172.5,
+      "y": 145,
+      "label": "PK"
+    }
+  ],
+  "connections": [
+    {
+      "id": 10,
+      "from": 1,
+      "to": 9,
+      "cardFrom": "",
+      "cardTo": ""
+    },
+    {
+      "id": 11,
+      "from": 1,
+      "to": 2,
+      "cardFrom": "",
+      "cardTo": ""
+    },
+    {
+      "id": 12,
+      "from": 1,
+      "to": 3,
+      "cardFrom": "",
+      "cardTo": ""
+    },
+    {
+      "id": 13,
+      "from": 1,
+      "to": 4,
+      "cardFrom": "",
+      "cardTo": ""
+    },
+    {
+      "id": 14,
+      "from": 1,
+      "to": 5,
+      "cardFrom": "",
+      "cardTo": ""
+    },
+    {
+      "id": 15,
+      "from": 1,
+      "to": 6,
+      "cardFrom": "",
+      "cardTo": ""
+    }
+  ],
+  "uid": 16,
+  "vb": {
+    "x": -100,
+    "y": -80,
+    "w": 1200,
+    "h": 750
+  }
+}
