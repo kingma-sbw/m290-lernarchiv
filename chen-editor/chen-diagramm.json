@@ -1,0 +1,147 @@
+{
+  "shapes": [
+    {
+      "id": 1,
+      "type": "entity",
+      "x": -9.837745666503906,
+      "y": 63.87604522705078,
+      "label": "Buch"
+    },
+    {
+      "id": 2,
+      "type": "entity",
+      "x": -22.749699592590332,
+      "y": 377.45204162597656,
+      "label": "Mitglied"
+    },
+    {
+      "id": 4,
+      "type": "relationship",
+      "x": -68.86381149291992,
+      "y": 222.50860595703125,
+      "label": "Ausleihe"
+    },
+    {
+      "id": 8,
+      "type": "attribute",
+      "x": 163.55133056640625,
+      "y": 25.140188217163086,
+      "label": "Titel"
+    },
+    {
+      "id": 9,
+      "type": "attribute",
+      "x": 193.0643768310547,
+      "y": 108.14559173583984,
+      "label": "Erscheinungsjahr"
+    },
+    {
+      "id": 10,
+      "type": "attribute",
+      "x": 161.70677185058594,
+      "y": 200.3738250732422,
+      "label": "Autor"
+    },
+    {
+      "id": 11,
+      "type": "key-attr",
+      "x": 161.70677185058594,
+      "y": 287.068359375,
+      "label": "ISBN"
+    },
+    {
+      "id": 17,
+      "type": "attribute",
+      "x": -150.024658203125,
+      "y": 473.3694152832031,
+      "label": "Name"
+    },
+    {
+      "id": 18,
+      "type": "attribute",
+      "x": -2.4594874382019043,
+      "y": 504.72698974609375,
+      "label": "DatumBegin"
+    },
+    {
+      "id": 19,
+      "type": "attribute",
+      "x": 169.08502197265625,
+      "y": 510.2607116699219,
+      "label": "Attribut"
+    },
+    {
+      "id": 20,
+      "type": "attribute",
+      "x": -247.78659057617188,
+      "y": 148.7260284423828,
+      "label": "DatumVon"
+    },
+    {
+      "id": 21,
+      "type": "attribute",
+      "x": -262.5431213378906,
+      "y": 272.3118591308594,
+      "label": "DateumBis"
+    }
+  ],
+  "connections": [
+    {
+      "id": 5,
+      "from": 1,
+      "to": 4,
+      "cardFrom": "",
+      "cardTo": ""
+    },
+    {
+      "id": 6,
+      "from": 2,
+      "to": 4,
+      "cardFrom": "",
+      "cardTo": ""
+    },
+    {
+      "id": 13,
+      "from": 1,
+      "to": 8,
+      "cardFrom": "",
+      "cardTo": ""
+    },
+    {
+      "id": 14,
+      "from": 1,
+      "to": 9,
+      "cardFrom": "",
+      "cardTo": ""
+    },
+    {
+      "id": 15,
+      "from": 1,
+      "to": 10,
+      "cardFrom": "",
+      "cardTo": ""
+    },
+    {
+      "id": 16,
+      "from": 1,
+      "to": 11,
+      "cardFrom": "",
+      "cardTo": ""
+    },
+    {
+      "id": 22,
+      "from": 20,
+      "to": 4,
+      "cardFrom": "",
+      "cardTo": ""
+    },
+    {
+      "id": 23,
+      "from": 21,
+      "to": 4,
+      "cardFrom": "",
+      "cardTo": ""
+    }
+  ],
+  "uid": 24
+}
