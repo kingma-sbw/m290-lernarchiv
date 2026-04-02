@@ -421,6 +421,24 @@
     }
     .btn-er:hover { opacity: 0.85; }
 
+    .btn-chen {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.55rem 1.2rem;
+      background: #1a6b6b;
+      color: white;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: opacity 0.15s;
+    }
+    .btn-chen:hover { opacity: 0.85; }
+
     .btn-done {
       font-family: var(--mono);
       font-size: 0.68rem;
@@ -606,6 +624,12 @@
           <ul class="req-list">
             <li v-for="r in task.requirements" :key="r">{{ r }}</li>
           </ul>
+          <p style="margin-top:0.9rem;font-size:0.78rem;color:var(--ink-faint);font-family:var(--mono);letter-spacing:0.04em;">
+            Zeichne das Diagramm zuerst in
+            <a href="../chen-editor/" target="_blank" style="color:#1a6b6b;text-decoration:none;font-weight:500;">Chen-Notation ◇</a>,
+            dann übertrage es in den
+            <a href="../er-designer/" target="_blank" style="color:var(--accent-er);text-decoration:none;font-weight:500;">ER-Editor 📐</a>.
+          </p>
         </div>
 
         <div class="hints-block">
@@ -616,8 +640,11 @@
         </div>
 
         <div class="actions-bar">
+          <a href="../chen-editor/" class="btn-chen" target="_blank">
+            ◇ Chen-Notation →
+          </a>
           <a :href="erEditorUrl(task)" class="btn-er" target="_blank">
-            📐 Im ER-Editor öffnen →
+            📐 ER-Editor →
           </a>
           <button class="btn-done" @click="toggleDone(task)">
             <span v-if="!task.done">☐ Als erledigt markieren</span>
