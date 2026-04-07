@@ -420,13 +420,12 @@ function borderPt(shape, tx, ty) {
   return { x: bx, y: by };
 }
 
-// Does this connection involve ONLY entities and/or relationships (no attributes)?
-// Only those lines get cardinality labels.
+// Only connections to/from a relationship (Beziehung) get cardinality labels.
 function connNeedsCardinality(conn) {
   const src = shapes.find(s => s.id === conn.from);
   const tgt = shapes.find(s => s.id === conn.to);
   if (!src || !tgt) return false;
-  return !isAttr(src.type) && !isAttr(tgt.type);
+  return isDiamond(src.type) || isDiamond(tgt.type);
 }
 
 // ── Render ────────────────────────────────────────────────────────────────────
