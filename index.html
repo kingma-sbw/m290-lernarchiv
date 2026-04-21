@@ -21,6 +21,7 @@
       --accent-4: #5a1a8f;   /* ER Aufgaben – violet */
       --accent-5: #1a6b6b;   /* Chen Editor – teal */
       --accent-6: #8f1a5a;   /* DCL Theorie – crimson */
+      --accent-7: #6b3a00;   /* DCL Aufgaben – amber */
       --serif:    'DM Serif Display', Georgia, serif;
       --mono:     'DM Mono', monospace;
       --sans:     'DM Sans', sans-serif;
@@ -177,6 +178,7 @@
     .card-4 { --card-accent: var(--accent-4); }
     .card-5 { --card-accent: var(--accent-5); }
     .card-6 { --card-accent: var(--accent-6); }
+    .card-7 { --card-accent: var(--accent-7); }
 
     .card-badge {
       position: absolute;
@@ -308,6 +310,13 @@ Vue.createApp({
           icon:  '🧩',
           title: 'ER Aufgaben',
           desc:  '13 praxisnahe Modellierungsaufgaben in 5 Schwierigkeitsstufen — von der einfachen Entität bis zum Flughafen-System.',
+        },
+        {
+          href:  'dcl-aufgaben',
+          icon:  '🔑',
+          title: 'DCL Aufgaben',
+          desc:  '10 Übungsaufgaben zu GRANT, REVOKE und CREATE USER auf Datenbank-, Tabellen- und Spalten-Ebene — mit SQL-Abgabe.',
+          badge: 'Neu',
         },
       ],
     };

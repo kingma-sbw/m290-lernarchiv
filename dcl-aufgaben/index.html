@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache">
+<title>DCL Aufgaben – m290</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #f5f2eb;
+    --ink:       #1a1a18;
+    --ink-dim:   #6b6860;
+    --ink-faint: #b8b4aa;
+    --rule:      #d9d5cc;
+    --surface:   #ffffff;
+    --surface2:  #f0ece3;
+    --accent:    #8f1a5a;
+    --accent-bg: rgba(143,26,90,0.07);
+    --accent-bd: rgba(143,26,90,0.22);
+    --green:     #1a6b3a;
+    --green-bg:  #e8f5ee;
+    --red:       #8f1a1a;
+    --red-bg:    #f5e8e8;
+    --yellow:    #7a6010;
+    --yellow-bg: #fdf8e8;
+    --purple:    #4a1a8f;
+    --purple-bg: #f0ebfa;
+    --serif:     'DM Serif Display', Georgia, serif;
+    --mono:      'DM Mono', monospace;
+    --sans:      'DM Sans', sans-serif;
+    --radius:    8px;
+    --tr:        0.18s ease;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    min-height: 100vh;
+    line-height: 1.6;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  }
+
+  .top-rule { width: 100%; height: 3px; background: var(--ink); }
+
+  header {
+    background: var(--bg); border-bottom: 1px solid var(--rule);
+    padding: 0 2rem; position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; gap: 1.5rem; height: 54px;
+  }
+  .header-back { font-family: var(--mono); font-size: 0.68rem; color: var(--ink-dim); text-decoration: none; letter-spacing: 0.1em; text-transform: uppercase; display: flex; align-items: center; gap: 0.4rem; transition: color var(--tr); }
+  .header-back:hover { color: var(--ink); }
+  .header-sep { color: var(--rule); font-size: 1.1rem; }
+  .header-title { font-family: var(--serif); font-size: 1.1rem; color: var(--ink); }
+  .header-badge { font-family: var(--mono); font-size: 0.65rem; color: var(--ink-dim); background: var(--surface2); border: 1px solid var(--rule); padding: 0.2rem 0.55rem; border-radius: 4px; letter-spacing: 0.06em; }
+  .header-spacer { flex: 1; }
+  .btn-download {
+    display: flex; align-items: center; gap: 0.4rem;
+    background: var(--accent); color: white; border: none;
+    font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.06em;
+    padding: 0.35rem 0.85rem; border-radius: 4px; cursor: pointer;
+    transition: opacity var(--tr); white-space: nowrap;
+  }
+  .btn-download:hover { opacity: 0.85; }
+
+  .tabs-bar { background: var(--bg); border-bottom: 1px solid var(--rule); display: flex; padding: 0 2rem; overflow-x: auto; scrollbar-width: none; }
+  .tabs-bar::-webkit-scrollbar { display: none; }
+  .nav-btn { background: none; border: none; border-bottom: 2px solid transparent; color: var(--ink-dim); font-family: var(--sans); font-size: 0.82rem; font-weight: 500; padding: 0.75rem 1rem; cursor: pointer; white-space: nowrap; transition: color var(--tr), border-color var(--tr); margin-bottom: -1px; }
+  .nav-btn:hover { color: var(--ink); }
+  .nav-btn.active { color: var(--ink); border-bottom-color: var(--ink); font-weight: 600; }
+
+  .progress-bar-wrap { background: var(--bg); border-bottom: 1px solid var(--rule); padding: 0.5rem 2rem; display: flex; align-items: center; gap: 1rem; }
+  .progress-label { font-family: var(--mono); font-size: 0.7rem; color: var(--ink-dim); white-space: nowrap; }
+  .progress-track { flex: 1; height: 3px; background: var(--rule); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.4s ease; }
+
+  main { max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem 5rem; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+  .section-enter-active { animation: fadeUp 0.25s ease; }
+
+  .page-title { font-family: var(--serif); font-size: 2rem; color: var(--ink); margin-bottom: 0.3rem; line-height: 1.1; }
+  .page-subtitle { color: var(--ink-dim); font-size: 0.88rem; margin-bottom: 2rem; font-weight: 300; }
+
+  /* ── Schema ── */
+  .schema-overview { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1px; background: var(--rule); border: 1px solid var(--rule); margin-bottom: 2rem; }
+  .schema-table { background: var(--surface); overflow: hidden; }
+  .schema-table-header { background: var(--surface2); padding: 0.55rem 1rem; font-family: var(--mono); font-size: 0.72rem; font-weight: 500; color: var(--accent); border-bottom: 1px solid var(--rule); }
+  .schema-fields { padding: 0.4rem 0; }
+  .schema-field { padding: 0.28rem 1rem; font-family: var(--mono); font-size: 0.72rem; display: flex; align-items: center; gap: 0.4rem; }
+  .field-name { color: var(--ink); }
+  .field-type { color: var(--ink-faint); font-size: 0.68rem; }
+  .badge-pk { background: rgba(143,26,90,0.1); color: var(--accent); font-size: 0.58rem; padding: 0.05rem 0.35rem; border-radius: 3px; font-weight: 600; }
+  .badge-fk { background: rgba(122,96,16,0.1); color: var(--yellow); font-size: 0.58rem; padding: 0.05rem 0.35rem; border-radius: 3px; font-weight: 600; }
+  .info-block { background: var(--accent-bg); border: 1px solid var(--accent-bd); border-radius: var(--radius); padding: 0.9rem 1.15rem; margin-bottom: 1.5rem; font-size: 0.85rem; color: var(--ink-dim); line-height: 1.7; }
+  .info-block strong { color: var(--accent); }
+  .info-block code { font-family: var(--mono); font-size: 0.78rem; background: var(--surface2); padding: 0.1rem 0.35rem; border-radius: 3px; }
+  .divider { border: none; border-top: 1px solid var(--rule); margin: 2rem 0; }
+
+  /* ── Task Cards ── */
+  .task-card { background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius); margin-bottom: 0.75rem; overflow: hidden; transition: border-color var(--tr); }
+  .task-card.done { border-color: var(--green); }
+  .task-header { padding: 1rem 1.25rem; display: flex; align-items: flex-start; gap: 1rem; cursor: pointer; user-select: none; transition: background var(--tr); }
+  .task-header:hover { background: var(--surface2); }
+  .task-num { font-family: var(--mono); font-size: 0.65rem; font-weight: 500; color: var(--accent); background: var(--accent-bg); border: 1px solid var(--accent-bd); border-radius: 4px; padding: 0.18rem 0.5rem; white-space: nowrap; margin-top: 0.1rem; flex-shrink: 0; }
+  .task-title-wrap { flex: 1; }
+  .task-title { font-weight: 500; font-size: 0.92rem; color: var(--ink); line-height: 1.4; }
+  .task-meta { font-size: 0.7rem; margin-top: 0.2rem; color: var(--ink-faint); font-family: var(--mono); display: flex; gap: 0.75rem; flex-wrap: wrap; }
+  .badge-diff { padding: 0.05rem 0.4rem; border-radius: 3px; font-size: 0.65rem; }
+  .diff-leicht  { background: var(--green-bg); color: var(--green); }
+  .diff-mittel  { background: var(--yellow-bg); color: var(--yellow); }
+  .diff-schwer  { background: var(--red-bg); color: var(--red); }
+  .badge-level { background: var(--surface2); color: var(--ink-dim); padding: 0.05rem 0.4rem; border-radius: 3px; font-size: 0.65rem; }
+  .task-chevron { color: var(--ink-faint); font-size: 0.85rem; transition: transform var(--tr); flex-shrink: 0; margin-top: 0.15rem; }
+  .task-card.open .task-chevron { transform: rotate(90deg); }
+  .task-check { color: var(--green); font-size: 1rem; flex-shrink: 0; margin-top: 0.15rem; }
+  .task-body { border-top: 1px solid var(--rule); padding: 1.25rem; animation: fadeUp 0.2s ease; }
+  .task-description { color: var(--ink); font-size: 0.88rem; line-height: 1.7; margin-bottom: 1.25rem; }
+  .task-description strong { color: var(--accent); font-weight: 600; }
+  .task-description code { font-family: var(--mono); font-size: 0.8rem; background: var(--surface2); padding: 0.1rem 0.35rem; border-radius: 3px; }
+
+  /* ── Roles table ── */
+  .roles-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-bottom: 1.25rem; }
+  .roles-table th { text-align: left; font-family: var(--mono); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-faint); border-bottom: 1px solid var(--rule); padding: 0.4rem 0.75rem; background: var(--surface2); }
+  .roles-table td { padding: 0.45rem 0.75rem; border-bottom: 1px solid var(--rule); font-family: var(--mono); font-size: 0.78rem; }
+  .roles-table tr:last-child td { border-bottom: none; }
+  .roles-table td:first-child { color: var(--accent); }
+
+  /* ── Editor ── */
+  .editor-wrap { background: #1a1a18; border: 1px solid var(--rule); border-radius: var(--radius); overflow: hidden; margin-bottom: 1rem; }
+  .editor-topbar { background: #2a2a28; border-bottom: 1px solid rgba(255,255,255,0.08); padding: 0.38rem 0.75rem; display: flex; align-items: center; justify-content: space-between; }
+  .editor-label { font-family: var(--mono); font-size: 0.65rem; color: rgba(255,255,255,0.3); letter-spacing: 0.06em; }
+  .btn-clear { background: none; border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.4); font-family: var(--mono); font-size: 0.65rem; padding: 0.18rem 0.55rem; border-radius: 4px; cursor: pointer; transition: var(--tr); }
+  .btn-clear:hover { border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.7); }
+  textarea.sql-input { width: 100%; background: transparent; border: none; color: #f0ece3; font-family: var(--mono); font-size: 0.82rem; line-height: 1.7; padding: 0.75rem 1rem; resize: vertical; min-height: 120px; outline: none; tab-size: 2; }
+  textarea.sql-input::placeholder { color: rgba(255,255,255,0.2); }
+
+  /* ── Buttons ── */
+  .task-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; align-items: center; }
+  .btn-mark { background: var(--green-bg); color: var(--green); border: 1px solid var(--green); font-family: var(--sans); font-size: 0.82rem; padding: 0.5rem 1.25rem; border-radius: var(--radius); cursor: pointer; transition: var(--tr); }
+  .btn-mark:hover { background: #d0eddc; }
+  .btn-mark.marked { background: var(--green); color: white; }
+  .btn-hint { background: var(--yellow-bg); color: var(--yellow); border: 1px solid rgba(122,96,16,0.2); font-family: var(--sans); font-size: 0.82rem; padding: 0.5rem 1.25rem; border-radius: var(--radius); cursor: pointer; transition: var(--tr); }
+  .btn-hint:hover { background: #f9f0d0; }
+  .btn-solution { background: var(--purple-bg); color: var(--purple); border: 1px solid rgba(74,26,143,0.2); font-family: var(--sans); font-size: 0.82rem; padding: 0.5rem 1.25rem; border-radius: var(--radius); cursor: pointer; transition: var(--tr); }
+  .btn-solution:hover { background: #e8e0f5; }
+
+  .hint-block { background: var(--yellow-bg); border: 1px solid rgba(122,96,16,0.2); border-radius: var(--radius); padding: 0.9rem 1rem; margin-bottom: 1rem; animation: fadeUp 0.2s ease; }
+  .hint-title { font-family: var(--mono); font-size: 0.65rem; color: var(--yellow); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.4rem; }
+  .hint-text { font-size: 0.85rem; color: var(--yellow); line-height: 1.6; }
+  .hint-text code { font-family: var(--mono); background: rgba(122,96,16,0.1); padding: 0.1rem 0.3rem; border-radius: 3px; }
+
+  .solution-block { background: var(--purple-bg); border: 1px solid rgba(74,26,143,0.2); border-radius: var(--radius); padding: 0.9rem 1rem; margin-bottom: 1rem; animation: fadeUp 0.2s ease; }
+  .solution-title { font-family: var(--mono); font-size: 0.65rem; color: var(--purple); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.75rem; }
+  pre.solution-sql { background: #1a1a18; border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 0.75rem 1rem; font-family: var(--mono); font-size: 0.78rem; color: #f0ece3; overflow-x: auto; line-height: 1.7; white-space: pre; }
+
+  /* ── Overview ── */
+  .overview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 1px; background: var(--rule); border: 1px solid var(--rule); }
+  .overview-item { background: var(--surface); padding: 1rem 1.1rem; cursor: pointer; transition: background var(--tr); position: relative; }
+  .overview-item:hover { background: var(--surface2); }
+  .overview-item.done { background: var(--green-bg); }
+  .overview-num { font-family: var(--mono); font-size: 0.65rem; color: var(--accent); margin-bottom: 0.3rem; }
+  .overview-title-text { font-size: 0.85rem; font-weight: 500; color: var(--ink); margin-bottom: 0.3rem; }
+  .overview-meta { display: flex; gap: 0.4rem; }
+  .overview-check { color: var(--green); position: absolute; top: 1rem; right: 1rem; }
+
+  /* ── Abgabe ── */
+  .submit-box { background: var(--surface); border: 1px solid var(--rule); border-radius: var(--radius); padding: 1.75rem; }
+  .submit-title { font-family: var(--serif); font-size: 1.4rem; margin-bottom: 0.4rem; }
+  .submit-sub { color: var(--ink-dim); font-size: 0.85rem; margin-bottom: 1.5rem; line-height: 1.6; }
+  .submit-field { margin-bottom: 1rem; }
+  .submit-field label { display: block; font-family: var(--mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-faint); margin-bottom: 0.4rem; }
+  .submit-field input { width: 100%; padding: 0.55rem 0.85rem; background: var(--bg); border: 1px solid var(--rule); border-radius: 6px; font-family: var(--sans); font-size: 0.88rem; color: var(--ink); outline: none; transition: border-color var(--tr); }
+  .submit-field input:focus { border-color: var(--accent); }
+  .btn-submit { background: var(--accent); color: white; border: none; font-family: var(--sans); font-weight: 600; font-size: 0.9rem; padding: 0.75rem 2rem; border-radius: var(--radius); cursor: pointer; transition: opacity var(--tr); width: 100%; margin-top: 0.5rem; }
+  .btn-submit:hover { opacity: 0.85; }
+  .submit-preview { margin-top: 1.5rem; }
+  .submit-preview-label { font-family: var(--mono); font-size: 0.65rem; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; }
+  pre.submit-preview-code { background: #1a1a18; color: #f0ece3; font-family: var(--mono); font-size: 0.72rem; line-height: 1.7; padding: 1rem; border-radius: var(--radius); overflow: auto; max-height: 320px; }
+  .submit-stats { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .stat { display: flex; flex-direction: column; gap: 0.2rem; }
+  .stat-value { font-family: var(--serif); font-size: 2rem; line-height: 1; color: var(--ink); }
+  .stat-label { font-family: var(--mono); font-size: 0.65rem; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.1em; }
+
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 3px; }
+  [v-cloak] { display: none; }
+</style>
+</head>
+<body>
+<div id="app" v-cloak>
+
+  <div class="top-rule"></div>
+
+  <header>
+    <a href="../" class="header-back">← Archiv</a>
+    <span class="header-sep">|</span>
+    <span class="header-title">DCL Aufgaben</span>
+    <span class="header-badge">m290</span>
+    <span class="header-spacer"></span>
+    <button class="btn-download" @click="activeTab = 'abgabe'" title="Abgabe vorbereiten">
+      ↓ Abgabe
+    </button>
+  </header>
+
+  <div class="tabs-bar">
+    <button v-for="tab in tabs" :key="tab.id" class="nav-btn" :class="{ active: activeTab === tab.id }" @click="activeTab = tab.id">
+      {{ tab.label }}
+    </button>
+  </div>
+
+  <div class="progress-bar-wrap">
+    <span class="progress-label">{{ doneCount }} / {{ tasks.length }} erledigt</span>
+    <div class="progress-track">
+      <div class="progress-fill" :style="{ width: progressPct + '%' }"></div>
+    </div>
+  </div>
+
+  <main>
+
+    <!-- ════ AUFGABEN ════ -->
+    <div v-show="activeTab === 'aufgaben'" class="section-enter-active">
+      <div class="page-title">DCL Aufgaben</div>
+      <div class="page-subtitle">10 Aufgaben zu Benutzerverwaltung und Rechtevergabe auf der Datenbank <code style="font-family:var(--mono);font-size:0.85em;background:var(--surface2);padding:0.1rem 0.35rem;border-radius:3px">m290_lj_school</code>.</div>
+
+      <div class="info-block">
+        <strong>Hinweis:</strong> Schreibe deine SQL-Befehle direkt in das Eingabefeld unter jeder Aufgabe. Deine Eingaben werden automatisch gespeichert. Für die Abgabe gehst du zum Tab <strong>Abgabe</strong> und lädst dort deine <code>.sql</code>-Datei herunter.
+      </div>
+
+      <div
+        v-for="(task, i) in tasks"
+        :key="task.id"
+        class="task-card"
+        :class="{ open: task.open, done: task.done }"
+      >
+        <div class="task-header" @click="toggleTask(i)">
+          <span class="task-num">A{{ String(i+1).padStart(2,'0') }}</span>
+          <div class="task-title-wrap">
+            <div class="task-title">{{ task.title }}</div>
+            <div class="task-meta">
+              <span class="badge-diff" :class="'diff-' + task.diff">{{ task.diff }}</span>
+              <span class="badge-level">{{ task.level }}</span>
+            </div>
+          </div>
+          <span v-if="task.done" class="task-check">✓</span>
+          <span v-else class="task-chevron">›</span>
+        </div>
+
+        <div v-if="task.open" class="task-body">
+          <div class="task-description" v-html="task.desc"></div>
+
+          <table v-if="task.roles" class="roles-table">
+            <thead><tr><th>Benutzer</th><th>Rechte</th><th>Gültigkeitsbereich</th></tr></thead>
+            <tbody>
+              <tr v-for="r in task.roles" :key="r.user">
+                <td>{{ r.user }}</td>
+                <td>{{ r.rights }}</td>
+                <td>{{ r.scope }}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="editor-wrap">
+            <div class="editor-topbar">
+              <span class="editor-label">SQL – A{{ String(i+1).padStart(2,'0') }}</span>
+              <button class="btn-clear" @click="clearAnswer(i)">Leeren</button>
+            </div>
+            <textarea
+              class="sql-input"
+              :placeholder="task.placeholder"
+              v-model="task.answer"
+              @input="saveAnswers"
+            ></textarea>
+          </div>
+
+          <div class="task-actions">
+            <button
+              class="btn-mark"
+              :class="{ marked: task.done }"
+              @click="toggleDone(i)"
+            >{{ task.done ? '✓ Erledigt' : 'Als erledigt markieren' }}</button>
+            <button class="btn-hint" @click="task.showHint = !task.showHint">
+              {{ task.showHint ? 'Hinweis ausblenden' : 'Hinweis anzeigen' }}
+            </button>
+            <button class="btn-solution" @click="task.showSolution = !task.showSolution">
+              {{ task.showSolution ? 'Lösung ausblenden' : 'Lösung anzeigen' }}
+            </button>
+          </div>
+
+          <div v-if="task.showHint" class="hint-block">
+            <div class="hint-title">Hinweis</div>
+            <div class="hint-text" v-html="task.hint"></div>
+          </div>
+
+          <div v-if="task.showSolution" class="solution-block">
+            <div class="solution-title">Musterlösung</div>
+            <pre class="solution-sql">{{ task.solution }}</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ SCHEMA ════ -->
+    <div v-show="activeTab === 'schema'" class="section-enter-active">
+      <div class="page-title">Datenbankschema</div>
+      <div class="page-subtitle">Die Datenbank <code style="font-family:var(--mono)">m290_lj_school</code> bildet die Grundlage aller Aufgaben.</div>
+
+      <div class="schema-overview">
+        <div v-for="tbl in schema" :key="tbl.name" class="schema-table">
+          <div class="schema-table-header">▤ {{ tbl.name }}</div>
+          <div class="schema-fields">
+            <div v-for="f in tbl.fields" :key="f.name" class="schema-field">
+              <span v-if="f.pk" class="badge-pk">PK</span>
+              <span v-if="f.fk" class="badge-fk">FK</span>
+              <span class="field-name">{{ f.name }}</span>
+              <span class="field-type">{{ f.type }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-block">
+        <strong>Beziehungen:</strong> <code>subject.teacher_id</code> → <code>teacher.teacher_id</code> (direkte 1:1-Zuweisung) ·
+        <code>subject_teacher</code> ist eine N:M-Brückentabelle für mehrere Lehrpersonen pro Fach.
+      </div>
+    </div>
+
+    <!-- ════ ÜBERSICHT ════ -->
+    <div v-show="activeTab === 'uebersicht'" class="section-enter-active">
+      <div class="page-title">Übersicht</div>
+      <div class="page-subtitle">Klicke auf eine Aufgabe um sie direkt zu öffnen.</div>
+      <div class="overview-grid">
+        <div
+          v-for="(task, i) in tasks"
+          :key="task.id"
+          class="overview-item"
+          :class="{ done: task.done }"
+          @click="jumpTo(i)"
+        >
+          <div class="overview-num">A{{ String(i+1).padStart(2,'0') }}</div>
+          <div class="overview-title-text">{{ task.title }}</div>
+          <div class="overview-meta">
+            <span class="badge-diff" :class="'diff-' + task.diff">{{ task.diff }}</span>
+            <span class="badge-level">{{ task.level }}</span>
+          </div>
+          <span v-if="task.done" class="overview-check">✓</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ ABGABE ════ -->
+    <div v-show="activeTab === 'abgabe'" class="section-enter-active">
+      <div class="page-title">Abgabe</div>
+      <div class="page-subtitle">Trage deinen Namen ein und lade deine Antworten als <code style="font-family:var(--mono)">.sql</code>-Datei herunter.</div>
+
+      <div class="submit-box">
+        <div class="submit-stats">
+          <div class="stat">
+            <span class="stat-value">{{ doneCount }}</span>
+            <span class="stat-label">Erledigt</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value">{{ answeredCount }}</span>
+            <span class="stat-label">Beantwortet</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value">{{ tasks.length }}</span>
+            <span class="stat-label">Total</span>
+          </div>
+        </div>
+
+        <div class="submit-field">
+          <label>Dein Name</label>
+          <input v-model="studentName" placeholder="Vorname Nachname" type="text" />
+        </div>
+        <div class="submit-field">
+          <label>Klasse</label>
+          <input v-model="studentClass" placeholder="z.B. IMD23a" type="text" />
+        </div>
+
+        <button class="btn-submit" @click="downloadSQL">↓ SQL-Datei herunterladen</button>
+
+        <div class="submit-preview">
+          <div class="submit-preview-label">Vorschau der Abgabedatei</div>
+          <pre class="submit-preview-code">{{ previewSQL }}</pre>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+<script>
+const LS_KEY = 'dcl-aufgaben-v1';
+
+Vue.createApp({
+  data() {
+    return {
+      activeTab: 'aufgaben',
+      studentName: '',
+      studentClass: '',
+      tabs: [
+        { id: 'aufgaben',  label: 'Aufgaben' },
+        { id: 'schema',    label: 'Schema' },
+        { id: 'uebersicht',label: 'Übersicht' },
+        { id: 'abgabe',    label: 'Abgabe' },
+      ],
+      schema: [
+        { name: 'subject', fields: [
+          { name: 'subject_id',   type: 'INT UNSIGNED', pk: true },
+          { name: 'subject_name', type: 'VARCHAR(255)' },
+          { name: 'teacher_id',   type: 'INT UNSIGNED', fk: true },
+        ]},
+        { name: 'teacher', fields: [
+          { name: 'teacher_id', type: 'INT UNSIGNED', pk: true },
+          { name: 'first_part', type: 'VARCHAR(80)' },
+          { name: 'last_part',  type: 'VARCHAR(80)' },
+        ]},
+        { name: 'subject_teacher', fields: [
+          { name: 'subject_id', type: 'INT UNSIGNED', pk: true, fk: true },
+          { name: 'teacher_id', type: 'INT UNSIGNED', pk: true, fk: true },
+        ]},
+      ],
+      tasks: [
+        {
+          id: 1, open: false, done: false, showHint: false, showSolution: false, answer: '',
+          title: 'Benutzer anlegen und Leserecht auf Datenbankebene',
+          diff: 'leicht', level: 'Datenbank-Ebene',
+          placeholder: '-- Benutzer anlegen und SELECT auf alle Tabellen erteilen\n',
+          desc: `Lege einen Benutzer <code>schul_leser</code> auf <code>localhost</code> mit dem Passwort <code>Lesen2025!</code> an.<br>
+Erteile ihm <strong>Leserechte (SELECT)</strong> auf <strong>alle Tabellen</strong> der Datenbank <code>m290_lj_school</code>.`,
+          hint: `Verwende <code>CREATE USER 'name'@'host' IDENTIFIED BY 'passwort'</code> und dann <code>GRANT ... ON datenbank.* TO ...</code>. Vergiss <code>FLUSH PRIVILEGES;</code> nicht.`,
+          solution:
+`CREATE USER 'schul_leser'@'localhost' IDENTIFIED BY 'Lesen2025!';
+GRANT SELECT ON m290_lj_school.* TO 'schul_leser'@'localhost';
+FLUSH PRIVILEGES;`,
+        },
+        {
+          id: 2, open: false, done: false, showHint: false, showSolution: false, answer: '',
+          title: 'SELECT-Recht nur auf eine Tabelle',
+          diff: 'leicht', level: 'Tabellen-Ebene',
+          placeholder: '-- Benutzer anlegen und SELECT nur auf subject erteilen\n',
+          desc: `Lege einen Benutzer <code>fach_leser</code> auf <code>localhost</code> mit dem Passwort <code>Lesen2025!</code> an.<br>
+Erteile ihm <strong>SELECT</strong> ausschliesslich auf die Tabelle <code>subject</code> — andere Tabellen soll er nicht sehen können.`,
+          hint: `Bei der Tabellen-Ebene nutzt du <code>ON datenbank.tabellenname</code> statt <code>ON datenbank.*</code>.`,
+          solution:
+`CREATE USER 'fach_leser'@'localhost' IDENTIFIED BY 'Lesen2025!';
+GRANT SELECT ON m290_lj_school.subject TO 'fach_leser'@'localhost';
+FLUSH PRIVILEGES;`,
+        },
+        {
+          id: 3, open: false, done: false, showHint: false, showSolution: false, answer: '',
+          title: 'Lesen, Einfügen und Ändern – kein Löschen',
+          diff: 'leicht', level: 'Tabellen-Ebene',
+          placeholder: '-- Benutzer mit SELECT, INSERT, UPDATE auf subject anlegen\n',
+          desc: `Lege einen Benutzer <code>fach_verwalter</code> mit dem Passwort <code>Verwalten2025!</code> an.<br>
+Er soll in der Tabelle <code>subject</code> Datensätze <strong>lesen, einfügen und ändern</strong> können — aber <strong>nicht löschen</strong>.`,
+          hint: `Du kannst mehrere Rechte kommagetrennt angeben: <code>GRANT SELECT, INSERT, UPDATE ON ...</code>`,
+          solution:
+`CREATE USER 'fach_verwalter'@'localhost' IDENTIFIED BY 'Verwalten2025!';
+GRANT SELECT, INSERT, UPDATE ON m290_lj_school.subject TO 'fach_verwalter'@'localhost';
+FLUSH PRIVILEGES;`,
+        },
+        {
+          id: 4, open: false, done: false, showHint: false, showSolution: false, answer: '',
+          title: 'SELECT auf einzelne Spalten (Spalten-Ebene)',
+          diff: 'mittel', level: 'Spalten-Ebene',
+          placeholder: '-- SELECT nur auf first_part und last_part der Tabelle teacher\n',
+          desc: `Lege einen Benutzer <code>lehrer_anzeige</code> mit dem Passwort <code>Anzeige2025!</code> an.<br>
+Er darf aus der Tabelle <code>teacher</code> nur die Spalten <strong><code>first_part</code> und <code>last_part</code></strong> lesen — die <code>teacher_id</code> soll verborgen bleiben.`,
+          hint: `Auf Spalten-Ebene gibst du die Spalten in Klammern direkt nach dem Privileg an: <code>GRANT SELECT (spalte1, spalte2) ON ...</code>`,
+          solution:
+`CREATE USER 'lehrer_anzeige'@'localhost' IDENTIFIED BY 'Anzeige2025!';
+GRANT SELECT (first_part, last_part) ON m290_lj_school.teacher TO 'lehrer_anzeige'@'localhost';
+FLUSH PRIVILEGES;`,
+        },
+        {
+          id: 5, open: false, done: false, showHint: false, showSolution: false, answer: '',
+          title: 'Brückentabelle verwalten',
+          diff: 'mittel', level: 'Tabellen-Ebene',
+          placeholder: '-- Benutzer mit INSERT und DELETE auf subject_teacher\n',
+          desc: `Lege einen Benutzer <code>zuweisung_admin</code> mit dem Passwort <code>Admin2025!</code> an.<br>
+Er soll in der Tabelle <code>subject_teacher</code> Einträge <strong>einfügen und löschen</strong> können, aber keine anderen Tabellen sehen.`,
+          hint: `Achte darauf, nur <code>subject_teacher</code> zu berechtigen und <em>kein</em> <code>ON datenbank.*</code> zu verwenden.`,
+          solution:
+`CREATE USER 'zuweisung_admin'@'localhost' IDENTIFIED BY 'Admin2025!';
+GRANT INSERT, DELETE ON m290_lj_school.subject_teacher TO 'zuweisung_admin'@'localhost';
+FLUSH PRIVILEGES;`,
+        },
+        {
+          id: 6, open: false, done: false, showHint: false, showSolution: false, answer: '',
+          title: 'Vollzugriff auf eine Tabelle',
+          diff: 'mittel', level: 'Tabellen-Ebene',
+          placeholder: '-- Benutzer mit ALL PRIVILEGES auf teacher anlegen\n',
+          desc: `Lege einen Benutzer <code>lehrer_admin</code> mit dem Passwort <code>LehrerAdmin2025!</code> an.<br>
+Erteile ihm <strong>alle Rechte (<code>ALL PRIVILEGES</code>)</strong> auf die Tabelle <code>teacher</code>.`,
+          hint: `<code>ALL PRIVILEGES</code> erteilt alle Rechte auf der angegebenen Ebene — ausser <code>GRANT OPTION</code>.`,
+          solution:
+`CREATE USER 'lehrer_admin'@'localhost' IDENTIFIED BY 'LehrerAdmin2025!';
+GRANT ALL PRIVILEGES ON m290_lj_school.teacher TO 'lehrer_admin'@'localhost';
+FLUSH PRIVILEGES;`,
+        },
+        {
+          id: 7, open: false, done: false, showHint: false, showSolution: false, answer: '',
+          title: 'Recht entziehen mit REVOKE',
+          diff: 'mittel', level: 'Tabellen-Ebene',
+          placeholder: '-- INSERT-Recht von fach_verwalter entziehen\n',
+          desc: `Der Benutzer <code>fach_verwalter</code> (aus Aufgabe 3) hat bisher <code>SELECT, INSERT, UPDATE</code> auf <code>subject</code>.<br>
+Entziehe ihm das <strong><code>INSERT</code>-Recht</strong> auf diese Tabelle. Die anderen Rechte sollen erhalten bleiben.`,
+          hint: `Die Syntax von <code>REVOKE</code> ist spiegelbildlich zu <code>GRANT</code>: <code>REVOKE recht ON tabelle FROM benutzer</code>.`,
+          solution:
+`REVOKE INSERT ON m290_lj_school.subject FROM 'fach_verwalter'@'localhost';
+FLUSH PRIVILEGES;`,
+        },
+        {
+          id: 8, open: false, done: false, showHint: false, showSolution: false, answer: '',
+          title: 'Rechte weitergeben mit GRANT OPTION',
+          diff: 'schwer', level: 'Tabellen-Ebene',
+          placeholder: '-- Benutzer mit GRANT OPTION anlegen\n',
+          desc: `Lege einen Benutzer <code>fach_chef</code> mit dem Passwort <code>Chef2025!</code> an.<br>
+Er soll <strong><code>SELECT</code> und <code>INSERT</code></strong> auf die Tabelle <code>subject</code> haben und diese Rechte <strong>auch an andere Benutzer weitergeben</strong> dürfen.`,
+          hint: `Am Ende des GRANT-Befehls fügst du <code>WITH GRANT OPTION</code> hinzu.`,
+          solution:
+`CREATE USER 'fach_chef'@'localhost' IDENTIFIED BY 'Chef2025!';
+GRANT SELECT, INSERT ON m290_lj_school.subject TO 'fach_chef'@'localhost' WITH GRANT OPTION;
+FLUSH PRIVILEGES;`,
+        },
+        {
+          id: 9, open: false, done: false, showHint: false, showSolution: false, answer: '',
+          title: 'Mehrbenutzer-Szenario',
+          diff: 'schwer', level: 'Datenbank- & Tabellen-Ebene',
+          placeholder: '-- Drei Benutzer mit unterschiedlichen Rollen anlegen\n',
+          desc: `Erstelle drei Benutzer für die Schulverwaltung gemäss folgender Rollentabelle:`,
+          roles: [
+            { user: 'direktion',  rights: 'SELECT',                     scope: 'gesamte Datenbank (alle Tabellen)' },
+            { user: 'sekretariat',rights: 'SELECT, UPDATE',              scope: 'nur subject und teacher' },
+            { user: 'it_support', rights: 'ALL PRIVILEGES',              scope: 'gesamte Datenbank' },
+          ],
+          hint: `Für <code>sekretariat</code> brauchst du zwei separate GRANT-Befehle (einen pro Tabelle). Alle Passwörter kannst du frei wählen.`,
+          solution:
+`CREATE USER 'direktion'@'localhost' IDENTIFIED BY 'Direktion2025!';
+GRANT SELECT ON m290_lj_school.* TO 'direktion'@'localhost';
+
+CREATE USER 'sekretariat'@'localhost' IDENTIFIED BY 'Sekretariat2025!';
+GRANT SELECT, UPDATE ON m290_lj_school.subject TO 'sekretariat'@'localhost';
+GRANT SELECT, UPDATE ON m290_lj_school.teacher TO 'sekretariat'@'localhost';
+
+CREATE USER 'it_support'@'localhost' IDENTIFIED BY 'Support2025!';
+GRANT ALL PRIVILEGES ON m290_lj_school.* TO 'it_support'@'localhost';
+
+FLUSH PRIVILEGES;`,
+        },
+        {
+          id: 10, open: false, done: false, showHint: false, showSolution: false, answer: '',
+          title: 'Vollständiges Rechtekonzept',
+          diff: 'schwer', level: 'Datenbank-, Tabellen- & Spalten-Ebene',
+          placeholder: '-- Vollständiges Rechtekonzept mit zwei Benutzern und REVOKE\n',
+          desc: `Entwirf ein vollständiges Rechtekonzept. Erstelle folgende zwei Benutzer und setze danach eine Einschränkung:`,
+          roles: [
+            { user: 'bericht_leser', rights: 'SELECT (first_part, last_part)', scope: 'teacher · SELECT auf subject (alle Spalten)' },
+            { user: 'daten_pfleger', rights: 'SELECT, INSERT, UPDATE, DELETE', scope: 'subject und subject_teacher · nur SELECT auf teacher' },
+          ],
+          desc2: true,
+          hint: `Für <code>bericht_leser</code> benötigst du zwei GRANT-Befehle: einen auf Spalten-Ebene (teacher) und einen auf Tabellen-Ebene (subject). Am Ende: <code>REVOKE DELETE ON ... subject FROM 'daten_pfleger'...</code>`,
+          solution:
+`CREATE USER 'bericht_leser'@'localhost' IDENTIFIED BY 'Bericht2025!';
+GRANT SELECT (first_part, last_part) ON m290_lj_school.teacher TO 'bericht_leser'@'localhost';
+GRANT SELECT ON m290_lj_school.subject TO 'bericht_leser'@'localhost';
+
+CREATE USER 'daten_pfleger'@'localhost' IDENTIFIED BY 'Pfleger2025!';
+GRANT SELECT, INSERT, UPDATE, DELETE ON m290_lj_school.subject TO 'daten_pfleger'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON m290_lj_school.subject_teacher TO 'daten_pfleger'@'localhost';
+GRANT SELECT ON m290_lj_school.teacher TO 'daten_pfleger'@'localhost';
+
+-- Einschränkung: DELETE auf subject entziehen
+REVOKE DELETE ON m290_lj_school.subject FROM 'daten_pfleger'@'localhost';
+
+FLUSH PRIVILEGES;`,
+        },
+      ],
+    };
+  },
+
+  computed: {
+    doneCount()     { return this.tasks.filter(t => t.done).length; },
+    answeredCount() { return this.tasks.filter(t => t.answer.trim().length > 0).length; },
+    progressPct()   { return (this.doneCount / this.tasks.length) * 100; },
+
+    previewSQL() {
+      const date = new Date().toLocaleDateString('de-CH');
+      const name = this.studentName || '[Name]';
+      const cls  = this.studentClass || '[Klasse]';
+      let out = `-- ================================================\n`;
+      out    += `-- DCL Aufgaben – m290 Datenbanken\n`;
+      out    += `-- Name:   ${name}\n`;
+      out    += `-- Klasse: ${cls}\n`;
+      out    += `-- Datum:  ${date}\n`;
+      out    += `-- ================================================\n\n`;
+      this.tasks.forEach((t, i) => {
+        const num = String(i + 1).padStart(2, '0');
+        out += `-- ────────────────────────────────────────────────\n`;
+        out += `-- A${num}: ${t.title}\n`;
+        out += `-- ────────────────────────────────────────────────\n`;
+        out += (t.answer.trim() || '-- (keine Antwort)') + '\n\n';
+      });
+      return out.trimEnd();
+    },
+  },
+
+  methods: {
+    toggleTask(i) {
+      this.tasks[i].open = !this.tasks[i].open;
+    },
+    toggleDone(i) {
+      this.tasks[i].done = !this.tasks[i].done;
+      this.saveAnswers();
+    },
+    clearAnswer(i) {
+      this.tasks[i].answer = '';
+      this.saveAnswers();
+    },
+    jumpTo(i) {
+      this.activeTab = 'aufgaben';
+      this.$nextTick(() => {
+        this.tasks.forEach((t, j) => t.open = j === i);
+        setTimeout(() => {
+          document.querySelectorAll('.task-card')[i]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 50);
+      });
+    },
+    saveAnswers() {
+      const data = this.tasks.map(t => ({ id: t.id, answer: t.answer, done: t.done }));
+      localStorage.setItem(LS_KEY, JSON.stringify({ answers: data, name: this.studentName, class: this.studentClass }));
+    },
+    loadAnswers() {
+      try {
+        const raw = localStorage.getItem(LS_KEY);
+        if (!raw) return;
+        const data = JSON.parse(raw);
+        if (data.name)  this.studentName  = data.name;
+        if (data.class) this.studentClass = data.class;
+        data.answers?.forEach(saved => {
+          const task = this.tasks.find(t => t.id === saved.id);
+          if (task) { task.answer = saved.answer ?? ''; task.done = saved.done ?? false; }
+        });
+      } catch (_) {}
+    },
+    downloadSQL() {
+      const filename = `dcl_aufgaben_${(this.studentName || 'abgabe').replace(/\s+/g, '_').toLowerCase()}.sql`;
+      const blob = new Blob([this.previewSQL], { type: 'text/plain;charset=utf-8' });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href = url; a.download = filename; a.click();
+      URL.revokeObjectURL(url);
+    },
+  },
+
+  watch: {
+    studentName()  { this.saveAnswers(); },
+    studentClass() { this.saveAnswers(); },
+  },
+
+  mounted() {
+    this.loadAnswers();
+  },
+}).mount('#app');
+</script>
+</body>
+</html>
