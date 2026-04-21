@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache">
+  <title>DCL & Sicherheit – m290</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:        #f5f2eb;
+      --ink:       #1a1a18;
+      --ink-dim:   #6b6860;
+      --ink-faint: #b8b4aa;
+      --rule:      #d9d5cc;
+      --surface:   #ffffff;
+      --surface2:  #f0ece3;
+      --accent:    #8f1a5a;
+      --accent-bg: #f5e8f0;
+      --green:     #1a6b3a;
+      --green-bg:  #e8f5ee;
+      --red:       #8f1a1a;
+      --red-bg:    #f5e8e8;
+      --yellow:    #7a6010;
+      --yellow-bg: #fdf8e8;
+      --serif:     'DM Serif Display', Georgia, serif;
+      --mono:      'DM Mono', monospace;
+      --sans:      'DM Sans', sans-serif;
+      --radius:    8px;
+      --tr:        0.18s ease;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+    }
+
+    .top-rule { width: 100%; height: 3px; background: var(--ink); flex-shrink: 0; }
+
+    header {
+      width: 100%;
+      padding: 0 2rem;
+      background: var(--bg);
+      border-bottom: 1px solid var(--rule);
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      height: 54px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-back {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--ink-dim);
+      text-decoration: none;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: color var(--tr);
+      white-space: nowrap;
+    }
+    .header-back:hover { color: var(--ink); }
+    .header-sep { color: var(--rule); font-size: 1.1rem; }
+    .header-title { font-family: var(--serif); font-size: 1.1rem; color: var(--ink); }
+    .header-badge {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--ink-dim);
+      background: var(--surface2);
+      border: 1px solid var(--rule);
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+      letter-spacing: 0.06em;
+    }
+
+    /* ── Tabs ── */
+    .tabs-bar {
+      width: 100%;
+      border-bottom: 1px solid var(--rule);
+      background: var(--bg);
+      display: flex;
+      padding: 0 2rem;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .tabs-bar::-webkit-scrollbar { display: none; }
+    .tab-btn {
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--ink-dim);
+      font-family: var(--sans);
+      font-size: 0.82rem;
+      font-weight: 500;
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: color var(--tr), border-color var(--tr);
+      margin-bottom: -1px;
+    }
+    .tab-btn:hover { color: var(--ink); }
+    .tab-btn.active { color: var(--ink); border-bottom-color: var(--ink); font-weight: 600; }
+
+    main { width: 100%; max-width: 780px; padding: 2.5rem 1.5rem 5rem; }
+
+    .view { display: none; }
+    .view.active { display: block; animation: fadeUp 0.25s ease; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Progress ── */
+    .progress-wrap { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
+    .progress-bar { flex: 1; height: 3px; background: var(--rule); border-radius: 2px; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--ink); border-radius: 2px; transition: width 0.4s ease; }
+    .progress-label { font-family: var(--mono); font-size: 0.72rem; color: var(--ink-dim); white-space: nowrap; }
+
+    /* ── Flashcard ── */
+    .card-scene {
+      perspective: 1100px;
+      width: 100%;
+      height: 300px;
+      cursor: pointer;
+      margin-bottom: 1.5rem;
+    }
+    .card-inner {
+      width: 100%; height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.5s cubic-bezier(.4,0,.2,1);
+    }
+    .card-scene.flipped .card-inner { transform: rotateY(180deg); }
+    .card-face {
+      position: absolute; inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: var(--radius);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2.5rem;
+      text-align: center;
+    }
+    .card-front { background: var(--surface); border: 1px solid var(--rule); }
+    .card-back  { background: var(--ink); transform: rotateY(180deg); }
+    .card-tag {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      margin-bottom: 1rem;
+    }
+    .card-front .card-tag { color: var(--ink-faint); }
+    .card-back .card-tag  { color: rgba(255,255,255,0.4); }
+    .card-term  { font-family: var(--serif); font-size: 2.4rem; color: var(--ink); line-height: 1.1; margin-bottom: 0.6rem; }
+    .card-hint  { font-size: 0.78rem; color: var(--ink-faint); font-family: var(--mono); }
+    .card-definition { font-size: 1rem; line-height: 1.65; color: #f0ece3; font-weight: 300; }
+    .card-example { margin-top: 1rem; font-size: 0.78rem; color: rgba(255,255,255,0.4); font-style: italic; font-family: var(--mono); }
+
+    .card-nav { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
+    .nav-btn {
+      padding: 0.55rem 1.4rem;
+      border: 1px solid var(--rule);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--tr);
+    }
+    .nav-btn:hover:not(:disabled) { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+    .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .shuffle-btn {
+      padding: 0.55rem 1rem;
+      border: 1px solid var(--rule);
+      border-radius: var(--radius);
+      background: transparent;
+      color: var(--ink-dim);
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      transition: all var(--tr);
+    }
+    .shuffle-btn:hover { color: var(--ink); border-color: var(--ink-dim); }
+
+    /* ── Quiz ── */
+    .quiz-question {
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+      margin-bottom: 1.25rem;
+    }
+    .quiz-question h2 { font-family: var(--serif); font-size: 1.3rem; line-height: 1.45; color: var(--ink); margin-bottom: 0.4rem; }
+    .quiz-meta { font-family: var(--mono); font-size: 0.7rem; color: var(--ink-faint); margin-bottom: 0.75rem; }
+    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.25rem; }
+    @media (max-width: 520px) { .options-grid { grid-template-columns: 1fr; } }
+    .option-btn {
+      padding: 1rem 1.1rem;
+      border: 1px solid var(--rule);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 0.88rem;
+      text-align: left;
+      cursor: pointer;
+      transition: all var(--tr);
+      line-height: 1.45;
+    }
+    .option-btn:hover:not(:disabled) { border-color: var(--ink); background: var(--surface2); }
+    .option-btn.correct { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+    .option-btn.wrong   { border-color: var(--red);   background: var(--red-bg);   color: var(--red); }
+    .option-btn:disabled { cursor: default; }
+
+    .quiz-feedback {
+      padding: 0.8rem 1rem;
+      border-radius: var(--radius);
+      font-size: 0.88rem;
+      margin-bottom: 1rem;
+      display: none;
+      font-family: var(--sans);
+    }
+    .quiz-feedback.show { display: block; }
+    .quiz-feedback.correct { background: var(--green-bg); border: 1px solid var(--green); color: var(--green); }
+    .quiz-feedback.wrong   { background: var(--red-bg);   border: 1px solid var(--red);   color: var(--red); }
+
+    .next-btn {
+      width: 100%;
+      padding: 0.85rem;
+      background: var(--ink);
+      border: none;
+      border-radius: var(--radius);
+      color: var(--bg);
+      font-family: var(--sans);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity var(--tr);
+      display: none;
+    }
+    .next-btn.show { display: block; }
+    .next-btn:hover { opacity: 0.82; }
+
+    /* ── Result ── */
+    .result-screen { text-align: center; padding: 4rem 0; }
+    .result-score  { font-family: var(--serif); font-size: 5rem; color: var(--ink); margin-bottom: 0.5rem; line-height: 1; }
+    .result-label  { font-size: 1rem; color: var(--ink-dim); margin-bottom: 2rem; font-weight: 300; }
+    .result-stars  { font-size: 1.8rem; margin-bottom: 2rem; letter-spacing: 0.1em; }
+    .restart-btn {
+      padding: 0.75rem 2.5rem;
+      background: var(--ink);
+      border: none;
+      border-radius: var(--radius);
+      color: var(--bg);
+      font-family: var(--sans);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity var(--tr);
+    }
+    .restart-btn:hover { opacity: 0.82; }
+
+    /* ── Overview ── */
+    .overview-heading {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--ink-faint);
+      margin-bottom: 1.25rem;
+    }
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 1px;
+      background: var(--rule);
+      border: 1px solid var(--rule);
+    }
+    .overview-card { background: var(--surface); padding: 1.1rem 1.25rem; cursor: pointer; transition: background var(--tr); }
+    .overview-card:hover { background: var(--surface2); }
+    .overview-term { font-family: var(--serif); font-size: 1.05rem; color: var(--ink); margin-bottom: 0.35rem; }
+    .overview-def  { font-size: 0.78rem; color: var(--ink-dim); line-height: 1.5; }
+
+    /* ── Referenz ── */
+    .ref-section { margin-bottom: 2.5rem; }
+    .ref-heading {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--ink-faint);
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--rule);
+    }
+    .ref-block {
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+    .ref-block-title {
+      padding: 0.85rem 1.25rem;
+      font-family: var(--sans);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--ink);
+      border-bottom: 1px solid var(--rule);
+      background: var(--surface2);
+    }
+    .ref-block-body { padding: 1.25rem; }
+    .ref-block-body p { font-size: 0.88rem; color: var(--ink-dim); line-height: 1.7; margin-bottom: 0.75rem; }
+    .ref-block-body p:last-child { margin-bottom: 0; }
+    pre {
+      background: var(--ink);
+      color: #f0ece3;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      line-height: 1.7;
+      padding: 1rem 1.25rem;
+      border-radius: 6px;
+      overflow-x: auto;
+      margin-bottom: 0.75rem;
+    }
+    pre:last-child { margin-bottom: 0; }
+    .priv-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .priv-table th {
+      text-align: left;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--ink-faint);
+      border-bottom: 1px solid var(--rule);
+      padding: 0.5rem 0.75rem;
+    }
+    .priv-table td { padding: 0.55rem 0.75rem; border-bottom: 1px solid var(--rule); color: var(--ink-dim); line-height: 1.5; }
+    .priv-table tr:last-child td { border-bottom: none; }
+    .priv-table td:first-child { font-family: var(--mono); font-size: 0.8rem; color: var(--ink); font-weight: 500; }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<div class="top-rule"></div>
+
+<header>
+  <a href="../" class="header-back">← Archiv</a>
+  <span class="header-sep">|</span>
+  <span class="header-title">DCL &amp; Sicherheit</span>
+  <span class="header-badge">m290</span>
+</header>
+
+<div class="tabs-bar">
+  <button class="tab-btn active" onclick="switchTab('cards', this)">Karteikarten</button>
+  <button class="tab-btn" onclick="switchTab('quiz', this)">Quiz</button>
+  <button class="tab-btn" onclick="switchTab('overview', this)">Übersicht</button>
+  <button class="tab-btn" onclick="switchTab('referenz', this)">Referenz</button>
+</div>
+
+<main>
+
+  <!-- ── KARTEIKARTEN ── -->
+  <div id="view-cards" class="view active">
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="card-progress"></div></div>
+      <span class="progress-label" id="card-counter">1 / 12</span>
+    </div>
+    <div class="card-scene" id="card-scene" onclick="flipCard()">
+      <div class="card-inner" id="card-inner">
+        <div class="card-face card-front">
+          <div class="card-tag">Begriff</div>
+          <div class="card-term" id="card-term"></div>
+          <div class="card-hint">Klicken zum Aufdecken</div>
+        </div>
+        <div class="card-face card-back">
+          <div class="card-tag">Definition</div>
+          <div class="card-definition" id="card-def"></div>
+          <div class="card-example" id="card-ex"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-nav">
+      <button class="nav-btn" id="prev-btn" onclick="prevCard()">← Zurück</button>
+      <button class="shuffle-btn" onclick="shuffleCards()">Mischen</button>
+      <button class="nav-btn" id="next-btn" onclick="nextCard()">Weiter →</button>
+    </div>
+  </div>
+
+  <!-- ── QUIZ ── -->
+  <div id="view-quiz" class="view">
+    <div id="quiz-content">
+      <div class="progress-wrap">
+        <div class="progress-bar"><div class="progress-fill" id="quiz-progress"></div></div>
+        <span class="progress-label" id="quiz-counter">Frage 1 / 10</span>
+      </div>
+      <div class="quiz-question">
+        <div class="quiz-meta" id="quiz-meta"></div>
+        <h2 id="quiz-question-text"></h2>
+      </div>
+      <div class="options-grid" id="options-grid"></div>
+      <div class="quiz-feedback" id="quiz-feedback"></div>
+      <button class="next-btn" id="next-q-btn" onclick="nextQuestion()">Nächste Frage →</button>
+    </div>
+    <div id="quiz-result" class="result-screen" style="display:none">
+      <div class="result-score" id="result-score"></div>
+      <div class="result-label" id="result-label"></div>
+      <div class="result-stars" id="result-stars"></div>
+      <button class="restart-btn" onclick="restartQuiz()">Nochmal versuchen</button>
+    </div>
+  </div>
+
+  <!-- ── ÜBERSICHT ── -->
+  <div id="view-overview" class="view">
+    <div class="overview-heading">Alle Begriffe auf einen Blick</div>
+    <div class="overview-grid" id="overview-grid"></div>
+  </div>
+
+  <!-- ── REFERENZ ── -->
+  <div id="view-referenz" class="view">
+
+    <div class="ref-section">
+      <div class="ref-heading">1 · Benutzer erstellen</div>
+      <div class="ref-block">
+        <div class="ref-block-title">CREATE USER</div>
+        <div class="ref-block-body">
+          <p>Benutzer werden über <strong>Benutzername und Host</strong> eindeutig identifiziert. Der Host bestimmt, von wo der Zugriff erlaubt ist.</p>
+          <pre>CREATE USER 'max'@'localhost' IDENTIFIED BY 'sicheres_passwort';
+CREATE USER 'max'@'%' IDENTIFIED BY 'passwort';  -- % = jeder Host</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="ref-section">
+      <div class="ref-heading">2 · Verfügbare Rechte</div>
+      <div class="ref-block">
+        <div class="ref-block-body">
+          <table class="priv-table">
+            <thead><tr><th>Privileg</th><th>Bedeutung</th></tr></thead>
+            <tbody>
+              <tr><td>ALL PRIVILEGES</td><td>Alle Rechte auf einer Ebene (ausser GRANT OPTION)</td></tr>
+              <tr><td>SELECT</td><td>Daten lesen</td></tr>
+              <tr><td>INSERT</td><td>Daten einfügen</td></tr>
+              <tr><td>UPDATE</td><td>Daten ändern</td></tr>
+              <tr><td>DELETE</td><td>Daten löschen</td></tr>
+              <tr><td>CREATE</td><td>Datenbanken / Tabellen anlegen</td></tr>
+              <tr><td>DROP</td><td>Objekte löschen</td></tr>
+              <tr><td>GRANT OPTION</td><td>Rechte an andere Benutzer weitergeben</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="ref-section">
+      <div class="ref-heading">3 · Rechte vergeben und entziehen</div>
+      <div class="ref-block">
+        <div class="ref-block-title">GRANT – Rechte erteilen</div>
+        <div class="ref-block-body">
+          <p>Die Ebene bestimmt den Gültigkeitsbereich: Datenbank, Tabelle oder Spalte.</p>
+          <pre>-- Datenbank-Ebene: alle Tabellen einer DB
+GRANT SELECT, INSERT ON meinedatenbank.* TO 'max'@'localhost';
+
+-- Tabellen-Ebene: nur eine bestimmte Tabelle
+GRANT UPDATE ON meinedatenbank.kunden TO 'max'@'localhost';
+
+-- Spalten-Ebene: nur bestimmte Spalten
+GRANT SELECT (name, email) ON meinedatenbank.kunden TO 'max'@'localhost';
+
+-- Änderungen aktivieren
+FLUSH PRIVILEGES;</pre>
+        </div>
+      </div>
+      <div class="ref-block">
+        <div class="ref-block-title">REVOKE – Rechte entziehen</div>
+        <div class="ref-block-body">
+          <pre>REVOKE INSERT ON meinedatenbank.* FROM 'max'@'localhost';</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="ref-section">
+      <div class="ref-heading">4 · Praxisbeispiel</div>
+      <div class="ref-block">
+        <div class="ref-block-title">Zwei Benutzer für eine Datenbank</div>
+        <div class="ref-block-body">
+          <p>Benutzer mit Lese- <em>und</em> Schreibrechten:</p>
+          <pre>CREATE USER 'redakteur'@'localhost' IDENTIFIED BY 'lesen_schreiben123';
+GRANT SELECT, INSERT, UPDATE, DELETE ON meinedatenbank.* TO 'redakteur'@'localhost';</pre>
+          <p>Benutzer mit <em>nur</em> Schreibrechten (kein SELECT):</p>
+          <pre>CREATE USER 'schreiber'@'localhost' IDENTIFIED BY 'nur_schreiben456';
+GRANT INSERT, UPDATE ON meinedatenbank.* TO 'schreiber'@'localhost';
+
+FLUSH PRIVILEGES;</pre>
+          <p>Der Benutzer <code style="font-family:var(--mono);font-size:0.85em">schreiber</code> kann Daten einfügen und ändern, aber nicht lesen — SELECT wurde bewusst nicht erteilt.</p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /view-referenz -->
+
+</main>
+
+<script>
+const TERMS = [
+  { term: "DCL", definition: "Data Control Language — der Teil von SQL, der Zugriffsrechte und Benutzerberechtigungen in einer Datenbank verwaltet.", example: "Bsp: GRANT, REVOKE und CREATE USER sind DCL-Befehle." },
+  { term: "CREATE USER", definition: "Legt einen neuen Datenbankbenutzer an. Die Identifikation erfolgt über Benutzername und Herkunfts-Host.", example: "Bsp: CREATE USER 'max'@'localhost' IDENTIFIED BY 'passwort';" },
+  { term: "GRANT", definition: "Erteilt einem Benutzer bestimmte Rechte auf einer Datenbank, Tabelle oder Spalte.", example: "Bsp: GRANT SELECT, INSERT ON shop.* TO 'max'@'localhost';" },
+  { term: "REVOKE", definition: "Entzieht einem Benutzer zuvor erteilte Rechte.", example: "Bsp: REVOKE INSERT ON shop.* FROM 'max'@'localhost';" },
+  { term: "FLUSH PRIVILEGES", definition: "Lädt die Berechtigungstabellen neu, damit Änderungen an Benutzerrechten sofort wirksam werden.", example: "Bsp: Nach GRANT oder REVOKE empfiehlt sich FLUSH PRIVILEGES;" },
+  { term: "Host", definition: "Der Netzwerk-Ursprung, von dem aus ein Benutzer sich verbinden darf. '%' erlaubt den Zugriff von jedem Host.", example: "Bsp: 'max'@'localhost' darf nur lokal verbinden; 'max'@'%' von überall." },
+  { term: "ALL PRIVILEGES", definition: "Erteilt alle verfügbaren Rechte auf einer Ebene — ausser GRANT OPTION.", example: "Bsp: GRANT ALL PRIVILEGES ON meinedatenbank.* TO 'admin'@'localhost';" },
+  { term: "GRANT OPTION", definition: "Erlaubt einem Benutzer, seine eigenen Rechte an andere Benutzer weiterzugeben.", example: "Bsp: GRANT SELECT ON db.* TO 'chef'@'localhost' WITH GRANT OPTION;" },
+  { term: "Prinzip der minimalen Rechte", definition: "Sicherheitsprinzip: Benutzer erhalten nur die Rechte, die sie für ihre Aufgabe tatsächlich benötigen — nicht mehr.", example: "Bsp: Ein Berichtsgenerator braucht nur SELECT, kein INSERT, UPDATE oder DELETE." },
+  { term: "SELECT-Recht", definition: "Erlaubt einem Benutzer, Daten aus einer Tabelle oder Datenbank zu lesen.", example: "Bsp: GRANT SELECT ON shop.produkte TO 'leser'@'localhost';" },
+  { term: "INSERT-Recht", definition: "Erlaubt einem Benutzer, neue Zeilen in eine Tabelle einzufügen.", example: "Bsp: GRANT INSERT ON shop.bestellungen TO 'app'@'localhost';" },
+  { term: "Spalten-Ebene", definition: "Rechte können auf einzelne Spalten einer Tabelle beschränkt werden, z.B. nur bestimmte Felder lesen oder ändern.", example: "Bsp: GRANT SELECT (name, email) ON db.kunden TO 'max'@'localhost';" },
+];
+
+// ── Tabs ──
+function switchTab(name, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'overview') renderOverview();
+}
+
+// ── Karteikarten ──
+let cardDeck = [...TERMS];
+let cardIndex = 0;
+let isFlipped = false;
+
+function renderCard() {
+  const t = cardDeck[cardIndex];
+  document.getElementById('card-term').textContent = t.term;
+  document.getElementById('card-def').textContent = t.definition;
+  document.getElementById('card-ex').textContent = t.example || '';
+  document.getElementById('card-counter').textContent = `${cardIndex + 1} / ${cardDeck.length}`;
+  const pct = ((cardIndex + 1) / cardDeck.length) * 100;
+  document.getElementById('card-progress').style.width = pct + '%';
+  document.getElementById('prev-btn').disabled = cardIndex === 0;
+  document.getElementById('next-btn').disabled = cardIndex === cardDeck.length - 1;
+  document.getElementById('card-scene').classList.remove('flipped');
+  isFlipped = false;
+}
+
+function flipCard() { document.getElementById('card-scene').classList.toggle('flipped'); isFlipped = !isFlipped; }
+function nextCard() { if (cardIndex < cardDeck.length - 1) { cardIndex++; renderCard(); } }
+function prevCard() { if (cardIndex > 0) { cardIndex--; renderCard(); } }
+
+function shuffleCards() {
+  for (let i = cardDeck.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [cardDeck[i], cardDeck[j]] = [cardDeck[j], cardDeck[i]];
+  }
+  cardIndex = 0;
+  renderCard();
+}
+
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('view-cards').classList.contains('active')) return;
+  if (e.key === 'ArrowRight') nextCard();
+  else if (e.key === 'ArrowLeft') prevCard();
+  else if (e.key === ' ') { e.preventDefault(); flipCard(); }
+});
+
+// ── Quiz ──
+const QUESTIONS = [
+  {
+    q: "Was bedeutet die Abkürzung DCL?",
+    opts: ["Data Control Language", "Database Configuration Layer", "Data Creation Logic", "Dynamic Command List"],
+    correct: 0, tag: "DCL"
+  },
+  {
+    q: "Welcher Befehl erteilt einem Benutzer Rechte?",
+    opts: ["GRANT", "ALLOW", "PERMIT", "SET PRIVILEGE"],
+    correct: 0, tag: "GRANT"
+  },
+  {
+    q: "Was bewirkt REVOKE?",
+    opts: ["Entzieht einem Benutzer Rechte", "Löscht einen Benutzer", "Erstellt einen neuen Benutzer", "Aktiviert Rechte neu"],
+    correct: 0, tag: "REVOKE"
+  },
+  {
+    q: "Wie identifiziert MariaDB einen Benutzer eindeutig?",
+    opts: ["Benutzername + Host", "Nur Benutzername", "Nur Passwort", "Benutzername + Passwort"],
+    correct: 0, tag: "CREATE USER"
+  },
+  {
+    q: "Was bedeutet '%' als Host?",
+    opts: ["Zugriff von jedem Host erlaubt", "Nur lokaler Zugriff", "Zugriff gesperrt", "Nur interne Netzwerke"],
+    correct: 0, tag: "Host"
+  },
+  {
+    q: "Welche Rechte erteilt ALL PRIVILEGES NICHT automatisch?",
+    opts: ["GRANT OPTION", "SELECT", "DELETE", "CREATE"],
+    correct: 0, tag: "ALL PRIVILEGES"
+  },
+  {
+    q: "Wofür steht das Prinzip der minimalen Rechte?",
+    opts: ["Benutzer bekommen nur nötige Rechte", "Alle Benutzer haben gleiche Rechte", "Admins haben keine Einschränkungen", "Rechte werden monatlich überprüft"],
+    correct: 0, tag: "Sicherheit"
+  },
+  {
+    q: "Welcher Befehl sollte nach GRANT ausgeführt werden?",
+    opts: ["FLUSH PRIVILEGES", "RELOAD USERS", "REFRESH DB", "COMMIT RIGHTS"],
+    correct: 0, tag: "FLUSH PRIVILEGES"
+  },
+  {
+    q: "Auf welcher Ebene können Rechte NICHT erteilt werden?",
+    opts: ["Zeilen-Ebene", "Datenbank-Ebene", "Tabellen-Ebene", "Spalten-Ebene"],
+    correct: 0, tag: "GRANT Ebenen"
+  },
+  {
+    q: "Was erlaubt GRANT OPTION?",
+    opts: ["Eigene Rechte an andere weitergeben", "Alle Rechte erhalten", "Passwort ändern", "Benutzer löschen"],
+    correct: 0, tag: "GRANT OPTION"
+  },
+];
+
+let quizDeck = [];
+let quizIndex = 0;
+let quizScore = 0;
+let quizAnswered = false;
+
+function startQuiz() {
+  quizDeck = [...QUESTIONS].sort(() => Math.random() - 0.5).slice(0, 10);
+  quizIndex = 0;
+  quizScore = 0;
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = quizDeck[quizIndex];
+  document.getElementById('quiz-meta').textContent = q.tag;
+  document.getElementById('quiz-question-text').textContent = q.q;
+  document.getElementById('quiz-counter').textContent = `Frage ${quizIndex + 1} / ${quizDeck.length}`;
+  document.getElementById('quiz-progress').style.width = ((quizIndex) / quizDeck.length * 100) + '%';
+  quizAnswered = false;
+
+  const shuffled = q.opts.map((o, i) => ({ o, isCorrect: i === q.correct })).sort(() => Math.random() - 0.5);
+  const grid = document.getElementById('options-grid');
+  grid.innerHTML = '';
+  shuffled.forEach(({ o, isCorrect }) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.textContent = o;
+    btn.onclick = () => answerQuestion(btn, isCorrect, shuffled, grid);
+    grid.appendChild(btn);
+  });
+
+  const fb = document.getElementById('quiz-feedback');
+  fb.className = 'quiz-feedback';
+  fb.textContent = '';
+  document.getElementById('next-q-btn').classList.remove('show');
+}
+
+function answerQuestion(btn, isCorrect, shuffled, grid) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  [...grid.children].forEach((b, i) => {
+    b.disabled = true;
+    if (shuffled[i].isCorrect) b.classList.add('correct');
+  });
+  const fb = document.getElementById('quiz-feedback');
+  if (isCorrect) {
+    quizScore++;
+    btn.classList.add('correct');
+    fb.textContent = 'Richtig!';
+    fb.className = 'quiz-feedback correct show';
+  } else {
+    btn.classList.add('wrong');
+    fb.textContent = 'Leider falsch.';
+    fb.className = 'quiz-feedback wrong show';
+  }
+  document.getElementById('next-q-btn').classList.add('show');
+}
+
+function nextQuestion() {
+  quizIndex++;
+  if (quizIndex >= quizDeck.length) {
+    showResult();
+  } else {
+    renderQuestion();
+  }
+}
+
+function showResult() {
+  document.getElementById('quiz-content').style.display = 'none';
+  document.getElementById('quiz-result').style.display = 'block';
+  const pct = Math.round((quizScore / quizDeck.length) * 100);
+  document.getElementById('result-score').textContent = pct + '%';
+  document.getElementById('result-label').textContent = `${quizScore} von ${quizDeck.length} Fragen richtig`;
+  document.getElementById('result-stars').textContent = pct >= 80 ? '★★★' : pct >= 50 ? '★★☆' : '★☆☆';
+}
+
+function restartQuiz() {
+  document.getElementById('quiz-content').style.display = 'block';
+  document.getElementById('quiz-result').style.display = 'none';
+  startQuiz();
+}
+
+// ── Übersicht ──
+function renderOverview() {
+  const grid = document.getElementById('overview-grid');
+  grid.innerHTML = '';
+  TERMS.forEach(t => {
+    const card = document.createElement('div');
+    card.className = 'overview-card';
+    card.innerHTML = `<div class="overview-term">${t.term}</div><div class="overview-def">${t.definition}</div>`;
+    grid.appendChild(card);
+  });
+}
+
+// ── Init ──
+renderCard();
+startQuiz();
+</script>
+</body>
+</html>
