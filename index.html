@@ -37,15 +37,11 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      /* Subtle paper grain */
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
     }
 
     /* ── Top rule ── */
-    .top-rule {
-      height: 3px;
-      background: var(--ink);
-    }
+    .top-rule { height: 3px; background: var(--ink); }
 
     /* ── Masthead ── */
     masthead {
@@ -87,10 +83,7 @@
       opacity: 0;
       animation: fadeUp 0.55s ease 0.2s forwards;
     }
-    h1 em {
-      font-style: italic;
-      color: var(--ink-dim);
-    }
+    h1 em { font-style: italic; color: var(--ink-dim); }
 
     .subtitle {
       font-size: 1rem;
@@ -159,28 +152,9 @@
       letter-spacing: 0.12em;
       margin-bottom: 1.25rem;
     }
-
-    .card-icon {
-      font-size: 1.6rem;
-      margin-bottom: 1rem;
-      line-height: 1;
-    }
-
-    .card-title {
-      font-family: var(--serif);
-      font-size: 1.35rem;
-      line-height: 1.2;
-      color: var(--ink);
-      margin-bottom: 0.6rem;
-    }
-
-    .card-desc {
-      font-size: 0.82rem;
-      color: var(--ink-dim);
-      line-height: 1.6;
-      flex: 1;
-      margin-bottom: 1.5rem;
-    }
+    .card-icon  { font-size: 1.6rem; margin-bottom: 1rem; line-height: 1; }
+    .card-title { font-family: var(--serif); font-size: 1.35rem; line-height: 1.2; color: var(--ink); margin-bottom: 0.6rem; }
+    .card-desc  { font-size: 0.82rem; color: var(--ink-dim); line-height: 1.6; flex: 1; margin-bottom: 1.5rem; }
 
     .card-cta {
       display: inline-flex;
@@ -197,7 +171,6 @@
     .card:hover .card-cta { gap: 0.7rem; }
     .card-cta .arrow { font-size: 0.9rem; }
 
-    /* per-card accent colours */
     .card-1 { --card-accent: var(--accent-1); }
     .card-2 { --card-accent: var(--accent-2); }
     .card-3 { --card-accent: var(--accent-3); }
@@ -205,7 +178,6 @@
     .card-5 { --card-accent: var(--accent-5); }
     .card-6 { --card-accent: var(--accent-6); }
 
-    /* new badge */
     .card-badge {
       position: absolute;
       top: 1rem;
@@ -215,7 +187,7 @@
       letter-spacing: 0.1em;
       text-transform: uppercase;
       padding: 0.2rem 0.5rem;
-      background: var(--accent-5);
+      background: var(--card-accent);
       color: white;
       border-radius: 2px;
     }
@@ -236,24 +208,9 @@
       opacity: 0;
       animation: fadeIn 0.5s ease 0.7s forwards;
     }
-    .footer-brand {
-      font-family: var(--mono);
-      font-size: 0.7rem;
-      color: var(--ink-faint);
-      letter-spacing: 0.08em;
-    }
-    .footer-rule {
-      flex: 1;
-      height: 1px;
-      background: var(--rule);
-      min-width: 40px;
-    }
-    .footer-note {
-      font-family: var(--mono);
-      font-size: 0.65rem;
-      color: var(--ink-faint);
-      letter-spacing: 0.06em;
-    }
+    .footer-brand { font-family: var(--mono); font-size: 0.7rem; color: var(--ink-faint); letter-spacing: 0.08em; }
+    .footer-rule  { flex: 1; height: 1px; background: var(--rule); min-width: 40px; }
+    .footer-note  { font-family: var(--mono); font-size: 0.65rem; color: var(--ink-faint); letter-spacing: 0.06em; }
 
     /* ── Animations ── */
     @keyframes fadeUp {
@@ -275,74 +232,87 @@
 </head>
 <body>
 
-<div class="top-rule"></div>
+<div id="app">
+  <div class="top-rule"></div>
 
-<masthead>
-  <p class="kicker">BFS · jkingma.sbw.media</p>
-  <h1>Lern<em>archiv</em></h1>
-  <p class="subtitle">Interaktive Lernmaterialien für Informatik &amp; Datenbanken — Modul 290 und mehr.</p>
-</masthead>
+  <masthead>
+    <p class="kicker">BFS · jkingma.sbw.media</p>
+    <h1>Lern<em>archiv</em></h1>
+    <p class="subtitle">Interaktive Lernmaterialien für Informatik &amp; Datenbanken — Modul 290 und mehr.</p>
+  </masthead>
 
-<hr class="rule">
+  <hr class="rule">
 
-<div class="cards">
+  <div class="cards">
+    <a
+      v-for="(card, i) in cards"
+      :key="card.href"
+      :href="card.href"
+      :class="['card', `card-${i + 1}`]"
+    >
+      <span v-if="card.badge" class="card-badge">{{ card.badge }}</span>
+      <div class="card-index">{{ String(i + 1).padStart(2, '0') }} / {{ String(cards.length).padStart(2, '0') }}</div>
+      <div class="card-icon">{{ card.icon }}</div>
+      <div class="card-title">{{ card.title }}</div>
+      <div class="card-desc">{{ card.desc }}</div>
+      <span class="card-cta">Öffnen <span class="arrow">→</span></span>
+    </a>
+  </div>
 
-  <a href="db-theorie" class="card card-1">
-    <div class="card-index">01 / 06</div>
-    <div class="card-icon">🗃</div>
-    <div class="card-title">DB Theorie</div>
-    <div class="card-desc">Karteikarten, Quiz und interaktive Tupel-Prüfung zu den Grundlagen relationaler Datenbanken.</div>
-    <span class="card-cta">Öffnen <span class="arrow">→</span></span>
-  </a>
-
-  <a href="er-designer" class="card card-2">
-    <div class="card-index">02 / 06</div>
-    <div class="card-icon">📐</div>
-    <div class="card-title">DB ER Editor</div>
-    <div class="card-desc">Visueller Entity-Relationship-Designer zum Erstellen und Analysieren von Datenbankdiagrammen.</div>
-    <span class="card-cta">Öffnen <span class="arrow">→</span></span>
-  </a>
-
-  <a href="sql-extra-vue" class="card card-3">
-    <div class="card-index">03 / 06</div>
-    <div class="card-icon">⌨︎</div>
-    <div class="card-title">Extra Aufgaben SQL</div>
-    <div class="card-desc">10 SQL-Übungsaufgaben von einfachen Abfragen bis zu komplexen Mehrfach-Join-Analysen.</div>
-    <span class="card-cta">Öffnen <span class="arrow">→</span></span>
-  </a>
-
-  <a href="er-aufgaben" class="card card-4">
-    <div class="card-index">04 / 06</div>
-    <div class="card-icon">🧩</div>
-    <div class="card-title">ER Aufgaben</div>
-    <div class="card-desc">13 praxisnahe Modellierungsaufgaben in 5 Schwierigkeitsstufen — von der einfachen Entität bis zum Flughafen-System.</div>
-    <span class="card-cta">Öffnen <span class="arrow">→</span></span>
-  </a>
-
-  <a href="chen-editor" class="card card-5">
-    <div class="card-index">05 / 06</div>
-    <div class="card-icon">◇</div>
-    <div class="card-title">Chen-Notation</div>
-    <div class="card-desc">Interaktiver Editor für Chen-ER-Diagramme — Entitäten, Attribute, Beziehungen und Kardinalitäten zeichnen.</div>
-    <span class="card-cta">Öffnen <span class="arrow">→</span></span>
-  </a>
-
-  <a href="dcl-theorie" class="card card-6">
-    <div class="card-badge">Neu</div>
-    <div class="card-index">06 / 06</div>
-    <div class="card-icon">🔐</div>
-    <div class="card-title">DCL &amp; Sicherheit</div>
-    <div class="card-desc">Karteikarten, Quiz und Referenz zu Benutzerverwaltung und Rechtevergabe mit GRANT, REVOKE und CREATE USER.</div>
-    <span class="card-cta">Öffnen <span class="arrow">→</span></span>
-  </a>
-
+  <footer>
+    <span class="footer-brand">LERN-ARCHIV</span>
+    <div class="footer-rule"></div>
+    <span class="footer-note">m290 · Datenbanken</span>
+  </footer>
 </div>
 
-<footer>
-  <span class="footer-brand">LERN-ARCHIV</span>
-  <div class="footer-rule"></div>
-  <span class="footer-note">m290 · Datenbanken</span>
-</footer>
-
+<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+<script>
+Vue.createApp({
+  data() {
+    return {
+      cards: [
+        {
+          href:  'db-theorie',
+          icon:  '🗃',
+          title: 'DB Theorie',
+          desc:  'Karteikarten, Quiz und interaktive Tupel-Prüfung zu den Grundlagen relationaler Datenbanken.',
+        },
+        {
+          href:  'dcl-theorie',
+          icon:  '🔐',
+          title: 'DCL & Sicherheit',
+          desc:  'Karteikarten, Quiz und Referenz zu Benutzerverwaltung und Rechtevergabe mit GRANT, REVOKE und CREATE USER.',
+          badge: 'Neu',
+        },
+        {
+          href:  'chen-editor',
+          icon:  '◇',
+          title: 'Chen-Notation',
+          desc:  'Interaktiver Editor für Chen-ER-Diagramme — Entitäten, Attribute, Beziehungen und Kardinalitäten zeichnen.',
+        },
+        {
+          href:  'er-designer',
+          icon:  '📐',
+          title: 'DB ER Editor',
+          desc:  'Visueller Entity-Relationship-Designer zum Erstellen und Analysieren von Datenbankdiagrammen.',
+        },
+        {
+          href:  'sql-extra-vue',
+          icon:  '⌨︎',
+          title: 'Extra Aufgaben SQL',
+          desc:  '10 SQL-Übungsaufgaben von einfachen Abfragen bis zu komplexen Mehrfach-Join-Analysen.',
+        },
+        {
+          href:  'er-aufgaben',
+          icon:  '🧩',
+          title: 'ER Aufgaben',
+          desc:  '13 praxisnahe Modellierungsaufgaben in 5 Schwierigkeitsstufen — von der einfachen Entität bis zum Flughafen-System.',
+        },
+      ],
+    };
+  },
+}).mount('#app');
+</script>
 </body>
 </html>
