@@ -433,11 +433,11 @@ Vue.createApp({
           title: 'Benutzer anlegen und Leserecht auf Datenbankebene',
           diff: 'leicht', level: 'Datenbank-Ebene',
           placeholder: '-- Benutzer anlegen und SELECT auf alle Tabellen erteilen\n',
-          desc: `Lege einen Benutzer <code>schul_leser</code> auf <code>localhost</code> mit dem Passwort <code>Lesen2025!</code> an.<br>
+          desc: `Lege einen Benutzer <code>schul_leser</code> auf <code>localhost</code> mit dem Passwort <code>Lesen2026!</code> an.<br>
 Erteile ihm <strong>Leserechte (SELECT)</strong> auf <strong>alle Tabellen</strong> der Datenbank <code>m290_lj_school</code>.`,
           hint: `Verwende <code>CREATE USER 'name'@'host' IDENTIFIED BY 'passwort'</code> und dann <code>GRANT ... ON datenbank.* TO ...</code>. Vergiss <code>FLUSH PRIVILEGES;</code> nicht.`,
           solution:
-`CREATE USER 'schul_leser'@'localhost' IDENTIFIED BY 'Lesen2025!';
+`CREATE USER 'schul_leser'@'localhost' IDENTIFIED BY 'Lesen2026!';
 GRANT SELECT ON m290_lj_school.* TO 'schul_leser'@'localhost';
 FLUSH PRIVILEGES;`,
         },
@@ -446,11 +446,11 @@ FLUSH PRIVILEGES;`,
           title: 'SELECT-Recht nur auf eine Tabelle',
           diff: 'leicht', level: 'Tabellen-Ebene',
           placeholder: '-- Benutzer anlegen und SELECT nur auf subject erteilen\n',
-          desc: `Lege einen Benutzer <code>fach_leser</code> auf <code>localhost</code> mit dem Passwort <code>Lesen2025!</code> an.<br>
+          desc: `Lege einen Benutzer <code>fach_leser</code> auf <code>localhost</code> mit dem Passwort <code>Lesen2026!</code> an.<br>
 Erteile ihm <strong>SELECT</strong> ausschliesslich auf die Tabelle <code>subject</code> — andere Tabellen soll er nicht sehen können.`,
           hint: `Bei der Tabellen-Ebene nutzt du <code>ON datenbank.tabellenname</code> statt <code>ON datenbank.*</code>.`,
           solution:
-`CREATE USER 'fach_leser'@'localhost' IDENTIFIED BY 'Lesen2025!';
+`CREATE USER 'fach_leser'@'localhost' IDENTIFIED BY 'Lesen2026!';
 GRANT SELECT ON m290_lj_school.subject TO 'fach_leser'@'localhost';
 FLUSH PRIVILEGES;`,
         },
@@ -459,11 +459,11 @@ FLUSH PRIVILEGES;`,
           title: 'Lesen, Einfügen und Ändern – kein Löschen',
           diff: 'leicht', level: 'Tabellen-Ebene',
           placeholder: '-- Benutzer mit SELECT, INSERT, UPDATE auf subject anlegen\n',
-          desc: `Lege einen Benutzer <code>fach_verwalter</code> mit dem Passwort <code>Verwalten2025!</code> an.<br>
+          desc: `Lege einen Benutzer <code>fach_verwalter</code> mit dem Passwort <code>Verwalten2026!</code> an.<br>
 Er soll in der Tabelle <code>subject</code> Datensätze <strong>lesen, einfügen und ändern</strong> können — aber <strong>nicht löschen</strong>.`,
           hint: `Du kannst mehrere Rechte kommagetrennt angeben: <code>GRANT SELECT, INSERT, UPDATE ON ...</code>`,
           solution:
-`CREATE USER 'fach_verwalter'@'localhost' IDENTIFIED BY 'Verwalten2025!';
+`CREATE USER 'fach_verwalter'@'localhost' IDENTIFIED BY 'Verwalten2026!';
 GRANT SELECT, INSERT, UPDATE ON m290_lj_school.subject TO 'fach_verwalter'@'localhost';
 FLUSH PRIVILEGES;`,
         },
@@ -472,11 +472,11 @@ FLUSH PRIVILEGES;`,
           title: 'SELECT auf einzelne Spalten (Spalten-Ebene)',
           diff: 'mittel', level: 'Spalten-Ebene',
           placeholder: '-- SELECT nur auf first_part und last_part der Tabelle teacher\n',
-          desc: `Lege einen Benutzer <code>lehrer_anzeige</code> mit dem Passwort <code>Anzeige2025!</code> an.<br>
+          desc: `Lege einen Benutzer <code>lehrer_anzeige</code> mit dem Passwort <code>Anzeige2026!</code> an.<br>
 Er darf aus der Tabelle <code>teacher</code> nur die Spalten <strong><code>first_part</code> und <code>last_part</code></strong> lesen — die <code>teacher_id</code> soll verborgen bleiben.`,
           hint: `Auf Spalten-Ebene gibst du die Spalten in Klammern direkt nach dem Privileg an: <code>GRANT SELECT (spalte1, spalte2) ON ...</code>`,
           solution:
-`CREATE USER 'lehrer_anzeige'@'localhost' IDENTIFIED BY 'Anzeige2025!';
+`CREATE USER 'lehrer_anzeige'@'localhost' IDENTIFIED BY 'Anzeige2026!';
 GRANT SELECT (first_part, last_part) ON m290_lj_school.teacher TO 'lehrer_anzeige'@'localhost';
 FLUSH PRIVILEGES;`,
         },
@@ -485,11 +485,11 @@ FLUSH PRIVILEGES;`,
           title: 'Brückentabelle verwalten',
           diff: 'mittel', level: 'Tabellen-Ebene',
           placeholder: '-- Benutzer mit INSERT und DELETE auf subject_teacher\n',
-          desc: `Lege einen Benutzer <code>zuweisung_admin</code> mit dem Passwort <code>Admin2025!</code> an.<br>
+          desc: `Lege einen Benutzer <code>zuweisung_admin</code> mit dem Passwort <code>Admin2026!</code> an.<br>
 Er soll in der Tabelle <code>subject_teacher</code> Einträge <strong>einfügen und löschen</strong> können, aber keine anderen Tabellen sehen.`,
           hint: `Achte darauf, nur <code>subject_teacher</code> zu berechtigen und <em>kein</em> <code>ON datenbank.*</code> zu verwenden.`,
           solution:
-`CREATE USER 'zuweisung_admin'@'localhost' IDENTIFIED BY 'Admin2025!';
+`CREATE USER 'zuweisung_admin'@'localhost' IDENTIFIED BY 'Admin2026!';
 GRANT INSERT, DELETE ON m290_lj_school.subject_teacher TO 'zuweisung_admin'@'localhost';
 FLUSH PRIVILEGES;`,
         },
@@ -498,11 +498,11 @@ FLUSH PRIVILEGES;`,
           title: 'Vollzugriff auf eine Tabelle',
           diff: 'mittel', level: 'Tabellen-Ebene',
           placeholder: '-- Benutzer mit ALL PRIVILEGES auf teacher anlegen\n',
-          desc: `Lege einen Benutzer <code>lehrer_admin</code> mit dem Passwort <code>LehrerAdmin2025!</code> an.<br>
+          desc: `Lege einen Benutzer <code>lehrer_admin</code> mit dem Passwort <code>LehrerAdmin2026!</code> an.<br>
 Erteile ihm <strong>alle Rechte (<code>ALL PRIVILEGES</code>)</strong> auf die Tabelle <code>teacher</code>.`,
           hint: `<code>ALL PRIVILEGES</code> erteilt alle Rechte auf der angegebenen Ebene — ausser <code>GRANT OPTION</code>.`,
           solution:
-`CREATE USER 'lehrer_admin'@'localhost' IDENTIFIED BY 'LehrerAdmin2025!';
+`CREATE USER 'lehrer_admin'@'localhost' IDENTIFIED BY 'LehrerAdmin2026!';
 GRANT ALL PRIVILEGES ON m290_lj_school.teacher TO 'lehrer_admin'@'localhost';
 FLUSH PRIVILEGES;`,
         },
@@ -523,11 +523,11 @@ FLUSH PRIVILEGES;`,
           title: 'Rechte weitergeben mit GRANT OPTION',
           diff: 'schwer', level: 'Tabellen-Ebene',
           placeholder: '-- Benutzer mit GRANT OPTION anlegen\n',
-          desc: `Lege einen Benutzer <code>fach_chef</code> mit dem Passwort <code>Chef2025!</code> an.<br>
+          desc: `Lege einen Benutzer <code>fach_chef</code> mit dem Passwort <code>Chef2026!</code> an.<br>
 Er soll <strong><code>SELECT</code> und <code>INSERT</code></strong> auf die Tabelle <code>subject</code> haben und diese Rechte <strong>auch an andere Benutzer weitergeben</strong> dürfen.`,
           hint: `Am Ende des GRANT-Befehls fügst du <code>WITH GRANT OPTION</code> hinzu.`,
           solution:
-`CREATE USER 'fach_chef'@'localhost' IDENTIFIED BY 'Chef2025!';
+`CREATE USER 'fach_chef'@'localhost' IDENTIFIED BY 'Chef2026!';
 GRANT SELECT, INSERT ON m290_lj_school.subject TO 'fach_chef'@'localhost' WITH GRANT OPTION;
 FLUSH PRIVILEGES;`,
         },
@@ -544,14 +544,14 @@ FLUSH PRIVILEGES;`,
           ],
           hint: `Für <code>sekretariat</code> brauchst du zwei separate GRANT-Befehle (einen pro Tabelle). Alle Passwörter kannst du frei wählen.`,
           solution:
-`CREATE USER 'direktion'@'localhost' IDENTIFIED BY 'Direktion2025!';
+`CREATE USER 'direktion'@'localhost' IDENTIFIED BY 'Direktion2026!';
 GRANT SELECT ON m290_lj_school.* TO 'direktion'@'localhost';
 
-CREATE USER 'sekretariat'@'localhost' IDENTIFIED BY 'Sekretariat2025!';
+CREATE USER 'sekretariat'@'localhost' IDENTIFIED BY 'Sekretariat2026!';
 GRANT SELECT, UPDATE ON m290_lj_school.subject TO 'sekretariat'@'localhost';
 GRANT SELECT, UPDATE ON m290_lj_school.teacher TO 'sekretariat'@'localhost';
 
-CREATE USER 'it_support'@'localhost' IDENTIFIED BY 'Support2025!';
+CREATE USER 'it_support'@'localhost' IDENTIFIED BY 'Support2026!';
 GRANT ALL PRIVILEGES ON m290_lj_school.* TO 'it_support'@'localhost';
 
 FLUSH PRIVILEGES;`,
@@ -569,11 +569,11 @@ FLUSH PRIVILEGES;`,
           desc2: true,
           hint: `Für <code>bericht_leser</code> benötigst du zwei GRANT-Befehle: einen auf Spalten-Ebene (teacher) und einen auf Tabellen-Ebene (subject). Am Ende: <code>REVOKE DELETE ON ... subject FROM 'daten_pfleger'...</code>`,
           solution:
-`CREATE USER 'bericht_leser'@'localhost' IDENTIFIED BY 'Bericht2025!';
+`CREATE USER 'bericht_leser'@'localhost' IDENTIFIED BY 'Bericht2026!';
 GRANT SELECT (first_part, last_part) ON m290_lj_school.teacher TO 'bericht_leser'@'localhost';
 GRANT SELECT ON m290_lj_school.subject TO 'bericht_leser'@'localhost';
 
-CREATE USER 'daten_pfleger'@'localhost' IDENTIFIED BY 'Pfleger2025!';
+CREATE USER 'daten_pfleger'@'localhost' IDENTIFIED BY 'Pfleger2026!';
 GRANT SELECT, INSERT, UPDATE, DELETE ON m290_lj_school.subject TO 'daten_pfleger'@'localhost';
 GRANT SELECT, INSERT, UPDATE, DELETE ON m290_lj_school.subject_teacher TO 'daten_pfleger'@'localhost';
 GRANT SELECT ON m290_lj_school.teacher TO 'daten_pfleger'@'localhost';
